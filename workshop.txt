@@ -1,0 +1,6 @@
+version=1
+title=The Last of Us Infected - Overhaul
+description=[video mp4=https://i.imgur.com/dAvvzEL.mp4][/video]
+
+tags=Build 41;Balance;Clothing/Armor;Hardmode;Items;Misc;Models;Realistic;Textures
+visibility=public
