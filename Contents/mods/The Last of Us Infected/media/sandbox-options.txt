@@ -14,8 +14,8 @@ option TLOUZombies.Runner
 {
 	type = double,
 	min = 0.00,
-	max = 100.00,
-	default = 58,
+	max = 1000.00,
+	default = 580,
 	page = TLOU_Zombies,
 	translation = TLOU_Runner,
 }
@@ -24,8 +24,8 @@ option TLOUZombies.Stalker
 {
 	type = double,
 	min = 0.00,
-	max = 100.00,
-	default = 9.00,
+	max = 1000.00,
+	default = 90.00,
 	page = TLOU_Zombies,
 	translation = TLOU_Stalker,
 }
@@ -34,8 +34,8 @@ option TLOUZombies.Clicker
 {
 	type = double,
 	min = 0.00,
-	max = 100.00,
-	default = 32.00,
+	max = 1000.00,
+	default = 320.00,
 	page = TLOU_Zombies,
 	translation = TLOU_Clicker,
 }
@@ -44,8 +44,8 @@ option TLOUZombies.Bloater
 {
 	type = double,
 	min = 0.00,
-	max = 100.00,
-	default = 1.00,
+	max = 1000.00,
+	default = 10.00,
 	page = TLOU_Zombies,
 	translation = TLOU_Bloater,
 }

@@ -1,0 +1,7 @@
+IGUI_EN = {
+    -- infected types names
+	IGUI_TLOU_Runner = "Runner",
+    IGUI_TLOU_Stalker = "Stalker",
+    IGUI_TLOU_Clicker = "Clicker",
+    IGUI_TLOU_Bloater = "Bloater",
+}

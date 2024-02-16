@@ -22,8 +22,49 @@ local TLOU_infected = {}
 ZomboidForge.InitTLOUInfected = function()
     table.insert(ZomboidForge.ZTypes,
         {
-            chance = SandboxVars.TLOUZombies.Clicker * Math.max(0, Math.min(1, (EvoDays - SandboxVars.TLOUZombies.ClickerStart) / (SandboxVars.TLOUZombies.ClickerEnd - SandboxVars.TLOUZombies.ClickerStart))),
-			name = "IGUI_TLOU_Clicker",
+            name = "Stalker",
+            onZombieUpdate = {"myfunction"},
+        }
+    )
+    table.insert(ZomboidForge.ZTypes,
+        {
+            name = "Clicker",
+            onZombieUpdate = {"myfunction"},
+        }
+    )
+
+    --[[
+    table.insert(ZomboidForge.ZTypes,
+        {
+            name = "IGUI_TLOU_Runner",
+            chance = SandboxVars.TLOUZombies.Runner,
+			walktype = 2,
+			strength = 1,
+			toughness = 1,
+			cognition = 3,
+			memory = 2,
+			sight = 3,
+			hearing = SandboxVars.TLOUZombies.RunnerHearing,
+			HP = SandboxVars.TLOUZombies.RunnerHealth,
+
+			keepstand = true,
+			isClicker = true,
+			isBloater = false,
+			hideIndoors = true,
+
+			color = {218, 109, 0,},
+			outline = {0, 0, 0,},
+
+			funcattack = {"RunnerAttack"},
+			funconhit = {"RunnerHit"},
+
+            onZombieUpdate = {"myfunction"},
+        }
+    )
+    table.insert(ZomboidForge.ZTypes,
+        {
+            name = "IGUI_TLOU_Clicker",
+            chance = SandboxVars.TLOUZombies.Clicker,
 			walktype = 2,
 			strength = 1,
 			toughness = 1,
@@ -47,25 +88,7 @@ ZomboidForge.InitTLOUInfected = function()
             onZombieUpdate = {"myfunction"},
         }
     )
-    table.insert(ZomboidForge.ZTypes,
-        {
-            name = "Stalker",
-            onZombieUpdate = {"myfunction"},
-        }
-    )
-    table.insert(ZomboidForge.ZTypes,
-        {
-            name = "Clicker",
-            onZombieUpdate = {"myfunction"},
-        }
-    )
-    table.insert(ZomboidForge.ZTypes,
-        {
-            name = "Bloater",
-            onZombieUpdate = {"myfunction"},
-        }
-    )
-
+    ]]
 end
 
 ZomboidForge.myfunction = function()
