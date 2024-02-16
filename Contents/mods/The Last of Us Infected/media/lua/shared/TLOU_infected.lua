@@ -12,6 +12,8 @@ This file defines the core of the mod of The Last of Us Infected Fork
 ]]--
 --[[ ================================================ ]]--
 
+
+print("load TLOU_infected")
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge"
 
@@ -20,6 +22,8 @@ local TLOU_infected = {}
 
 --- Create zombie type
 ZomboidForge.InitTLOUInfected = function()
+    print("insert in table TLOU")
+    --[[
     table.insert(ZomboidForge.ZTypes,
         {
             name = "Stalker",
@@ -32,8 +36,8 @@ ZomboidForge.InitTLOUInfected = function()
             onZombieUpdate = {"myfunction"},
         }
     )
-
-    --[[
+    ]]
+    
     table.insert(ZomboidForge.ZTypes,
         {
             name = "IGUI_TLOU_Runner",
@@ -88,11 +92,11 @@ ZomboidForge.InitTLOUInfected = function()
             onZombieUpdate = {"myfunction"},
         }
     )
-    ]]
 end
 
 ZomboidForge.myfunction = function()
-    print("hello")
+    --print("hello")
 end
 
 Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)
+--Events.OnGameBoot.Add(ZomboidForge.InitTLOUInfected)
