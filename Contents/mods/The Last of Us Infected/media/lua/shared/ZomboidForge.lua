@@ -28,10 +28,13 @@ ZomboidForge.ShowNametag = {}
 ZomboidForge.OnLoad = function()
     ZomboidForge.TotalZTypes = #ZomboidForge.ZTypes
 
-
     ZomboidForge.TotalChance = 0
     for i = 1,ZomboidForge.TotalZTypes do
-        ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZomboidForge.ZTypes[i].chance
+        ZombieTable = ZomboidForge.ZTypes[i]
+        if not ZombieTable.spawn then
+            ZombieTable.chance = 0
+        end
+        ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZombieTable.chance
     end
 end
 
@@ -46,15 +49,24 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
         rand = rand - ZomboidForge.ZTypes[i].chance
         if rand <= 0 then
             zombie:getModData()['ZType'] = i
-            
-            print("setting name")
-            local name = ZomboidForge.ZTypes[i].name
-            print(name)
             break
         end
     end
 
     local ZType = zombie:getModData()['ZType']
+
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
+
+    -- become reanimated zombie
+    if ZombieTable.reanimatedPlayer and not zombie:isReanimatedPlayer() then
+        zombie:setReanimatedPlayer(true)
+    end
+
+    -- set zombie age
+    if zombie:getAge() > -1 then	
+		-- TLOU_updateZombieClothing(zombie,ZType)
+		zombie:setAge(-1)
+	end
 
     -- update stats
     ZomboidForge.SetZombieStats(zombie,ZType)
@@ -63,7 +75,8 @@ end
 --- Initialize a zombie type
 ZomboidForge.SetZombieStats = function(zombie,ZType)
     local ZombieTable = ZomboidForge.ZTypes[ZType]
-    local TLOU = ModData.getOrCreate("CZ")
+
+    -- set walktype
     if ZombieTable.walktype and ZombieTable.walktype ~= 4 then
         getSandboxOptions():set("ZombieLore.Speed", ZombieTable.walktype)
         if zombie:isCrawling() then
@@ -82,12 +95,18 @@ ZomboidForge.SetZombieStats = function(zombie,ZType)
         end
     end
 
+    -- visual look
     if ZombieTable.skeleton and not zombie:isSkeleton() then
         zombie:setSkeleton(true)
+    end
+    if ZombieTable.hair then
         zombie:getHumanVisual():setHairModel("")
+    end
+    if ZombieTable.beard then
         zombie:getHumanVisual():setBeardModel("")
     end
 
+    -- stats
     if ZombieTable.strength then
         getSandboxOptions():set("ZombieLore.Strength",ZombieTable.strength)
     end
@@ -112,6 +131,14 @@ ZomboidForge.SetZombieStats = function(zombie,ZType)
     if ZombieTable.noteeth then
         zombie:setNoTeeth(ZombieTable.noteeth)
     end
+    if ZombieTable.HP then
+        zombie:setHealth(ZombieTable.HP)
+    end
+
+    -- refresh stats
+    zombie:makeInactive(true)
+    zombie:makeInactive(false)
+    zombie:DoZombieStats()
 end
 
 --- Main function:
@@ -120,36 +147,45 @@ ZomboidForge.ZombieUpdate = function(zombie)
 
     local ZType = zombie:getModData()['ZType']
     -- initialize zombie type
-    if zombie:getModData()['ZType'] == nil then
+    if not ZType then
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
 
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
-    -- run onZombieUpdate functions for this ZType
-    for i = 1,#ZombieTable.onZombieUpdate do
-        local ZombieTable = ZomboidForge.ZTypes[i]
-        ZomboidForge[ZombieTable.onZombieUpdate[i]]()
+    -- set zombie clothing, very limited
+    if #ZombieTable.outfit > 0 then
+        ZomboidForge.ZombieOutfit(zombie,ZType)
+    end
+
+    -- run custom behavior functions for this zombie
+    for i = 1,#ZombieTable.customBehavior do
+        ZomboidForge[ZombieTable.customBehavior[i]](zombie,ZType)
     end
 
     -- zombie attack
     if zombie:isAttacking() then
-        local player = zombie:getTarget()
-        if player and player:isCharacter() then
-            ZomboidForge.ShowZombieName(player, zombie,ZType)
-            if ZombieTable.funcattack then
-                for i=1,#ZombieTable.funcattack do
-                    ZomboidForge[ZombieTable.funcattack[i]](player,zombie,ZType)
-                end
-            end
-        end
+        ZomboidForge.ZombieAttack(zombie,ZType)
     end
 end
 
 Events.OnZombieUpdate.Add(ZomboidForge.ZombieUpdate)
 
---- player attacking zombie
+--- zombie attacking player, trigger funcattack
+ZomboidForge.ZombieAttack = function(zombie,ZType)
+    local player = zombie:getTarget()
+    if player and player:isCharacter() then
+        ZomboidForge.ShowZombieName(player, zombie,ZType)
+        if ZombieTable.funcattack then
+            for i=1,#ZombieTable.funcattack do
+                ZomboidForge[ZombieTable.funcattack[i]](player,zombie,ZType)
+            end
+        end
+    end
+end
+
+--- player attacking zombie, trigger funconhit
 ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
     if victim:isZombie() then
         local ZType = victim:getModData()['ZType']
@@ -171,6 +207,44 @@ end
 Events.OnWeaponHitCharacter.Add(ZomboidForge.OnHit)
 
 --- Tools
+
+-- check outfit
+ZomboidForge.ZombieOutfit = function(zombie,ZType)
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
+    local outfits = ZombieTable.outfit; if not outfits then return end
+    local sizeOutfits = #ZombieTable.outfit
+    local currentOutfit = zombie:getOutfitName()
+
+    local outfitCheck = false
+    --[[
+    for i = 1,sizeOutfits do
+        if currentOutfit == outfits[i] then
+            outfitCheck = true
+            break
+        end
+    end
+    ]]
+    if not outfitCheck then
+        local rand = ZombRand(1,sizeOutfits)
+        zombie:dressInNamedOutfit(outfits[rand])
+	    zombie:reloadOutfit()
+        --ZomboidForge.SetZombieOutfit(zombie,ZType)
+    end
+end
+
+--[[
+-- set outfit
+ZomboidForge.SetZombieOutfit = function(zombie,ZType)
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
+    local outfits = ZombieTable.outfit; if not outfits then return end
+    local sizeOutfits = #ZombieTable.outfit
+
+    local rand = ZombRand(1,sizeOutfits)
+    zombie:dressInNamedOutfit(outfits[rand])
+	zombie:reloadOutfit()
+end
+]]
+
 -- get Zombie ID
 ZomboidForge.GetZombieID = function(zombie)
 	if zombie and zombie:isZombie() then
@@ -262,7 +336,6 @@ Events.OnPlayerUpdate.Add(ZomboidForge.GetZombieOnPlayerMouse)
 
 -- show zombie Nametag
 ZomboidForge.UpdateNametag = function()
-        
     local TLOU=ModData.getOrCreate("CZ")
 	for ZID,ZData in pairs(ZomboidForge.ShowNametag) do
 		local zombie = ZData[1]

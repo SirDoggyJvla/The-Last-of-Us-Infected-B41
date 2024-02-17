@@ -25,14 +25,20 @@ local ZomboidForge = require "ZomboidForge"
 --- setup local functions
 local TLOU_infected = {}
 
---- Create zombie type
+--- Create zombie types
 ZomboidForge.InitTLOUInfected = function()
-    -- Runner
+    -- RUNNER
     table.insert(ZomboidForge.ZTypes,
         {
             -- base informations
+            spawn = true,
             name = "IGUI_TLOU_Runner",
             chance = SandboxVars.TLOUZombies.Runner,
+			outfit = {},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = false, -- input string
+			beard = false, -- input string
 
             -- stats
 			walktype = 1,
@@ -43,6 +49,9 @@ ZomboidForge.InitTLOUInfected = function()
 			sight = SandboxVars.TLOUZombies.RunnerVision,
 			hearing = SandboxVars.TLOUZombies.RunnerHearing,
 			HP = 1,
+
+			noteeth = false,
+			transmission = false, -- probably requires a number
 
             -- custom variables
 			keepstand = true,
@@ -59,16 +68,22 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {},
 
             -- custom behavior
-            onZombieUpdate = {},
+            customBehavior = {},
         }
     )
 
-    -- Stalker
+    -- STALKER
     table.insert(ZomboidForge.ZTypes,
         {
             -- base informations
+            spawn = true,
             name = "IGUI_TLOU_Stalker",
             chance = SandboxVars.TLOUZombies.Stalker,
+			outfit = {},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = false, -- input string
+			beard = false, -- input string
 
             -- stats
 			walktype = 1,
@@ -79,6 +94,9 @@ ZomboidForge.InitTLOUInfected = function()
 			sight = SandboxVars.TLOUZombies.StalkerVision,
 			hearing = SandboxVars.TLOUZombies.StalkerHearing,
 			HP = 1,
+
+			noteeth = false,
+			transmission = false, -- probably requires a number
 
             -- custom variables
 			keepstand = true,
@@ -95,16 +113,22 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {},
 
             -- custom behavior
-            onZombieUpdate = {},
+            customBehavior = {},
         }
     )
 
-    -- Clicker
+    -- CLICKER
     table.insert(ZomboidForge.ZTypes,
         {
             -- base informations
+            spawn = true,
             name = "IGUI_TLOU_Clicker",
             chance = SandboxVars.TLOUZombies.Clicker,
+			outfit = {},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = false, -- input string
+			beard = false, -- input string
 
             -- stats
 			walktype = 2,
@@ -115,6 +139,9 @@ ZomboidForge.InitTLOUInfected = function()
 			sight = 3,
 			hearing = SandboxVars.TLOUZombies.ClickerHearing,
 			HP = SandboxVars.TLOUZombies.ClickerHealth,
+
+			noteeth = false,
+			transmission = false, -- probably requires a number
 
             -- custom variables
 			keepstand = true,
@@ -131,16 +158,22 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {"ClickerHit"},
 
             -- custom behavior
-            onZombieUpdate = {},
+            customBehavior = {"SetClickerClothing"},
         }
     )
 
-    -- Bloater
+    -- BLOATER
     table.insert(ZomboidForge.ZTypes,
         {
             -- base informations
+            spawn = true,
             name = "IGUI_TLOU_Bloater",
             chance = SandboxVars.TLOUZombies.Bloater,
+			outfit = {"Bloater"},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = false, -- input string
+			beard = false, -- input string
 
             -- stats
 			walktype = 2,
@@ -151,6 +184,9 @@ ZomboidForge.InitTLOUInfected = function()
 			sight = 3,
 			hearing = SandboxVars.TLOUZombies.BloaterHearing,
 			HP = SandboxVars.TLOUZombies.BloaterHealth,
+
+			noteeth = false,
+			transmission = false, -- probably requires a numbers
 
             -- custom variables
 			keepstand = true,
@@ -167,12 +203,13 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {"BloaterHit"},
 
             -- custom behavior
-            onZombieUpdate = {},
+            customBehavior = {},
         }
     )
 end
 
---- Behavior functions
+--- Attack functions
+
 -- clicker attacks a player
 function ZomboidForge.ClickerAttack(player,zombie)
 	if player and player:isAlive() then
@@ -238,3 +275,88 @@ end
 
 Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)
 --Events.OnGameBoot.Add(ZomboidForge.InitTLOUInfected)
+
+--- Custom behavior
+
+-- clothing priority to replace
+local clothingPriority = {
+	["Hat"] = 1,
+	["Mask"] = 2,
+	["Eyes"] = 3,
+	["LeftEye"] = 4,
+	["RightEye"] = 5,
+	["Nose"] = 6,
+	["BellyButton"] = 7,
+	["Right_MiddleFinge"] = 8,
+	["Left_MiddleFinger"] = 9,
+	["Right_RingFinger"] = 10,
+	["Left_RingFinger"] = 11,
+	["Ears"] = 12,
+	["EarTop"] = 13,
+	["Necklace"] = 14,
+	["Necklace_Long"] = 15,
+	["UnderwearTop"] = 16,
+	["UnderwearBottom"] = 17,
+	["UnderwearExtra1"] = 18,
+	["UnderwearExtra2"] = 19,
+	["Underwear"] = 20,
+	["Socks"] = 21,
+	["RightWrist"] = 22,
+	["LeftWrist"] = 23,
+	["Tail"] = 24,
+
+	["Hands"] = 25,
+	["Belt"] = 26,
+	["BeltExtra"] = 27,
+	["AmmoStrap"] = 28,
+	["Scarf"] = 29,
+	["Neck"] = 30,
+	["TorsoExtra"] = 31,
+	["TankTop"] = 32,
+	["Tshirt"] = 33,
+	["ShortSleeveShirt"] = 34,
+	["Shirt"] = 35,
+	["Sweater"] = 36,
+	["TorsoExtraVest"] = 37,
+	["Pants"] = 38,
+	["Skirt"] = 39,
+	["Torso1Legs1"] = 40,
+	["Legs1"] = 41,
+	["Shoes"] = 42,
+	["Jacket"] = 43,
+}
+
+-- set clicker clothing by visually replacing one of its clothing
+function ZomboidForge.SetClickerClothing(zombie,ZType)
+	--if not zombie:getModData()['ClickerClothing'] then
+		-- get zombie visual clothing
+		local visual = zombie:getItemVisuals()
+		-- scroll through every clothing and replace it
+		if visual:size() > 0 then
+			local hasHat_Fungi = false
+			local priority = 100
+			local itemReset = nil
+			for i = 1, visual:size()-1 do
+				local item = visual:get(i)
+				if not item then
+					break
+				end
+				local bodyLocation = item:getScriptItem():getBodyLocation()
+				local priorityTest = clothingPriority[bodyLocation]
+				if item:getItemType() == "Base.Hat_Fungi" then
+					hasHat_Fungi = true
+					break
+				elseif priorityTest and priorityTest < priority then
+					-- if not, then add one to the item
+					priority = priorityTest
+					itemReset = item
+				end
+			end
+			if not hasHat_Fungi and itemReset then
+				itemReset:setItemType("Base.Hat_Fungi")
+				zombie:resetModel()
+			end
+		end
+		zombie:getModData()['ClickerClothing'] = true
+	--end
+end
