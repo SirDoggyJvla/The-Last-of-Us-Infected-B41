@@ -4,4 +4,22 @@ IGUI_EN = {
     IGUI_TLOU_Stalker = "Stalker",
     IGUI_TLOU_Clicker = "Clicker",
     IGUI_TLOU_Bloater = "Bloater",
+
+    -- mod options
+    IGUI_TLOU_NameTag= "Show Zombie Type",
+	IGUI_TLOU_NameTag_Tooltip= "Show the type of zombie that the player is aiming at",
+	IGUI_TLOU_TextHeight = "NameTag Height"
+	IGUI_TLOU_TextHeight1 = "Overhead"
+	IGUI_TLOU_TextHeight2 = "On Body"
+	IGUI_TLOU_TextHeight3 = "Underfoot"
+	IGUI_TLOU_TextHeight_Tooltip= "Set the height of Zombies' NameTag",
+	IGUI_TLOU_HeightOffset = "Height Offset"
+	IGUI_TLOU_HeightOffset1 = "3↑"
+	IGUI_TLOU_HeightOffset2 = "2↑"
+	IGUI_TLOU_HeightOffset3 = "1↑"
+	IGUI_TLOU_HeightOffset4 = "0"
+	IGUI_TLOU_HeightOffset5 = "1↓"
+	IGUI_TLOU_HeightOffset6 = "2↓"
+	IGUI_TLOU_HeightOffset7 = "3↓"
+	IGUI_TLOU_HeightOffset_Tooltip= "Set the position of Zombies' NameTag precisely",
 }
