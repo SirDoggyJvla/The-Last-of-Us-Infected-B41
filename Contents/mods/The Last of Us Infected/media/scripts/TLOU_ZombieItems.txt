@@ -1,0 +1,8 @@
+module TLOU
+{
+    item Player_Corpse
+    {
+        Type = Normal,
+        Weight = 0,
+    }
+}

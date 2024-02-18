@@ -227,13 +227,3 @@ option TLOUZombies.BloaterHealth
 	page = TLOU_Zombies,
 	translation = TLOU_BloaterHP,
 }
-
-
-
-option ZomboidForge.nametags
-{
-	type = boolean,
-	default = true,
-	page = ZomboidForge,
-	translation = ZomboidForge_nametags,
-}

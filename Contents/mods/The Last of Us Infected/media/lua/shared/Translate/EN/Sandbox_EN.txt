@@ -64,24 +64,21 @@ Sandbox_EN = {
 	Sandbox_TLOU_BloaterHP = "Bloater health multiplier",
 	Sandbox_TLOU_BloaterHP_tooltip = "Multiplies the health of bloaters. Old value was 50, which took around 12 shotgun blasts to kill."
 
-	Sandbox_TLOU_CordycepsSpawn = "Allow cordyceps item in killed infected inventory ?"
+
+
+
+	Sandbox_TLOU_CordycepsSpawn = "[Overhaul] Allow cordyceps item in killed infected inventory ?"
 	Sandbox_TLOU_CordycepsSpawn_tooltip = "Cordyceps items that usually spawn in corpses in Spore Zones added by Braven will be able to spawn in killed infected. Only works if Cordyceps Spore Zone by Braven is installed."
 
-	Sandbox_TLOU_CordycepsSpawnRate_Runner = "Cordyceps drop chance for Runners [in %]"
+	Sandbox_TLOU_CordycepsSpawnRate_Runner = "[Overhaul] Cordyceps drop chance for Runners [in %]"
 	Sandbox_TLOU_CordycepsSpawnRate_Runner_tooltip = "If cordyceps items are allowed to spawn, chose the droprate of it in percentage for Runners."
 
-	Sandbox_TLOU_CordycepsSpawnRate_Stalker = "Cordyceps drop chance for Stalkers [in %]"
+	Sandbox_TLOU_CordycepsSpawnRate_Stalker = "[Overhaul] Cordyceps drop chance for Stalkers [in %]"
 	Sandbox_TLOU_CordycepsSpawnRate_Stalker_tooltip = "If cordyceps items are allowed to spawn, chose the droprate of it in percentage for Stalkers."
 
-	Sandbox_TLOU_CordycepsSpawnRate_Clicker = "Cordyceps drop chance for Clickers [in %]"
+	Sandbox_TLOU_CordycepsSpawnRate_Clicker = "[Overhaul] Cordyceps drop chance for Clickers [in %]"
 	Sandbox_TLOU_CordycepsSpawnRate_Clicker_tooltip = "If cordyceps items are allowed to spawn, chose the droprate of it in percentage for Clickers."
 
-	Sandbox_TLOU_CordycepsSpawnRate_Bloater = "Cordyceps drop chance for Bloaters [in %]"
+	Sandbox_TLOU_CordycepsSpawnRate_Bloater = "[Overhaul] Cordyceps drop chance for Bloaters [in %]"
 	Sandbox_TLOU_CordycepsSpawnRate_Bloater_tooltip = "If cordyceps items are allowed to spawn, chose the droprate of it in percentage for Bloaters."
-
-
-
-	Sandbox_ZomboidForge = "Zomboid Forge",
-	Sandbox_ZomboidForge_nametags = "Allow zombie nametags ?"
-	Sandbox_ZomboidForge_nametags_tooltip = "Toggling this ON will allow players to have the nametags of the various zombies. If toggled OFF, no one can see the nametags."
 }

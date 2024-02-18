@@ -36,12 +36,6 @@ ZomboidForge.OnLoad = function()
         end
         ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZombieTable.chance
     end
-
-    --[[
-    if SandboxVars.ZomboidForge.nametags then
-        Events.OnTick.Add(ZomboidForge.UpdateNametag)
-    end
-    ]]
 end
 
 Events.OnLoad.Add(ZomboidForge.OnLoad)
@@ -150,7 +144,7 @@ end
 --- Main function:
 -- meant to do every actions of a zombie
 ZomboidForge.ZombieUpdate = function(zombie)
-    print("zombie update")
+
     local ZType = zombie:getModData()['ZType']
     -- initialize zombie type
     if not ZType then
@@ -166,8 +160,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
     end
 
     -- run custom behavior functions for this zombie
-    print(ZombieTable.name)
-    print(#ZombieTable.customBehavior)
     for i = 1,#ZombieTable.customBehavior do
         ZomboidForge[ZombieTable.customBehavior[i]](zombie,ZType)
     end
@@ -213,26 +205,6 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
 end
 
 Events.OnWeaponHitCharacter.Add(ZomboidForge.OnHit)
-
---- OnDeath functions
-ZomboidForge.OnDeath = function(zombie)
-    local ZType = zombie:getModData()['ZType']
-    -- initialize zombie type
-    -- only a security for mods that insta-kill zombies on spawn
-    if not ZType then
-        ZomboidForge.ZombieInitiliaze(zombie)
-        return
-    end
-
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-    -- run custom behavior functions for this zombie
-    for i = 1,#ZombieTable.onDeath do
-        ZomboidForge[ZombieTable.onDeath[i]](zombie,ZType)
-    end
-end
-
-Events.OnZombieDead.Add(ZomboidForge.OnDeath)
 
 --- Tools
 
@@ -397,5 +369,7 @@ ZomboidForge.UpdateNametag = function()
 		end
 	end
 end
+
+Events.OnTick.Add(ZomboidForge.UpdateNametag)
 
 return ZomboidForge
