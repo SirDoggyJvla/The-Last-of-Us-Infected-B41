@@ -209,7 +209,7 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
 
     --player was just hit, not zombie
     --elseif victim:isPlayer() then
-    end	
+    end
 end
 
 Events.OnWeaponHitCharacter.Add(ZomboidForge.OnHit)
@@ -296,7 +296,6 @@ ZomboidForge.ShowZombieName = function(player,zombie,ZType)
 			ZomboidForge.ShowNametag[ZomboidForge.GetZombieID(zombie)] = {zombie,100}
 		end
     end
-
 end
 
 -- get nametag zombie 

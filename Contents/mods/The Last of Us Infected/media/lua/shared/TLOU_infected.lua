@@ -18,7 +18,6 @@ local ipairs = ipairs -- ipair function
 local ZombRand = ZombRand -- java random function
 local print = print -- print function
 
-print("load TLOU_infected")
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge"
 
