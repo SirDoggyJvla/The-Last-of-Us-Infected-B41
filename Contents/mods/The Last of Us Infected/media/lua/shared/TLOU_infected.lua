@@ -27,6 +27,13 @@ local TLOU_infected = {}
 
 --- Create zombie types
 ZomboidForge.InitTLOUInfected = function()
+	TLOU_infected.lootchance = {
+		runner = SandboxVars.TLOU_Overhaul.CordycepsSpawnRate_Runner,
+		stalker = SandboxVars.TLOU_Overhaul.CordycepsSpawnRate_Stalker,
+		clicker = SandboxVars.TLOU_Overhaul.CordycepsSpawnRate_Clicker,
+		bloater = SandboxVars.TLOU_Overhaul.CordycepsSpawnRate_Bloater,
+	}
+
     -- RUNNER
     table.insert(ZomboidForge.ZTypes,
         {
@@ -54,10 +61,7 @@ ZomboidForge.InitTLOUInfected = function()
 			transmission = false, -- probably requires a number
 
             -- custom variables
-			keepstand = true,
-			isClicker = true,
-			isBloater = false,
-			hideIndoors = true,
+			isRunner = true,
 
             -- UI
 			color = {122, 243, 0,},
@@ -68,7 +72,12 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {},
 
             -- custom behavior
-            customBehavior = {},
+			onDeath = {
+				"OnInfectedDeath",
+			},
+            customBehavior = {
+				"SetRunnerSounds",
+			},
         }
     )
 
@@ -99,10 +108,7 @@ ZomboidForge.InitTLOUInfected = function()
 			transmission = false, -- probably requires a number
 
             -- custom variables
-			keepstand = true,
-			isClicker = true,
-			isBloater = false,
-			hideIndoors = true,
+			isStalker = true,
 
             -- UI
 			color = {230, 230, 0,},
@@ -113,7 +119,12 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {},
 
             -- custom behavior
-            customBehavior = {},
+			onDeath = {
+				"OnInfectedDeath",
+			},
+            customBehavior = {
+				"SetStalkerSounds",
+			},
         }
     )
 
@@ -144,10 +155,7 @@ ZomboidForge.InitTLOUInfected = function()
 			transmission = false, -- probably requires a number
 
             -- custom variables
-			keepstand = true,
 			isClicker = true,
-			isBloater = false,
-			hideIndoors = true,
 
             -- UI
 			color = {218, 109, 0,},
@@ -158,7 +166,14 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {"ClickerHit"},
 
             -- custom behavior
-            customBehavior = {"SetClickerClothing"},
+			onDeath = {
+				"OnClickerDeath",
+				"OnInfectedDeath",
+			},
+            customBehavior = {
+				"SetClickerClothing",
+				"SetClickerSounds",
+			},
         }
     )
 
@@ -189,10 +204,7 @@ ZomboidForge.InitTLOUInfected = function()
 			transmission = false, -- probably requires a numbers
 
             -- custom variables
-			keepstand = true,
-			isClicker = false,
 			isBloater = true,
-			hideIndoors = true,
 
             -- UI
 			color = {205, 0, 0,},
@@ -203,7 +215,12 @@ ZomboidForge.InitTLOUInfected = function()
 			funconhit = {"BloaterHit"},
 
             -- custom behavior
-            customBehavior = {},
+			onDeath = {
+				"OnInfectedDeath",
+			},
+            customBehavior = {
+				"SetBloaterSounds",
+			},
         }
     )
 end
@@ -277,6 +294,89 @@ Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)
 --Events.OnGameBoot.Add(ZomboidForge.InitTLOUInfected)
 
 --- Custom behavior
+
+-- onDeath of a clicker
+ZomboidForge.OnClickerDeath = function(zombie,ZType)
+	-- add fungi hat food type to inventory
+	local inventory = zombie:getInventory()
+	inventory:AddItems("Hat_Fungi_Loot",1)
+end
+
+-- add cordyceps mushrooms
+ZomboidForge.OnInfectedDeath = function(zombie,ZType)
+	-- add fungi hat food type to inventory
+	local inventory = zombie:getInventory()
+	local ZombieTable = ZomboidForge.ZTypes[ZType]
+
+	-- roll to inventory
+	local rand = ZombRand(1,100)
+	local lootchance = TLOU_infected.lootchance
+	if ZombieTable.isRunner and lootchance.runner >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(1,3))
+	elseif ZombieTable.isStalker and lootchance.stalker >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(1,5))
+	elseif ZombieTable.isClicker and lootchance.clicker >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(3,10))
+	elseif ZombieTable.isBloater and lootchance.bloater >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(5,15))
+	end
+end
+
+-- set runner sounds
+ZomboidForge.SetRunnerSounds = function(zombie,ZType)
+	if zombie:getAge() == -1 then
+		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+			zombie:setAge(-2)
+			if zombie:isFemale() then
+				zombie:getEmitter():playVocals("Zombie/Voice/FemaleA")
+			else 
+				zombie:getEmitter():playVocals("Zombie/Voice/MaleA")
+			end
+			zombie:makeInactive(true);
+			zombie:makeInactive(false);
+		end
+	end
+end
+
+-- set stalker sounds
+ZomboidForge.SetStalkerSounds = function(zombie,ZType)
+	if zombie:getAge() == -1 then
+		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+			zombie:setAge(-2)
+			if zombie:isFemale() then
+				zombie:getEmitter():playVocals("Zombie/Voice/FemaleB")
+			else
+				zombie:getEmitter():playVocals("Zombie/Voice/MaleB")
+			end
+			zombie:makeInactive(true);
+			zombie:makeInactive(false);
+		end
+	end
+end
+-- set clicker sounds
+ZomboidForge.SetClickerSounds = function(zombie,ZType)
+	print("setting clicker sounds")
+	if zombie:getAge() == -1 then
+		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+			zombie:setAge(-2)
+			zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
+			zombie:makeInactive(true);
+			zombie:makeInactive(false);
+		end
+	end
+end
+-- set bloater sounds
+ZomboidForge.SetBloaterSounds = function(zombie,ZType)
+	print("setting bloater sounds")
+	if zombie:getAge() == -1 then
+		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+			zombie:setAge(-2)
+			zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
+			zombie:makeInactive(true);
+			zombie:makeInactive(false);
+		end
+	end
+end
 
 -- clothing priority to replace
 local clothingPriority = {
