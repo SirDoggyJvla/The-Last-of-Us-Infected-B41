@@ -331,8 +331,6 @@ ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 			else 
 				zombie:getEmitter():playVocals("Zombie/Voice/MaleA")
 			end
-			zombie:makeInactive(true);
-			zombie:makeInactive(false);
 		end
 	end
 end
@@ -347,32 +345,24 @@ ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 			else
 				zombie:getEmitter():playVocals("Zombie/Voice/MaleB")
 			end
-			zombie:makeInactive(true);
-			zombie:makeInactive(false);
 		end
 	end
 end
 -- set clicker sounds
 ZomboidForge.SetClickerSounds = function(zombie,ZType)
-	print("setting clicker sounds")
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
 			zombie:setAge(-2)
 			zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
-			zombie:makeInactive(true);
-			zombie:makeInactive(false);
 		end
 	end
 end
 -- set bloater sounds
 ZomboidForge.SetBloaterSounds = function(zombie,ZType)
-	print("setting bloater sounds")
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
 			zombie:setAge(-2)
 			zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
-			zombie:makeInactive(true);
-			zombie:makeInactive(false);
 		end
 	end
 end

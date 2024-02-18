@@ -228,6 +228,53 @@ option TLOUZombies.BloaterHealth
 	translation = TLOU_BloaterHP,
 }
 
+option TLOU_Overhaul.CordycepsSpawn
+{
+	type = boolean,
+	default = true,
+	page = TLOU_Zombies,
+	translation = TLOU_CordycepsSpawn,
+}
+
+option TLOU_Overhaul.CordycepsSpawnRate_Runner
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 50,
+	page = TLOU_Zombies,
+	translation = TLOU_CordycepsSpawnRate_Runner,
+}
+
+option TLOU_Overhaul.CordycepsSpawnRate_Stalker
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 100,
+	page = TLOU_Zombies,
+	translation = TLOU_CordycepsSpawnRate_Stalker,
+}
+
+option TLOU_Overhaul.CordycepsSpawnRate_Clicker
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 100,
+	page = TLOU_Zombies,
+	translation = TLOU_CordycepsSpawnRate_Clicker,
+}
+
+option TLOU_Overhaul.CordycepsSpawnRate_Bloater
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 100,
+	page = TLOU_Zombies,
+	translation = TLOU_CordycepsSpawnRate_Bloater,
+}
 
 
 option ZomboidForge.nametags

@@ -6,7 +6,7 @@
 --[[ ================================================ ]]--
 --[[
 
-This file defines the core of the mod of The Last of Us Infected Fork
+This file defines the core of the mod Zomboid Forge
 
 ]]--
 --[[ ================================================ ]]--
@@ -37,11 +37,11 @@ ZomboidForge.OnLoad = function()
         ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZombieTable.chance
     end
 
-    --[[
+    
     if SandboxVars.ZomboidForge.nametags then
         Events.OnTick.Add(ZomboidForge.UpdateNametag)
     end
-    ]]
+    
 end
 
 Events.OnLoad.Add(ZomboidForge.OnLoad)
@@ -140,23 +140,26 @@ ZomboidForge.SetZombieStats = function(zombie,ZType)
     if ZombieTable.HP then
         zombie:setHealth(ZombieTable.HP)
     end
+    zombie:DoZombieStats()
 
     -- refresh stats
     zombie:makeInactive(true)
     zombie:makeInactive(false)
-    zombie:DoZombieStats()
+    
 end
 
 --- Main function:
 -- meant to do every actions of a zombie
 ZomboidForge.ZombieUpdate = function(zombie)
-    print("zombie update")
     local ZType = zombie:getModData()['ZType']
     -- initialize zombie type
     if not ZType then
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
+    local persistentOutfitID = zombie:getPersistentOutfitID()
+
+    --print(persistentOutfitID)
 
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
@@ -165,9 +168,12 @@ ZomboidForge.ZombieUpdate = function(zombie)
         ZomboidForge.ZombieOutfit(zombie,ZType)
     end
 
+    -- check zombie health
+    if not zombie:getModData()['checkHP'] then
+        ZomboidForge.CheckZombieHealth(zombie,ZType)
+    end
+
     -- run custom behavior functions for this zombie
-    print(ZombieTable.name)
-    print(#ZombieTable.customBehavior)
     for i = 1,#ZombieTable.customBehavior do
         ZomboidForge[ZombieTable.customBehavior[i]](zombie,ZType)
     end
@@ -180,7 +186,16 @@ end
 
 Events.OnZombieUpdate.Add(ZomboidForge.ZombieUpdate)
 
---- zombie attacking player, trigger funcattack
+--- Check HP of zombie is set
+ZomboidForge.CheckZombieHealth = function(zombie,ZType)
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
+    if zombie:getHealth() ~= ZombieTable.HP then
+        zombie:setHealth(ZombieTable.HP)
+    end
+    zombie:getModData()['checkHP'] = true
+end
+
+--- Zombie attacking player, trigger funcattack
 ZomboidForge.ZombieAttack = function(zombie,ZType)
     local player = zombie:getTarget()
     if player and player:isCharacter() then
@@ -196,6 +211,7 @@ end
 --- player attacking zombie, trigger funconhit
 ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
     if victim:isZombie() then
+        print(victim:getHealth())
         local ZType = victim:getModData()['ZType']
         local ZombieTable = ZomboidForge.ZTypes[ZType]
         if ZType then

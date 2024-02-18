@@ -82,6 +82,6 @@ Sandbox_EN = {
 
 
 	Sandbox_ZomboidForge = "Zomboid Forge",
-	Sandbox_ZomboidForge_nametags = "Allow zombie nametags ?"
+	Sandbox_ZomboidForge_nametags = "Allow zombie nametags"
 	Sandbox_ZomboidForge_nametags_tooltip = "Toggling this ON will allow players to have the nametags of the various zombies. If toggled OFF, no one can see the nametags."
 }

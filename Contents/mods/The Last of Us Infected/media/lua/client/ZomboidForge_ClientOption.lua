@@ -1,7 +1,7 @@
 local OPTIONS = {NameTag=true, TextHeight = 1, HeightOffset = 4}
 
 if ModOptions and ModOptions.getInstance then
-    local settings = ModOptions:getInstance(OPTIONS, "2749928925", "IGUI_ZomboidForge_Zombie")
+    local settings = ModOptions:getInstance(OPTIONS, "2749928925", getText("IGUI_ZomboidForge_Zombie"))
     local Height = settings:getData("TextHeight")
     local Offset = settings:getData("HeightOffset")
     local Tag = settings:getData("NameTag")
