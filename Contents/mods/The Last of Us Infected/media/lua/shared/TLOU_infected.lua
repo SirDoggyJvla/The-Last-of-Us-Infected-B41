@@ -19,7 +19,7 @@ local ZombRand = ZombRand -- java random function
 local print = print -- print function
 
 --- import module from ZomboidForge
-local ZomboidForge = require "ZomboidForge"
+local ZomboidForge = require "ZomboidForge_module"
 
 --- setup local functions
 local TLOU_infected = {}

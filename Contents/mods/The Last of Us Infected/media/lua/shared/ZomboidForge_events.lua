@@ -5,7 +5,7 @@
 --[[                     \__|\__|_/                   ]]--
 --[[ ================================================ ]]--
 --- Import ZomboidForge module
-local ZomboidForge = require "ZomboidForge"
+local ZomboidForge = require "ZomboidForge_module"
 
 --- Local module
 local ZFEvents = {}

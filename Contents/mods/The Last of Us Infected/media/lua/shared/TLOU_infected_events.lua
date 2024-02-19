@@ -8,7 +8,7 @@
 require "TLOU_infected"
 
 --- Import ZomboidForge module
-local ZomboidForge = require "ZomboidForge"
+local ZomboidForge = require "ZomboidForge_module"
 
 --- ZomboidForge.TLOU_infected functions
 Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)

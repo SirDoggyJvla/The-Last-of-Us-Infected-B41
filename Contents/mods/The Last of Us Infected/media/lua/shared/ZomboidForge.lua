@@ -18,15 +18,145 @@ local ZombRand = ZombRand -- java function
 local print = print -- print function
 
 --- main module for use in storing informations and pass along other files
-local ZomboidForge = {}
+--local ZomboidForge = {}
+
+--- import module from ZomboidForge
+local ZomboidForge = require "ZomboidForge_module"
 
 -- initialize variables within ZomboidForge
-ZomboidForge.ZTypes = ZomboidForge.ZTypes or {}
-ZomboidForge.ShowNametag = ZomboidForge.ShowNametag or {}
+--ZomboidForge.ZTypes = ZomboidForge.ZTypes or {}
+--ZomboidForge.ShowNametag = ZomboidForge.ShowNametag or {}
+--[[
 ZomboidForge.ClassFields = {
     walktype = "public int zombie.characters.IsoZombie.speedType",
 }
+]]
+
+--- Stats for each zombies. `key` of `Stats` are the variable to 
+-- define with `key` value from `returnValue`. The `value` of `returnValue` 
+-- associated to a `key` is the compared one with what the game returns 
+-- from `isoZombie class fields`.
+ZomboidForge.Stats = {
+    -- defines walk speed of zombie
+    walktype = {
+        setSandboxOption = "ZombieLore.Speed",
+        classField = "speedType",
+        returnValue = {
+            [1] = 1, -- sprinter
+            [2] = 2, -- fast shambler
+            [3] = 3, -- shambler
+        },
+    },
+
+    -- defines the sight setting
+    sight = {
+        setSandboxOption = "ZombieLore.Sight",
+        classField = "sight",
+        returnValue = {
+            [1] = 1, -- Eagle
+            [2] = 2, -- Normal 
+            [3] = 3, -- Poor
+            --[4] = ZomboidForge.coinFlip(),
+        },
+    },
+
+    -- defines the sight setting
+    hearing = {
+        setSandboxOption = "ZombieLore.Hearing",
+        classField = "hearing",
+        returnValue = {
+            [1] = 1, -- Pinpoint
+            [2] = 2, -- Normal 
+            [3] = 3, -- Poor
+            --[4] = ZomboidForge.coinFlip(),
+        },
+    },
+
+    -- defines cognition aka navigation of zombie
+    --
+    -- navigate = basic navigate.
+    -- It's a lie from the base game so doesn't matter which one
+    -- you chose
+    cognition = {
+        setSandboxOption = "ZombieLore.Cognition",
+        classField = "cognition",
+        returnValue = {
+            [1] = 1, -- can open doors
+            [2] = -1, -- navigate 
+            [3] = -1, -- basic navigate
+            --[4] = ZomboidForge.coinFlip(),
+        },
+    },
+
+    --- UNDEFINED STATS
+    
+    -- defines strength of zombie
+    -- undefined
+    strength = {
+        setSandboxOption = "ZombieLore.Strength",
+        --classField = "strength",
+        returnValue = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
+        },
+    },
+
+    -- defines toughness of zombie
+    -- undefined
+    toughness = {
+        setSandboxOption = "ZombieLore.Toughness",
+        --classField = missing,
+        returnValue = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
+        },
+    },
+
+    -- defines the transmission setting
+    transmission = {
+        setSandboxOption = "ZombieLore.Transmission",
+        --classField = missing,
+        returnValue = {
+            [1] = 1, -- can open doors
+            [2] = 2, -- navigate 
+            [3] = 3, -- basic navigate
+            --[4] = ZomboidForge.coinFlip(),
+        },
+    },
+
+    -- defines the memory setting
+    memory = {
+        setSandboxOption = "ZombieLore.Memory",
+        --classField = missing,
+        returnValue = {
+            [1] = 1, -- can open doors
+            [2] = 2, -- navigate 
+            [3] = 3, -- basic navigate
+            --[4] = ZomboidForge.coinFlip(),
+        },
+    },
+}
+
+ZomboidForge.coinFlip = function()
+    -- Generate a random number between 0 and 1
+    local randomNumber = ZombRand(2)
+
+    -- Map the random number to either -1 or 1
+    if randomNumber < 0.5 then
+        return -1
+    else
+        return 1
+    end
+end
+ZomboidForge.ClassFields = {
+    walktype = "speedType",
+    sight = "sight",
+    hearing = "hearing",
+}
 ZomboidForge.SandboxOptions = {
+    walktype = "ZombieLore.Speed",
     strength = "ZombieLore.Strength",
     toughness = "ZombieLore.Toughness",
     cognition = "ZombieLore.Cognition",
@@ -193,9 +323,12 @@ ZomboidForge.ZombieUpdate = function(zombie)
     local ZombieData = ModData.getOrCreate("ZomboidForge")
 
     -- initialize zombie type
-    if not ZombieData.ZombieInfo[persistentOutfitID] then
-        ZomboidForge.ZombieInitiliaze(zombie)
-        return
+    if not ZombieData.ZombieInfo[persistentOutfitID] or not ZombieData.ZombieInfo[persistentOutfitID].ZType then
+        ZombieData.ZombieInfo[persistentOutfitID] = {}
+        if not ZombieData.ZombieInfo[persistentOutfitID].ZType then
+            ZomboidForge.ZombieInitiliaze(zombie)
+            return
+        end
     end
     
     local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
@@ -203,6 +336,8 @@ ZomboidForge.ZombieUpdate = function(zombie)
     --print(persistentOutfitID)
     local ZType = ZombieInfo.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
+
+    if not ZombieTable then return end 
 
     -- set zombie clothing, very limited
     if #ZombieTable.outfit > 0 then
@@ -224,8 +359,21 @@ ZomboidForge.ZombieUpdate = function(zombie)
     print(value)
     ]]
 
+    --[[
+    print("start")
+    local fields = getmetatable(getmetatable(zombie).__index).fieldGetters
+    for fieldName,getter in pairs(fields) do
+        -- you can get the current value using this:
+        local fieldVal = getter(zombie)
+        print("fieldName: "..tostring(fieldName).." = "..tostring(fieldVal))
+    end
+    ]]
+
     -- update zombie stats
     ZomboidForge.CheckZombieStats(zombie,ZType)
+
+    --print(ZomboidForge.coinFlip())
+    --print(ZomboidForge.Stats.cognition.returnValue[4])
 
     -- check zombie health
     if not zombie:getModData()['checkHP'] then
@@ -246,11 +394,45 @@ end
 --- Check stats of zombie is set
 ZomboidForge.CheckZombieStats = function(zombie,ZType)
     local ZombieTable = ZomboidForge.ZTypes[ZType]
+    --[[
     for k,v in pairs(ZomboidForge.ClassFields) do
-        local stat = javaFieldGetter.getFieldValue(zombie,v)
-        if not ZombieTable[k] == stat then
+        --local stat = javaFieldGetter.getFieldValue(zombie,v)
+        local stat = zombie[v]
+        if not (stat == ZombieTable[k]) then
+            --print("changing stats")
             local sandboxOption = ZomboidForge.SandboxOptions[k]
-            getSandboxOptions():set(sandboxOption,ZombieTable.strength)
+            getSandboxOptions():set(sandboxOption,ZombieTable[k])
+            zombie:DoZombieStats()
+            zombie:makeInactive(true)
+            zombie:makeInactive(false)
+        end
+    end
+    ]]
+
+    for k,_ in pairs(ZomboidForge.Stats) do
+        --local stat = javaFieldGetter.getFieldValue(zombie,v)
+        local classField = ZomboidForge.Stats[k].classField
+        if classField then
+            local stat = zombie[classField]
+            local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
+            print(
+                "stat name = "..tostring(k)..
+                "    classFieldValue = "..tostring(stat)..
+                "    returnValue = "..tostring(value))
+            if not (stat == value) then
+                print("updated")
+                --print("changing stats")
+                --local sandboxOption = ZomboidForge.SandboxOptions[k]
+                local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+                getSandboxOptions():set(sandboxOption,ZombieTable[k])
+                zombie:DoZombieStats()
+                zombie:makeInactive(true)
+                zombie:makeInactive(false)
+            end
+        else
+            local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+            getSandboxOptions():set(sandboxOption,ZombieTable[k])
+            zombie:DoZombieStats()
             zombie:makeInactive(true)
             zombie:makeInactive(false)
         end
@@ -525,4 +707,4 @@ function javaFieldGetter.getFieldValue(object, classField)
     return value
 end
 
-return ZomboidForge
+--return ZomboidForge

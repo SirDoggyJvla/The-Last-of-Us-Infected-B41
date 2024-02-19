@@ -11,3 +11,4 @@ icon=icon.png
 tags=Build 41,Zombies,Infected,TLOU,The Last of Us,Cordyceps,Post,Apocalypse
 url=https://ko-fi.com/sirdoggyjvla
 versionMin=41.0
+require=00AccessibleFields
