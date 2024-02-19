@@ -288,10 +288,6 @@ function ZomboidForge.BloaterHit(player, zombie, HandWeapon, damage)
 	zombie:setHitTime(0)
 end
 
-
-Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)
---Events.OnGameBoot.Add(ZomboidForge.InitTLOUInfected)
-
 --- Custom behavior
 
 -- onDeath of a clicker
@@ -368,7 +364,7 @@ ZomboidForge.SetBloaterSounds = function(zombie,ZType)
 end
 
 -- clothing priority to replace
-local clothingPriority = {
+TLOU_infected.clothingPriority = {
 	["Hat"] = 1,
 	["Mask"] = 2,
 	["Eyes"] = 3,
@@ -431,7 +427,7 @@ function ZomboidForge.SetClickerClothing(zombie,ZType)
 					break
 				end
 				local bodyLocation = item:getScriptItem():getBodyLocation()
-				local priorityTest = clothingPriority[bodyLocation]
+				local priorityTest = TLOU_infected.clothingPriority[bodyLocation]
 				if item:getItemType() == "Base.Hat_Fungi" then
 					hasHat_Fungi = true
 					break
