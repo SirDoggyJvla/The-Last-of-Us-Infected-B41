@@ -88,17 +88,29 @@ ZomboidForge.Stats = {
         },
     },
 
+    -- defines the memory setting
+    memory = {
+        setSandboxOption = "ZombieLore.Memory",
+        classField = "memory",
+        returnValue = {
+            [1] = 1250, -- long
+            [2] = 800, -- normal 
+            [3] = 500, -- short
+            [4] = 25, -- none
+        },
+    },
+
     --- UNDEFINED STATS
     
     -- defines strength of zombie
-    -- undefined
+    -- undefined, causes issues when toughness is modified
     strength = {
         setSandboxOption = "ZombieLore.Strength",
-        --classField = "strength",
+        classField = "strength",
         returnValue = {
-            [1] = 1,
-            [2] = 2,
-            [3] = 3,
+            [1] = 5, -- Superhuman
+            [2] = 3, -- Normal
+            [3] = 1, -- Weak
         },
     },
 
@@ -117,18 +129,6 @@ ZomboidForge.Stats = {
     -- defines the transmission setting
     transmission = {
         setSandboxOption = "ZombieLore.Transmission",
-        --classField = missing,
-        returnValue = {
-            [1] = 1, -- can open doors
-            [2] = 2, -- navigate 
-            [3] = 3, -- basic navigate
-            --[4] = ZomboidForge.coinFlip(),
-        },
-    },
-
-    -- defines the memory setting
-    memory = {
-        setSandboxOption = "ZombieLore.Memory",
         --classField = missing,
         returnValue = {
             [1] = 1, -- can open doors
@@ -415,12 +415,11 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
         if classField then
             local stat = zombie[classField]
             local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
-            print(
-                "stat name = "..tostring(k)..
-                "    classFieldValue = "..tostring(stat)..
-                "    returnValue = "..tostring(value))
-            if not (stat == value) then
-                print("updated")
+            print("stat name = "..tostring(k).."    classFieldValue = "..tostring(stat).."    returnValue = "..tostring(value).."   sandbox option = "..tostring(ZombieTable[k]))
+            if not (stat == value) and ZombieTable[k] then
+                print("stat = "..tostring(stat).."   value = "..tostring(value))
+                print("update = "..tostring(k))
+                --print("updated")
                 --print("changing stats")
                 --local sandboxOption = ZomboidForge.SandboxOptions[k]
                 local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
@@ -429,12 +428,28 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
                 zombie:makeInactive(true)
                 zombie:makeInactive(false)
             end
-        else
+        --[[
+        elseif ZomboidForge.Stats[k].setSandboxOption then
             local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
             getSandboxOptions():set(sandboxOption,ZombieTable[k])
-            zombie:DoZombieStats()
-            zombie:makeInactive(true)
-            zombie:makeInactive(false)
+            --zombie:DoZombieStats()]]
+        else
+            local persistentOutfitID = zombie:getPersistentOutfitID()
+            local ZombieData = ModData.getOrCreate("ZomboidForge")
+            local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+            local counter = ZombieInfo.Counter
+            if counter and counter < 0 then
+                local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+                getSandboxOptions():set(sandboxOption,ZombieTable[k])
+                zombie:DoZombieStats()
+                zombie:makeInactive(true)
+                zombie:makeInactive(false)
+                ZombieInfo.Counter = 500
+            elseif counter then
+                ZombieInfo.Counter = counter - 1
+            else
+                ZombieInfo.Counter = 500
+            end
         end
     end
 end
