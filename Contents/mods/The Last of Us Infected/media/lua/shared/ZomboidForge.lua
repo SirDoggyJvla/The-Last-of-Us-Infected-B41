@@ -40,7 +40,7 @@ ZomboidForge.Stats = {
     -- defines walk speed of zombie
     walktype = {
         setSandboxOption = "ZombieLore.Speed",
-        classField = "speedType",
+        --classField = "speedType",
         returnValue = {
             [1] = 1, -- sprinter
             [2] = 2, -- fast shambler
@@ -88,10 +88,15 @@ ZomboidForge.Stats = {
         },
     },
 
+    --- UNVERIFIED STATS
+    -- these stats can't be checked if already updated because
+    -- of how the fields are updated or if they don't have any
+    -- class fields to check them.
+    
     -- defines the memory setting
     memory = {
         setSandboxOption = "ZombieLore.Memory",
-        classField = "memory",
+        --classField = "memory",
         returnValue = {
             [1] = 1250, -- long
             [2] = 800, -- normal 
@@ -100,13 +105,11 @@ ZomboidForge.Stats = {
         },
     },
 
-    --- UNDEFINED STATS
-    
     -- defines strength of zombie
     -- undefined, causes issues when toughness is modified
     strength = {
         setSandboxOption = "ZombieLore.Strength",
-        classField = "strength",
+        --classField = "strength",
         returnValue = {
             [1] = 5, -- Superhuman
             [2] = 3, -- Normal
@@ -138,37 +141,6 @@ ZomboidForge.Stats = {
         },
     },
 }
-
-ZomboidForge.coinFlip = function()
-    -- Generate a random number between 0 and 1
-    local randomNumber = ZombRand(2)
-
-    -- Map the random number to either -1 or 1
-    if randomNumber < 0.5 then
-        return -1
-    else
-        return 1
-    end
-end
-ZomboidForge.ClassFields = {
-    walktype = "speedType",
-    sight = "sight",
-    hearing = "hearing",
-}
-ZomboidForge.SandboxOptions = {
-    walktype = "ZombieLore.Speed",
-    strength = "ZombieLore.Strength",
-    toughness = "ZombieLore.Toughness",
-    cognition = "ZombieLore.Cognition",
-    transmission = "ZombieLore.Transmission",
-    memory = "ZombieLore.Memory",
-    sight = "ZombieLore.Sight",
-    hearing = "ZombieLore.Hearing",
-}
-
-local javaFieldGetter = {}
-javaFieldGetter.trackedFields = {}
----[classField] = placement
 
 --- OnLoad function to initialize the mod
 ZomboidForge.OnLoad = function()
@@ -215,7 +187,11 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
 
     local ZType = ZombieInfo.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
-    
+
+    -- makes sure stats get updated
+    ZombieInfo.UpdateCounter = nil
+    ZombieInfo.statChecked = nil
+
     -- become reanimated zombie
     if ZombieTable.reanimatedPlayer and not zombie:isReanimatedPlayer() then
         zombie:setReanimatedPlayer(true)
@@ -223,12 +199,13 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
 
     -- set zombie age
     if zombie:getAge() > -1 then	
-		-- TLOU_updateZombieClothing(zombie,ZType)
 		zombie:setAge(-1)
 	end
 
     -- update stats
     ZomboidForge.SetZombieStats(zombie,ZType)
+
+    ZomboidForge.PersistentOutfitID[persistentOutfitID].IsInitialized = true
 end
 
 --- Initialize a zombie type
@@ -238,11 +215,10 @@ ZomboidForge.SetZombieStats = function(zombie,ZType)
     -- set walktype
     if ZombieTable.walktype and ZombieTable.walktype ~= 4 then
         getSandboxOptions():set("ZombieLore.Speed", ZombieTable.walktype)
-        --[[
         if zombie:isCrawling() then
             zombie:toggleCrawling()
         end
-        ]]
+
         zombie:setCanWalk(true)
         zombie:makeInactive(true)
         zombie:makeInactive(false)
@@ -265,47 +241,11 @@ ZomboidForge.SetZombieStats = function(zombie,ZType)
         zombie:setSkeleton(true)
     end
     if ZombieTable.hair then
-        zombie:getHumanVisual():setHairModel("")
+        zombie:getHumanVisual():setHairModel(ZombieTable.hair)
     end
     if ZombieTable.beard then
-        zombie:getHumanVisual():setBeardModel("")
+        zombie:getHumanVisual():setBeardModel(ZombieTable.beard)
     end
-
-    -- stats
-    for k,v in pairs(ZomboidForge.SandboxOptions) do
-        if ZombieTable[k] then
-            getSandboxOptions():set(v,ZombieTable[k])
-        end
-    end
-    --[[
-    if ZombieTable.strength then
-        getSandboxOptions():set("ZombieLore.Strength",ZombieTable.strength)
-    end
-    if ZombieTable.toughness then
-        getSandboxOptions():set("ZombieLore.Toughness",ZombieTable.toughness)
-    end
-    if ZombieTable.cognition then
-        getSandboxOptions():set("ZombieLore.Cognition",ZombieTable.cognition)
-    end
-    if ZombieTable.transmission then
-        getSandboxOptions():set("ZombieLore.Transmission",ZombieTable.transmission)
-    end
-    if ZombieTable.memory then
-        getSandboxOptions():set("ZombieLore.Memory",ZombieTable.memory)
-    end
-    if ZombieTable.sight then
-        getSandboxOptions():set("ZombieLore.Sight",ZombieTable.sight)
-    end
-    if ZombieTable.hearing then
-        getSandboxOptions():set("ZombieLore.Hearing",ZombieTable.hearing)
-    end
-    if ZombieTable.noteeth then
-        zombie:setNoTeeth(ZombieTable.noteeth)
-    end
-    if ZombieTable.HP then
-        zombie:setHealth(ZombieTable.HP)
-    end
-    ]]
 
     -- refresh stats
     zombie:DoZombieStats()
@@ -323,6 +263,22 @@ ZomboidForge.ZombieUpdate = function(zombie)
     local ZombieData = ModData.getOrCreate("ZomboidForge")
 
     -- initialize zombie type
+    local NonPersistentData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    if not NonPersistentData then
+        ZomboidForge.PersistentOutfitID[persistentOutfitID] = {}
+    end
+    IsInitialized = ZomboidForge.PersistentOutfitID[persistentOutfitID].IsInitialized
+    if not IsInitialized then
+        ZombieData.ZombieInfo[persistentOutfitID] = {}
+        ZomboidForge.ZombieInitiliaze(zombie)
+        return
+    end
+
+
+    -- do pID change for outfit changing
+
+
+    --[[
     if not ZombieData.ZombieInfo[persistentOutfitID] or not ZombieData.ZombieInfo[persistentOutfitID].ZType then
         ZombieData.ZombieInfo[persistentOutfitID] = {}
         if not ZombieData.ZombieInfo[persistentOutfitID].ZType then
@@ -330,7 +286,8 @@ ZomboidForge.ZombieUpdate = function(zombie)
             return
         end
     end
-    
+    ]]
+
     local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
 
     --print(persistentOutfitID)
@@ -343,31 +300,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
     if #ZombieTable.outfit > 0 then
         ZomboidForge.ZombieOutfit(zombie,ZType)
     end
-
-    --[[
-    print(zombie.bRunning)
-    print(zombie.speedType)
-    print(zombie.walkVariant)
-    print(zombie.SPEED_SPRINTER)
-    print(zombie.SPEED_FAST_SHAMBLER)
-    ]]
-
-    --[[
-    local classField = "public int zombie.characters.IsoZombie.speedType"
-    local value = javaFieldGetter.getFieldValue(zombie,classField)
-    print("speedType for this zombie")
-    print(value)
-    ]]
-
-    --[[
-    print("start")
-    local fields = getmetatable(getmetatable(zombie).__index).fieldGetters
-    for fieldName,getter in pairs(fields) do
-        -- you can get the current value using this:
-        local fieldVal = getter(zombie)
-        print("fieldName: "..tostring(fieldName).." = "..tostring(fieldVal))
-    end
-    ]]
 
     -- update zombie stats
     ZomboidForge.CheckZombieStats(zombie,ZType)
@@ -391,65 +323,64 @@ ZomboidForge.ZombieUpdate = function(zombie)
     end
 end
 
+local timeStatCheck = 1000
 --- Check stats of zombie is set
 ZomboidForge.CheckZombieStats = function(zombie,ZType)
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-    --[[
-    for k,v in pairs(ZomboidForge.ClassFields) do
-        --local stat = javaFieldGetter.getFieldValue(zombie,v)
-        local stat = zombie[v]
-        if not (stat == ZombieTable[k]) then
-            --print("changing stats")
-            local sandboxOption = ZomboidForge.SandboxOptions[k]
-            getSandboxOptions():set(sandboxOption,ZombieTable[k])
-            zombie:DoZombieStats()
-            zombie:makeInactive(true)
-            zombie:makeInactive(false)
-        end
-    end
-    ]]
+    -- get zombie info
+    local persistentOutfitID = zombie:getPersistentOutfitID()
+    local ZombieData = ModData.getOrCreate("ZomboidForge")
+    local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+    local UpdateCounter = ZombieInfo.UpdateCounter
 
+    -- create a global check when everything is checked to bypass everything after
+    -- + multiple checks for unverified stats
+
+    print(UpdateCounter)
+    -- counter to update
+    if UpdateCounter and UpdateCounter > 0 then
+        ZombieInfo.UpdateCounter = UpdateCounter - 1
+        return
+    else
+        ZombieInfo.UpdateCounter = timeStatCheck
+    end
+
+    -- get info if stat already checked for each stats
+    -- else initialize it
+    local statChecked = ZombieInfo.statChecked
+    if not statChecked then
+        ZombieInfo.statChecked = {}
+        statChecked = ZombieInfo.statChecked
+    end
+
+    -- for every stats available to update
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
     for k,_ in pairs(ZomboidForge.Stats) do
-        --local stat = javaFieldGetter.getFieldValue(zombie,v)
-        local classField = ZomboidForge.Stats[k].classField
-        if classField then
-            local stat = zombie[classField]
-            local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
-            print("stat name = "..tostring(k).."    classFieldValue = "..tostring(stat).."    returnValue = "..tostring(value).."   sandbox option = "..tostring(ZombieTable[k]))
-            if not (stat == value) and ZombieTable[k] then
-                print("stat = "..tostring(stat).."   value = "..tostring(value))
-                print("update = "..tostring(k))
-                --print("updated")
-                --print("changing stats")
-                --local sandboxOption = ZomboidForge.SandboxOptions[k]
+        if not statChecked[k] then
+            local classField = ZomboidForge.Stats[k].classField
+            if classField then
+                local stat = zombie[classField]
+                local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
+                if not (stat == value) and ZombieTable[k] then
+                    --print("pass test")
+                    local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+                    getSandboxOptions():set(sandboxOption,ZombieTable[k])
+                    zombie:DoZombieStats()
+                    zombie:makeInactive(true)
+                    zombie:makeInactive(false)
+                else
+                    statChecked[k] = true
+                end
+            elseif not classField then
                 local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
                 getSandboxOptions():set(sandboxOption,ZombieTable[k])
                 zombie:DoZombieStats()
                 zombie:makeInactive(true)
                 zombie:makeInactive(false)
+                statChecked[k] = true
             end
-        --[[
-        elseif ZomboidForge.Stats[k].setSandboxOption then
-            local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
-            getSandboxOptions():set(sandboxOption,ZombieTable[k])
-            --zombie:DoZombieStats()]]
+            print("updating = "..tostring(k))
         else
-            local persistentOutfitID = zombie:getPersistentOutfitID()
-            local ZombieData = ModData.getOrCreate("ZomboidForge")
-            local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
-            local counter = ZombieInfo.Counter
-            if counter and counter < 0 then
-                local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
-                getSandboxOptions():set(sandboxOption,ZombieTable[k])
-                zombie:DoZombieStats()
-                zombie:makeInactive(true)
-                zombie:makeInactive(false)
-                ZombieInfo.Counter = 500
-            elseif counter then
-                ZombieInfo.Counter = counter - 1
-            else
-                ZombieInfo.Counter = 500
-            end
+            print("already checked = "..tostring(k))
         end
     end
 end
@@ -689,37 +620,6 @@ ZomboidForge.UpdateNametag = function()
 			end
 		end
 	end
-end
-
-
-
-
-
-
-
---Example:  "public float zombie.inventory.types.HandWeapon.WeaponLength"
---          "public int zombie.characters.IsoZombie.speedType"
-function javaFieldGetter.determineFieldPlacement(object, classField)
-    --use the stored placement value for faster lookups
-    if javaFieldGetter.trackedFields[classField] then return javaFieldGetter.trackedFields[classField] end
-    
-    local numClassFields = getNumClassFields(object)
-    for i = 0, numClassFields - 1 do
-        ---@type Field
-        local javaField = getClassField(object, i)
-        if javaField and tostring(javaField) == classField then
-            javaFieldGetter.trackedFields[classField] = i
-            return i
-        end
-    end
-end
-
-function javaFieldGetter.getFieldValue(object, classField)
-    local fieldPlacement = javaFieldGetter.determineFieldPlacement(object, classField)
-    local javaField = getClassField(object, fieldPlacement)
-    local value = getClassFieldVal(object, javaField)
-    --print("classField: "..tostring(classField).." = "..tostring(value))
-    return value
 end
 
 --return ZomboidForge

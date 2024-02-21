@@ -4,5 +4,6 @@ local ZomboidForge = {}
 -- initialize variables within ZomboidForge
 ZomboidForge.ZTypes = ZomboidForge.ZTypes or {}
 ZomboidForge.ShowNametag = ZomboidForge.ShowNametag or {}
+ZomboidForge.PersistentOutfitID = {}
 
 return ZomboidForge
