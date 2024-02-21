@@ -88,7 +88,7 @@ ZomboidForge.Stats = {
         },
     },
 
-    --- UNVERIFIED STATS
+    --- UNVERIFIABLE STATS
     -- these stats can't be checked if already updated because
     -- of how the fields are updated or if they don't have any
     -- class fields to check them.
@@ -191,6 +191,8 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
     -- makes sure stats get updated
     ZombieInfo.UpdateCounter = nil
     ZombieInfo.statChecked = nil
+    ZombieInfo.GlobalCheck = nil
+    ZombieInfo.multiCheck = nil
 
     -- become reanimated zombie
     if ZombieTable.reanimatedPlayer and not zombie:isReanimatedPlayer() then
@@ -323,7 +325,7 @@ ZomboidForge.ZombieUpdate = function(zombie)
     end
 end
 
-local timeStatCheck = 1000
+local timeStatCheck = 500
 --- Check stats of zombie is set
 ZomboidForge.CheckZombieStats = function(zombie,ZType)
     -- get zombie info
@@ -332,16 +334,21 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
     local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
     local UpdateCounter = ZombieInfo.UpdateCounter
 
+    -- GlobalCheck, if true then stats are already checked
+    local GlobalCheck = ZombieInfo.GlobalCheck
+    if GlobalCheck == true then return end
     -- create a global check when everything is checked to bypass everything after
     -- + multiple checks for unverified stats
 
-    print(UpdateCounter)
+    --print(UpdateCounter)
     -- counter to update
     if UpdateCounter and UpdateCounter > 0 then
         ZombieInfo.UpdateCounter = UpdateCounter - 1
         return
-    else
+    elseif UpdateCounter then
         ZombieInfo.UpdateCounter = timeStatCheck
+    elseif not UpdateCounter then
+        ZombieInfo.UpdateCounter = -1
     end
 
     -- get info if stat already checked for each stats
@@ -352,11 +359,20 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
         statChecked = ZombieInfo.statChecked
     end
 
+    -- multiCheck for unverifiable stats
+    local multiCheck = ZombieInfo.multiCheck
+    if not multiCheck then
+        ZombieInfo.multiCheck = {}
+        multiCheck = ZombieInfo.multiCheck
+    end
+
     -- for every stats available to update
     local ZombieTable = ZomboidForge.ZTypes[ZType]
+    local size2 = 0
     for k,_ in pairs(ZomboidForge.Stats) do
         if not statChecked[k] then
             local classField = ZomboidForge.Stats[k].classField
+            -- verifiable stats
             if classField then
                 local stat = zombie[classField]
                 local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
@@ -369,19 +385,39 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
                     zombie:makeInactive(false)
                 else
                     statChecked[k] = true
+                    size2 = size2 + 1
                 end
+
+            -- unverifiable stats
             elseif not classField then
                 local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
                 getSandboxOptions():set(sandboxOption,ZombieTable[k])
                 zombie:DoZombieStats()
                 zombie:makeInactive(true)
                 zombie:makeInactive(false)
-                statChecked[k] = true
+                if not multiCheck[k] then
+                    multiCheck[k] = 0
+                end
+                if multiCheck[k] and multiCheck[k] < 10 then
+                    multiCheck[k] = multiCheck[k] + 1
+                elseif multiCheck[k] and multiCheck[k] == 10 then
+                    statChecked[k] = true
+                    size2 = size2 + 1
+                end
             end
-            print("updating = "..tostring(k))
+            --print("updating = "..tostring(k).."   multiCheck = "..tostring(multiCheck[k]))
         else
-            print("already checked = "..tostring(k))
+            size2 = size2 + 1
+            --print("already checked = "..tostring(k))
         end
+        --print(statChecked[k])
+    end
+
+    local size = 8
+    --print("size = "..tostring(size).."   size2 = "..tostring(size2))
+    if size == size2 then
+        --print("pass test")
+        ZombieInfo.GlobalCheck = true
     end
 end
 
