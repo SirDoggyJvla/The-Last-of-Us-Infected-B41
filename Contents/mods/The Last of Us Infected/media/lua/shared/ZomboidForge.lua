@@ -168,13 +168,11 @@ end
 
 --- Initialize a zombie type
 ZomboidForge.ZombieInitiliaze = function(zombie)
-    local persistentOutfitID = ZomboidForge.pID(zombie)
-
-    ZomboidForge.pID(zombie)
+    local trueID = ZomboidForge.pID(zombie)
 
     local ZFModData = ModData.getOrCreate("ZomboidForge")
-    ZFModData.PersistentZData[persistentOutfitID] = ZFModData.PersistentZData[persistentOutfitID] or {}
-    local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+    ZFModData.PersistentZData[trueID] = ZFModData.PersistentZData[trueID] or {}
+    local PersistentZData = ZFModData.PersistentZData[trueID]
 
     -- attribute zombie type if not set
     if not PersistentZData.ZType then
@@ -193,7 +191,7 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
     -- makes sure stats get updated
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
     nonPersistentZData.StatCheck = {}
 
 
@@ -207,13 +205,13 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
 		zombie:setAge(-1)
 	end
 
-    ZomboidForge.PersistentOutfitID[persistentOutfitID].IsInitialized = true
+    ZomboidForge.PersistentOutfitID[trueID].IsInitialized = true
 end
 
 --- Updates visual, stats etc if those aren't set already
 ZomboidForge.SetZombieData = function(zombie,ZType)
-    local persistentOutfitID = ZomboidForge.pID(zombie)
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    local trueID = ZomboidForge.pID(zombie)
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
     local IsSet = 0
 
     -- get ZType data
@@ -230,14 +228,14 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         local currentOutfit = zombie:getOutfitName()
         local outfitChoice = ZomboidForge.RandomizeTable(zombie,ZType,"outfit",currentOutfit)
         if outfitChoice then
-            local old_persistentOutfitID = persistentOutfitID
+            local old_trueID = trueID
             zombie:dressInNamedOutfit(outfitChoice)
 	        zombie:reloadOutfit()
-            persistentOutfitID = ZomboidForge.pID(zombie)
-            if not (old_persistentOutfitID == persistentOutfitID) then
-                print("pID was changed")
-                print("old = "..old_persistentOutfitID)
-                print("new = "..persistentOutfitID)
+            trueID = ZomboidForge.pID(zombie)
+            if not (old_trueID == trueID) then
+                print("trueID was changed")
+                print("old = "..old_trueID)
+                print("new = "..trueID)
             end
         else
             IsSet = IsSet + 1
@@ -313,8 +311,8 @@ local timeStatCheck = 500
 --- Check stats of zombie is set
 ZomboidForge.CheckZombieStats = function(zombie,ZType)
     -- get zombie info
-    local persistentOutfitID = ZomboidForge.pID(zombie)
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    local trueID = ZomboidForge.pID(zombie)
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
 
     -- GlobalCheck, if true then stats are already checked
     if nonPersistentZData.GlobalCheck then return end
@@ -418,20 +416,18 @@ end
 --- Main function:
 -- meant to do every actions of a zombie
 ZomboidForge.ZombieUpdate = function(zombie)
-    -- get persistentOutfitID aka pID
-    local persistentOutfitID = ZomboidForge.pID(zombie)
+    -- get persistentOutfitID aka trueID
+    local trueID = ZomboidForge.pID(zombie)
 
     -- persistentData
     local ZFModData = ModData.getOrCreate("ZomboidForge")
 
-    ZomboidForge.pID(zombie)
-
-    --print("pID = "..persistentOutfitID)
+    --print("trueID = "..trueID)
     -- get nonPersistentZData checked at every save reload and initialize it if not already done
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
     if not nonPersistentZData then
-        ZomboidForge.PersistentOutfitID[persistentOutfitID] = {}
-        nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+        ZomboidForge.PersistentOutfitID[trueID] = {}
+        nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
     end
 
     -- check if zombie IsInitialized
@@ -440,9 +436,9 @@ ZomboidForge.ZombieUpdate = function(zombie)
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
-    local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+    local PersistentZData = ZFModData.PersistentZData[trueID]
 
-    -- do pID change for outfit changing
+    -- do trueID change for outfit changing
 
     local ZType = PersistentZData.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -497,10 +493,10 @@ end
 ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
     if victim:isZombie() then
         --print(victim:getHealth())
-        local persistentOutfitID = ZomboidForge.pID(victim)
-        --print("pID on hat lose = "..persistentOutfitID)
+        local trueID = ZomboidForge.pID(victim)
+        --print("trueID on hat lose = "..trueID)
         local ZFModData = ModData.getOrCreate("ZomboidForge")
-        local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+        local PersistentZData = ZFModData.PersistentZData[trueID]
         
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -520,9 +516,9 @@ end
 
 --- OnDeath functions
 ZomboidForge.OnDeath = function(zombie)
-    local persistentOutfitID = ZomboidForge.pID(zombie)
+    local trueID = ZomboidForge.pID(zombie)
     local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+    local PersistentZData = ZFModData.PersistentZData[trueID]
     
     local ZType = PersistentZData.ZType
     -- initialize zombie type
@@ -671,9 +667,9 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 					for i=0, movingObjects:size()-1 do
 						local zombie = movingObjects:get(i)
 						if zombie and instanceof(zombie, "IsoZombie") then
-                            local persistentOutfitID = ZomboidForge.pID(zombie)
+                            local trueID = ZomboidForge.pID(zombie)
                             local ZFModData = ModData.getOrCreate("ZomboidForge")
-                            local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+                            local PersistentZData = ZFModData.PersistentZData[trueID]
                             
                             local ZType = PersistentZData.ZType
 							if ZomboidForge.ZTypes[ZType] and player:CanSee(zombie) then
@@ -683,7 +679,7 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 									TLOU_CheckZombieType(zombie,ZID,ModData.getOrCreate("CZList"))
 								end
                                 ]]
-                                --ZomboidForge.ShowNametag[persistentOutfitID] = {zombie,100}
+                                --ZomboidForge.ShowNametag[trueID] = {zombie,100}
 								ZomboidForge.ShowNametag[ZID] = {zombie,100}
 							end
 						end
@@ -700,9 +696,9 @@ ZomboidForge.UpdateNametag = function()
 		local zombie = ZData[1]
 		local interval = ZData[2]
 
-        local persistentOutfitID = ZomboidForge.pID(zombie)
+        local trueID = ZomboidForge.pID(zombie)
         local ZFModData = ModData.getOrCreate("ZomboidForge")
-        local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+        local PersistentZData = ZFModData.PersistentZData[trueID]
         
         if not PersistentZData then return end
         local ZType = PersistentZData.ZType
