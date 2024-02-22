@@ -45,6 +45,7 @@ ZomboidForge.Stats = {
             [1] = 1, -- sprinter
             [2] = 2, -- fast shambler
             [3] = 3, -- shambler
+            -- [4] crawlers speed doesn't matter
         },
     },
 
@@ -145,9 +146,9 @@ ZomboidForge.Stats = {
 --- OnLoad function to initialize the mod
 ZomboidForge.OnLoad = function()
     -- initialize ModData
-    local ZombieData = ModData.getOrCreate("ZomboidForge")
-    if not ZombieData.ZombieInfo then
-        ZombieData.ZombieInfo = {}
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+    if not ZFModData.PersistentZData then
+        ZFModData.PersistentZData = {}
     end
 
     -- get numbers of Zombie Types
@@ -167,32 +168,34 @@ end
 
 --- Initialize a zombie type
 ZomboidForge.ZombieInitiliaze = function(zombie)
-    local persistentOutfitID = zombie:getPersistentOutfitID()
-    local ZombieData = ModData.getOrCreate("ZomboidForge")
-    ZombieData.ZombieInfo[persistentOutfitID] = {}
-    local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+    local persistentOutfitID = ZomboidForge.pID(zombie)
 
-    -- attribute zombie type
-    if not ZombieInfo.ZType then
+    ZomboidForge.pID(zombie)
+
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+    ZFModData.PersistentZData[persistentOutfitID] = ZFModData.PersistentZData[persistentOutfitID] or {}
+    local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
+
+    -- attribute zombie type if not set
+    if not PersistentZData.ZType then
         local rand = ZombRand(ZomboidForge.TotalChance)
         for i = 1,ZomboidForge.TotalZTypes do
             rand = rand - ZomboidForge.ZTypes[i].chance
             if rand <= 0 then
-                ZombieInfo.ZType = i
+                PersistentZData.ZType = i
                 --zombie:getModData()['ZType'] = i
                 break
             end
         end
     end
 
-    local ZType = ZombieInfo.ZType
+    local ZType = PersistentZData.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
     -- makes sure stats get updated
-    ZombieInfo.UpdateCounter = nil
-    ZombieInfo.statChecked = nil
-    ZombieInfo.GlobalCheck = nil
-    ZombieInfo.multiCheck = nil
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    nonPersistentZData.StatCheck = {}
+
 
     -- become reanimated zombie
     if ZombieTable.reanimatedPlayer and not zombie:isReanimatedPlayer() then
@@ -204,110 +207,253 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
 		zombie:setAge(-1)
 	end
 
-    -- update stats
-    ZomboidForge.SetZombieStats(zombie,ZType)
-
     ZomboidForge.PersistentOutfitID[persistentOutfitID].IsInitialized = true
 end
 
---- Initialize a zombie type
-ZomboidForge.SetZombieStats = function(zombie,ZType)
+--- Updates visual, stats etc if those aren't set already
+ZomboidForge.SetZombieData = function(zombie,ZType)
+    local persistentOutfitID = ZomboidForge.pID(zombie)
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    local IsSet = 0
+
+    -- get ZType data
     local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-    -- set walktype
-    if ZombieTable.walktype and ZombieTable.walktype ~= 4 then
-        getSandboxOptions():set("ZombieLore.Speed", ZombieTable.walktype)
-        if zombie:isCrawling() then
-            zombie:toggleCrawling()
-        end
-
-        zombie:setCanWalk(true)
-        zombie:makeInactive(true)
-        zombie:makeInactive(false)
-    elseif ZombieTable.walktype == 4 then
-        if zombie:isCanWalk() then
-            zombie:setCanWalk(false)
-        end
-        if not zombie:isProne() then
-            zombie:setFallOnFront(true)
-        end
-        if not zombie:isCrawling() then
-            zombie:toggleCrawling()
-        end
-        zombie:makeInactive(true)
-        zombie:makeInactive(false)
+    -- update zombie stats
+    if not nonPersistentZData.GlobalCheck then
+        ZomboidForge.CheckZombieStats(zombie,ZType)
+    else
+        IsSet = IsSet + 1
     end
 
-    -- visual look
+    -- set zombie clothing
+    if #ZombieTable.outfit > 0 then
+        local currentOutfit = zombie:getOutfitName()
+        local outfitChoice = ZomboidForge.RandomizeTable(zombie,ZType,"outfit",currentOutfit)
+        if outfitChoice then
+            local old_persistentOutfitID = persistentOutfitID
+            zombie:dressInNamedOutfit(outfitChoice)
+	        zombie:reloadOutfit()
+            persistentOutfitID = ZomboidForge.pID(zombie)
+            if not (old_persistentOutfitID == persistentOutfitID) then
+                print("pID was changed")
+                print("old = "..old_persistentOutfitID)
+                print("new = "..persistentOutfitID)
+            end
+        else
+            IsSet = IsSet + 1
+        end
+    else
+        IsSet = IsSet + 1
+    end
+
+    -- update zombie visuals
+    -- set to skeleton
     if ZombieTable.skeleton and not zombie:isSkeleton() then
         zombie:setSkeleton(true)
-    end
-    if ZombieTable.hair then
-        zombie:getHumanVisual():setHairModel(ZombieTable.hair)
-    end
-    if ZombieTable.beard then
-        zombie:getHumanVisual():setBeardModel(ZombieTable.beard)
+    elseif zombie:isSkeleton() then
+        IsSet = IsSet + 1
     end
 
-    -- refresh stats
-    zombie:DoZombieStats()
+    -- set hair
+    if #ZombieTable.hair > 0 then
+        local zombieVisual = zombie:getHumanVisual()
+        local currentHair = zombieVisual:getHairModel()
+        local hairChoice = ZomboidForge.RandomizeTable(zombie,ZType,"hair",currentHair)
+        if hairChoice then
+            zombieVisual:setHairModel(hairChoice)
+        else
+            IsSet = IsSet + 1
+        end
+    else
+        IsSet = IsSet + 1
+    end
 
-    -- refresh sandbox settings for this zombie
-    zombie:makeInactive(true)
-    zombie:makeInactive(false)
+    -- set beard
+    if #ZombieTable.beard > 0 then
+        local zombieVisual = zombie:getHumanVisual()
+        local currentBeard = zombieVisual:getBeardModel()
+        local beardChoice = ZomboidForge.RandomizeTable(zombie,ZType,"beard",currentBeard)
+        if beardChoice then
+            zombieVisual:setBeardModel(beardChoice)
+        else
+            IsSet = IsSet + 1
+        end
+    else
+        IsSet = IsSet + 1
+    end
+
+    -- update IsDataSet
+    if IsSet == 5 then
+        nonPersistentZData.IsDataSet = true
+    end
+end
+
+--- Initialize a zombie type
+ZomboidForge.RandomizeTable = function(zombie,ZType,ZData,current)
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
+    local ZDataTable = ZombieTable[ZData]; if not ZDataTable then return end
+    local size = #ZDataTable
+
+    local check = false
+    for i = 1,size do
+        if current == ZDataTable[i] then
+            check = true
+            break
+        end
+    end
+    if not check then
+        local rand = ZombRand(1,size)
+        return ZDataTable[rand]
+    else
+        return false
+    end
+end
+
+local timeStatCheck = 500
+--- Check stats of zombie is set
+ZomboidForge.CheckZombieStats = function(zombie,ZType)
+    -- get zombie info
+    local persistentOutfitID = ZomboidForge.pID(zombie)
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+
+    -- GlobalCheck, if true then stats are already checked
+    if nonPersistentZData.GlobalCheck then return end
+
+    -- counter to update
+    local UpdateCounter = nonPersistentZData.UpdateCounter
+    if UpdateCounter and UpdateCounter > 0 then
+        -- start counting
+        nonPersistentZData.UpdateCounter = UpdateCounter - 1
+        return
+    elseif UpdateCounter then
+        -- back to start
+        nonPersistentZData.UpdateCounter = timeStatCheck
+    elseif not UpdateCounter then
+        -- to have a first check instantly
+        nonPersistentZData.UpdateCounter = -1
+    end
+
+    -- get info if stat already checked for each stats
+    -- else initialize it
+    local statChecked = nonPersistentZData.statChecked
+    if not statChecked then
+        nonPersistentZData.statChecked = {}
+        statChecked = nonPersistentZData.statChecked
+    end
+
+    -- multiCheck for unverifiable stats
+    local multiCheck = nonPersistentZData.multiCheck
+    if not multiCheck then
+        nonPersistentZData.multiCheck = {}
+        multiCheck = nonPersistentZData.multiCheck
+    end
+
+    -- for every stats available to update
+    local ZombieTable = ZomboidForge.ZTypes[ZType]
+    local ready = 0
+    for k,_ in pairs(ZomboidForge.Stats) do
+        if not statChecked[k] then
+            local classField = ZomboidForge.Stats[k].classField
+            -- verifiable stats
+            if classField then
+                local stat = zombie[classField]
+                local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
+                if k == "walktype" and ZombieTable[k] and ZombieTable[k] == 4 then
+                    if zombie:isCanWalk() then
+                        zombie:setCanWalk(false)
+                    end
+                    if not zombie:isProne() then
+                        zombie:setFallOnFront(true)
+                    end
+                    if not zombie:isCrawling() then
+                        zombie:toggleCrawling()
+                    end
+                end
+                if not (stat == value) and ZombieTable[k] then
+                    local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+                    getSandboxOptions():set(sandboxOption,ZombieTable[k])
+                    zombie:makeInactive(true)
+                    zombie:makeInactive(false)
+                end
+
+                -- do multiCheck
+                if not multiCheck[k] then
+                    multiCheck[k] = 0
+                end
+                if multiCheck[k] and multiCheck[k] < 10 then
+                    multiCheck[k] = multiCheck[k] + 1
+                elseif multiCheck[k] and multiCheck[k] == 10 then
+                    statChecked[k] = true
+                    ready = ready + 1
+                end
+            -- unverifiable stats
+            elseif not classField then
+                local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+                getSandboxOptions():set(sandboxOption,ZombieTable[k])
+                zombie:makeInactive(true)
+                zombie:makeInactive(false)
+
+                -- do multiCheck
+                if not multiCheck[k] then
+                    multiCheck[k] = 0
+                end
+                if multiCheck[k] and multiCheck[k] < 10 then
+                    multiCheck[k] = multiCheck[k] + 1
+                elseif multiCheck[k] and multiCheck[k] == 10 then
+                    statChecked[k] = true
+                    ready = ready + 1
+                end
+            end
+        else
+            ready = ready + 1
+        end
+    end
+
+    -- if every stats are checked
+    if ready == 8 then
+        nonPersistentZData.GlobalCheck = true
+    end
 end
 
 --- Main function:
 -- meant to do every actions of a zombie
 ZomboidForge.ZombieUpdate = function(zombie)
-    --local ZType = zombie:getModData()['ZType']
-    local persistentOutfitID = zombie:getPersistentOutfitID()
-    local ZombieData = ModData.getOrCreate("ZomboidForge")
+    -- get persistentOutfitID aka pID
+    local persistentOutfitID = ZomboidForge.pID(zombie)
 
-    -- initialize zombie type
-    local NonPersistentData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
-    if not NonPersistentData then
+    -- persistentData
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+
+    ZomboidForge.pID(zombie)
+
+    --print("pID = "..persistentOutfitID)
+    -- get nonPersistentZData checked at every save reload and initialize it if not already done
+    local nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
+    if not nonPersistentZData then
         ZomboidForge.PersistentOutfitID[persistentOutfitID] = {}
+        nonPersistentZData = ZomboidForge.PersistentOutfitID[persistentOutfitID]
     end
-    IsInitialized = ZomboidForge.PersistentOutfitID[persistentOutfitID].IsInitialized
+
+    -- check if zombie IsInitialized
+    local IsInitialized = nonPersistentZData.IsInitialized
     if not IsInitialized then
-        ZombieData.ZombieInfo[persistentOutfitID] = {}
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
-
+    local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
 
     -- do pID change for outfit changing
 
-
-    --[[
-    if not ZombieData.ZombieInfo[persistentOutfitID] or not ZombieData.ZombieInfo[persistentOutfitID].ZType then
-        ZombieData.ZombieInfo[persistentOutfitID] = {}
-        if not ZombieData.ZombieInfo[persistentOutfitID].ZType then
-            ZomboidForge.ZombieInitiliaze(zombie)
-            return
-        end
-    end
-    ]]
-
-    local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
-
-    --print(persistentOutfitID)
-    local ZType = ZombieInfo.ZType
+    local ZType = PersistentZData.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
-    if not ZombieTable then return end 
+    if not ZombieTable then return end
 
-    -- set zombie clothing, very limited
-    if #ZombieTable.outfit > 0 then
-        ZomboidForge.ZombieOutfit(zombie,ZType)
+    -- set zombie data
+    local IsDataSet = nonPersistentZData.IsDataSet
+    if not IsDataSet then
+        ZomboidForge.SetZombieData(zombie,ZType)
     end
-
-    -- update zombie stats
-    ZomboidForge.CheckZombieStats(zombie,ZType)
-
-    --print(ZomboidForge.coinFlip())
-    --print(ZomboidForge.Stats.cognition.returnValue[4])
 
     -- check zombie health
     if not zombie:getModData()['checkHP'] then
@@ -322,102 +468,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
     -- run zombie attack functions
     if zombie:isAttacking() then
         ZomboidForge.ZombieAttack(zombie,ZType)
-    end
-end
-
-local timeStatCheck = 500
---- Check stats of zombie is set
-ZomboidForge.CheckZombieStats = function(zombie,ZType)
-    -- get zombie info
-    local persistentOutfitID = zombie:getPersistentOutfitID()
-    local ZombieData = ModData.getOrCreate("ZomboidForge")
-    local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
-    local UpdateCounter = ZombieInfo.UpdateCounter
-
-    -- GlobalCheck, if true then stats are already checked
-    local GlobalCheck = ZombieInfo.GlobalCheck
-    if GlobalCheck == true then return end
-    -- create a global check when everything is checked to bypass everything after
-    -- + multiple checks for unverified stats
-
-    --print(UpdateCounter)
-    -- counter to update
-    if UpdateCounter and UpdateCounter > 0 then
-        ZombieInfo.UpdateCounter = UpdateCounter - 1
-        return
-    elseif UpdateCounter then
-        ZombieInfo.UpdateCounter = timeStatCheck
-    elseif not UpdateCounter then
-        ZombieInfo.UpdateCounter = -1
-    end
-
-    -- get info if stat already checked for each stats
-    -- else initialize it
-    local statChecked = ZombieInfo.statChecked
-    if not statChecked then
-        ZombieInfo.statChecked = {}
-        statChecked = ZombieInfo.statChecked
-    end
-
-    -- multiCheck for unverifiable stats
-    local multiCheck = ZombieInfo.multiCheck
-    if not multiCheck then
-        ZombieInfo.multiCheck = {}
-        multiCheck = ZombieInfo.multiCheck
-    end
-
-    -- for every stats available to update
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-    local size2 = 0
-    for k,_ in pairs(ZomboidForge.Stats) do
-        if not statChecked[k] then
-            local classField = ZomboidForge.Stats[k].classField
-            -- verifiable stats
-            if classField then
-                local stat = zombie[classField]
-                local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
-                if not (stat == value) and ZombieTable[k] then
-                    --print("pass test")
-                    local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
-                    getSandboxOptions():set(sandboxOption,ZombieTable[k])
-                    zombie:DoZombieStats()
-                    zombie:makeInactive(true)
-                    zombie:makeInactive(false)
-                else
-                    statChecked[k] = true
-                    size2 = size2 + 1
-                end
-
-            -- unverifiable stats
-            elseif not classField then
-                local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
-                getSandboxOptions():set(sandboxOption,ZombieTable[k])
-                zombie:DoZombieStats()
-                zombie:makeInactive(true)
-                zombie:makeInactive(false)
-                if not multiCheck[k] then
-                    multiCheck[k] = 0
-                end
-                if multiCheck[k] and multiCheck[k] < 10 then
-                    multiCheck[k] = multiCheck[k] + 1
-                elseif multiCheck[k] and multiCheck[k] == 10 then
-                    statChecked[k] = true
-                    size2 = size2 + 1
-                end
-            end
-            --print("updating = "..tostring(k).."   multiCheck = "..tostring(multiCheck[k]))
-        else
-            size2 = size2 + 1
-            --print("already checked = "..tostring(k))
-        end
-        --print(statChecked[k])
-    end
-
-    local size = 8
-    --print("size = "..tostring(size).."   size2 = "..tostring(size2))
-    if size == size2 then
-        --print("pass test")
-        ZombieInfo.GlobalCheck = true
     end
 end
 
@@ -446,12 +496,13 @@ end
 --- player attacking zombie, trigger funconhit
 ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
     if victim:isZombie() then
-        print(victim:getHealth())
-        local persistentOutfitID = victim:getPersistentOutfitID()
-        local ZombieData = ModData.getOrCreate("ZomboidForge")
-        local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+        --print(victim:getHealth())
+        local persistentOutfitID = ZomboidForge.pID(victim)
+        --print("pID on hat lose = "..persistentOutfitID)
+        local ZFModData = ModData.getOrCreate("ZomboidForge")
+        local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
         
-        local ZType = ZombieInfo.ZType
+        local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
         if ZType then
             if ZombieTable and ZombieTable.funconhit then
@@ -469,11 +520,11 @@ end
 
 --- OnDeath functions
 ZomboidForge.OnDeath = function(zombie)
-    local persistentOutfitID = zombie:getPersistentOutfitID()
-    local ZombieData = ModData.getOrCreate("ZomboidForge")
-    local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+    local persistentOutfitID = ZomboidForge.pID(zombie)
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+    local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
     
-    local ZType = ZombieInfo.ZType
+    local ZType = PersistentZData.ZType
     -- initialize zombie type
     -- only a security for mods that insta-kill zombies on spawn
     if not ZType then
@@ -491,40 +542,66 @@ end
 
 --- Tools
 
--- check outfit
-ZomboidForge.ZombieOutfit = function(zombie,ZType)
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-    local outfits = ZombieTable.outfit; if not outfits then return end
-    local sizeOutfits = #ZombieTable.outfit
-    local currentOutfit = zombie:getOutfitName()
+--- Bitwise stuff from Chuck
+-- https://discord.com/channels/908422782554107904/908459714248048730/1209705754517573752
+-- https://stackoverflow.com/questions/5977654/how-do-i-use-the-bitwise-operator-xor-in-lua
+ZomboidForge.bit = {}
 
-    local outfitCheck = false
-    for i = 1,sizeOutfits do
-        if currentOutfit == outfits[i] then
-            outfitCheck = true
-            break
-        end
+function ZomboidForge.bit.Or(a,b)
+    local p,c=1,0
+    while a+b>0 do
+        local ra,rb=a%2,b%2
+        if ra+rb>0 then c=c+p end
+        a,b,p=(a-ra)/2,(b-rb)/2,p*2
     end
-    if not outfitCheck then
-        local rand = ZombRand(1,sizeOutfits)
-        zombie:dressInNamedOutfit(outfits[rand])
-	    zombie:reloadOutfit()
-        --ZomboidForge.SetZombieOutfit(zombie,ZType)
-    end
+    return c
 end
 
---[[
--- set outfit
-ZomboidForge.SetZombieOutfit = function(zombie,ZType)
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-    local outfits = ZombieTable.outfit; if not outfits then return end
-    local sizeOutfits = #ZombieTable.outfit
-
-    local rand = ZombRand(1,sizeOutfits)
-    zombie:dressInNamedOutfit(outfits[rand])
-	zombie:reloadOutfit()
+function ZomboidForge.bit.And(a,b)
+    local p,c=1,0
+    while a>0 and b>0 do
+        local ra,rb=a%2,b%2
+        if ra+rb>1 then c=c+p end
+        a,b,p=(a-ra)/2,(b-rb)/2,p*2
+    end
+    return c
 end
-]]
+
+function ZomboidForge.bit.Not(n)
+    local p,c=1,0
+    while n>0 do
+        local r=n%2
+        if r<1 then c=c+p end
+        n,p=(n-r)/2,p*2
+    end
+    return c
+end
+
+-- based on Chuck's work
+ZomboidForge.pID = function(zombie)
+    local pID = zombie:getPersistentOutfitID()
+    local bit = ZomboidForge.bit
+    local pID_new = 0
+    if pID < 0 then
+        pID_new = bit.Not(-pID) + 1
+    else
+        pID_new = pID
+    end
+
+    local found = ZomboidForge.TrueID[pID]
+    if found then return found end
+    -- store bit.hat
+    ZomboidForge.bit.hat = ZomboidForge.bit.hat or bit.Not(32768)
+    local bitHat = ZomboidForge.bit.hat
+
+    local trueID = bit.And(pID_new,bitHat)
+    --local hatID = (trueID~=pID_new and pID_new) or bit.Or(pID_new,32768)
+
+    print("pID = "..pID.."   trueID = "..trueID)
+
+    ZomboidForge.TrueID[pID] = trueID
+    return trueID
+end
 
 -- get Zombie ID
 ZomboidForge.GetZombieID = function(zombie)
@@ -594,11 +671,11 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 					for i=0, movingObjects:size()-1 do
 						local zombie = movingObjects:get(i)
 						if zombie and instanceof(zombie, "IsoZombie") then
-                            local persistentOutfitID = zombie:getPersistentOutfitID()
-                            local ZombieData = ModData.getOrCreate("ZomboidForge")
-                            local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+                            local persistentOutfitID = ZomboidForge.pID(zombie)
+                            local ZFModData = ModData.getOrCreate("ZomboidForge")
+                            local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
                             
-                            local ZType = ZombieInfo.ZType
+                            local ZType = PersistentZData.ZType
 							if ZomboidForge.ZTypes[ZType] and player:CanSee(zombie) then
 								local ZID = ZomboidForge.GetZombieID(zombie)
                                 --[[
@@ -617,18 +694,18 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 	end
 end
 
--- show zombie Nametag
+-- show zombie Nametag on player update
 ZomboidForge.UpdateNametag = function()
 	for ZID,ZData in pairs(ZomboidForge.ShowNametag) do
 		local zombie = ZData[1]
 		local interval = ZData[2]
 
-        local persistentOutfitID = zombie:getPersistentOutfitID()
-        local ZombieData = ModData.getOrCreate("ZomboidForge")
-        local ZombieInfo = ZombieData.ZombieInfo[persistentOutfitID]
+        local persistentOutfitID = ZomboidForge.pID(zombie)
+        local ZFModData = ModData.getOrCreate("ZomboidForge")
+        local PersistentZData = ZFModData.PersistentZData[persistentOutfitID]
         
-        if not ZombieInfo then return end
-        local ZType = ZombieInfo.ZType
+        if not PersistentZData then return end
+        local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
 		if interval>0 and ZomboidForge.ZTypes and ZombieTable then
 			local player = getPlayer()

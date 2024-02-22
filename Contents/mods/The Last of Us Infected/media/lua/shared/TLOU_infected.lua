@@ -43,8 +43,10 @@ ZomboidForge.InitTLOUInfected = function()
 			outfit = {},
 			reanimatedPlayer = false,
 			skeleton = false,
-			hair = false, -- input string
-			beard = false, -- input string
+			hair = {},
+			hairColor = {},
+			beard = {},
+			beardColor = {},
 
             -- stats
 			walktype = 1,
@@ -90,8 +92,10 @@ ZomboidForge.InitTLOUInfected = function()
 			outfit = {},
 			reanimatedPlayer = false,
 			skeleton = false,
-			hair = false, -- input string
-			beard = false, -- input string
+			hair = {},
+			hairColor = {},
+			beard = {},
+			beardColor = {},
 
             -- stats
 			walktype = 1,
@@ -137,8 +141,14 @@ ZomboidForge.InitTLOUInfected = function()
 			outfit = {},
 			reanimatedPlayer = false,
 			skeleton = false,
-			hair = false, -- input string
-			beard = false, -- input string
+			hair = {
+				"",
+			},
+			hairColor = {},
+			beard = {
+				"",
+			},
+			beardColor = {},
 
             -- stats
 			walktype = 2,
@@ -183,11 +193,15 @@ ZomboidForge.InitTLOUInfected = function()
             spawn = true,
             name = "IGUI_TLOU_Bloater",
             chance = SandboxVars.TLOUZombies.Bloater,
-			outfit = {"Bloater"},
+			outfit = {
+				"Bloater",
+			},
 			reanimatedPlayer = false,
 			skeleton = false,
-			hair = false, -- input string
-			beard = false, -- input string
+			hair = {},
+			hairColor = {},
+			beard = {},
+			beardColor = {},
 
             -- stats
 			walktype = 2,
