@@ -95,7 +95,9 @@ ZomboidForge.InitTLOUInfected = function()
 				skeleton = false,
 				hair = {},
 				hairColor = {},
-				beard = {},
+				beard = {
+					"",
+				},
 				beardColor = {},
 
 				-- stats
@@ -144,7 +146,12 @@ ZomboidForge.InitTLOUInfected = function()
 				reanimatedPlayer = false,
 				skeleton = false,
 				hair = {
-					"",
+					male = {
+						"",
+					},
+					female = {
+						"",
+					},
 				},
 				hairColor = {
 					ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),

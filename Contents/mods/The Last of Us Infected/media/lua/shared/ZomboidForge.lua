@@ -259,13 +259,23 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     end
 
     -- set hair
-    if #ZombieTable.hair > 0 then
+    if ZombieTable.hair then
+        local key = "male"
+        if zombie:isFemale() then
+            key = "female"
+        end
+        local ZDataTable = ZombieTable.hair
         local zombieVisual = zombie:getHumanVisual()
         local currentHair = zombieVisual:getHairModel()
-        local hairChoice = ZomboidForge.RandomizeTable(ZType,"hair",currentHair)
+        --local hairChoice = false
+        print(ZDataTable[key])
+        local hairChoice = false
+        if ZDataTable[key] then
+            hairChoice = ZomboidForge.RandomizeTable(ZDataTable,key,currentHair)
+        end
         if hairChoice then
             zombieVisual:setHairModel(hairChoice)
-            zombie:resetModel();
+            zombie:resetModel()
         else
             IsSet = IsSet + 1
         end
@@ -275,12 +285,13 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
 
     -- set hair color
     if #ZombieTable.hairColor > 0 then
+        local ZDataTable = ZombieTable
         local zombieVisual = zombie:getHumanVisual()
         local currentHairColor = zombieVisual:getHairColor()
-        local hairColorChoice = ZomboidForge.RandomizeTable(ZType,"hairColor",currentHairColor)
+        local hairColorChoice = ZomboidForge.RandomizeTable(ZDataTable,"hairColor",currentHairColor)
         if hairColorChoice then
             zombieVisual:setHairColor(hairColorChoice)
-            zombie:resetModel();
+            zombie:resetModel()
         else
             IsSet = IsSet + 1
         end
@@ -288,14 +299,14 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
-    -- set beard
-    if #ZombieTable.beard > 0 then
+    -- set beard if male
+    if #ZombieTable.beard > 0 and not zombie:isFemale() then
         local zombieVisual = zombie:getHumanVisual()
         local currentBeard = zombieVisual:getBeardModel()
-        local beardChoice = ZomboidForge.RandomizeTable(ZType,"beard",currentBeard)
+        local beardChoice = ZomboidForge.RandomizeTable(ZombieTable,"beard",currentBeard)
         if beardChoice then
             zombieVisual:setBeardModel(beardChoice)
-            zombie:resetModel();
+            zombie:resetModel()
         else
             IsSet = IsSet + 1
         end
@@ -303,14 +314,14 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
-    -- set beard color
-    if #ZombieTable.beardColor > 0 then
+    -- set beard color if male
+    if #ZombieTable.beardColor > 0 and not zombie:isFemale() then
         local zombieVisual = zombie:getHumanVisual()
         local currentBeardColor = zombieVisual:getHairColor()
-        local beardColorChoice = ZomboidForge.RandomizeTable(ZType,"beardColor",currentBeardColor)
+        local beardColorChoice = ZomboidForge.RandomizeTable(ZombieTable,"beardColor",currentBeardColor)
         if beardColorChoice or true then
             zombieVisual:setHairColor(beardColorChoice)
-            zombie:resetModel();
+            zombie:resetModel()
         else
             IsSet = IsSet + 1
         end
@@ -319,31 +330,31 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     end
 
     -- update IsDataSet
-    if IsSet == 7 then
+    if IsSet >= 7 then
         nonPersistentZData.IsDataSet = true
     end
 end
 
 --- Randomly choses a `Zombie` `ZData` within a ZType data table.
----@param ZType integer     --Zombie Type ID
+---@param ZDataTable table  --Zombie Table to randomize
 ---@param ZData string      --Chosen data in ZType table
 ---@param current any       --Used to verify `current` from `Zombie` is not in table
 ---@return any              --Random choice within ZData
-ZomboidForge.RandomizeTable = function(ZType,ZData,current)
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-    local ZDataTable = ZombieTable[ZData]; if not ZDataTable then return end
-    local size = #ZDataTable
+ZomboidForge.RandomizeTable = function(ZDataTable,ZData,current)
+    --local ZombieTable = ZomboidForge.ZTypes[ZType]
+    local ZDataTable_check = ZDataTable[ZData]; if not ZDataTable_check then return end
+    local size = #ZDataTable_check
 
     local check = false
     for i = 1,size do
-        if current == ZDataTable[i] then
+        if current == ZDataTable_check[i] then
             check = true
             break
         end
     end
     if not check then
         local rand = ZombRand(1,size)
-        return ZDataTable[rand]
+        return ZDataTable_check[rand]
     end
     return false
 end
@@ -529,10 +540,10 @@ ZomboidForge.ZombieUpdate = function(zombie)
     -- get structure target from that ?
 
 
+    -- makes hairs chech male and female
+
     -- run zombie attack functions
     if zombie:isAttacking() then
-        print("is attacking")
-        
         local target = zombie:getTarget()
         zombie:addLineChatElement("target = "..tostring(target))
         ZomboidForge.ZombieAttack(zombie,ZType)
@@ -590,6 +601,11 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
             ZomboidForge.ShowZombieName(attacker, victim)
         end
     end
+
+    local zombieVisual = victim:getHumanVisual()
+    local hairChoice = "MaleHair_Baldspot"
+    zombieVisual:setHairModel(hairChoice)
+    victim:resetModel()
 end
 
 --- OnDeath functions
