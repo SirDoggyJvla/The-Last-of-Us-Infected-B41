@@ -13,7 +13,7 @@ local ZFEvents = {}
 --- Events added OnLoad
 ZFEvents.OnLoad = function()
     -- Adds the nametag update event if activated in sandbox settings
-    if SandboxVars.ZomboidForge.nametags then
+    if SandboxVars.ZomboidForge.Nametags then
         Events.OnTick.Add(ZomboidForge.UpdateNametag)
     end
 end

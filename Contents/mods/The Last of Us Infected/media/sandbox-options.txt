@@ -1,119 +1,75 @@
 VERSION = 1,
 
-option TLOUZombies.Normal
+option TLOUZombies.RunnerSpawn
 {
-	type = double,
-	min = 0.00,
-	max = 100.00,
-	default = 0,
-	page = TLOU_Zombies,
-	translation = TLOU_Normal,
+	type = boolean,
+	default = true,
+	page = ZomboidForge,
+	translation = ZomboidForge_runnerSpawn,
 }
 
-option TLOUZombies.Runner
+option TLOUZombies.RunnerChance
 {
-	type = double,
-	min = 0.00,
-	max = 1000.00,
+	type = integer,
+	min = 0,
+	max = 1000,
 	default = 580,
-	page = TLOU_Zombies,
+	page = ZomboidForge,
 	translation = TLOU_Runner,
 }
 
-option TLOUZombies.Stalker
+option TLOUZombies.StalkerSpawn
 {
-	type = double,
-	min = 0.00,
-	max = 1000.00,
-	default = 90.00,
-	page = TLOU_Zombies,
+	type = boolean,
+	default = true,
+	page = ZomboidForge,
+	translation = ZomboidForge_stalkerSpawn,
+}
+
+option TLOUZombies.StalkerChance
+{
+	type = integer,
+	min = 0,
+	max = 1000,
+	default = 90,
+	page = ZomboidForge,
 	translation = TLOU_Stalker,
 }
 
-option TLOUZombies.Clicker
+option TLOUZombies.ClickerSpawn
 {
-	type = double,
-	min = 0.00,
-	max = 1000.00,
-	default = 320.00,
-	page = TLOU_Zombies,
+	type = boolean,
+	default = true,
+	page = ZomboidForge,
+	translation = ZomboidForge_clickerSpawn,
+}
+
+option TLOUZombies.ClickerChance
+{
+	type = integer,
+	min = 0,
+	max = 1000,
+	default = 320,
+	page = ZomboidForge,
 	translation = TLOU_Clicker,
 }
 
-option TLOUZombies.Bloater
+option TLOUZombies.BloaterSpawn
 {
-	type = double,
-	min = 0.00,
-	max = 1000.00,
-	default = 10.00,
-	page = TLOU_Zombies,
+	type = boolean,
+	default = true,
+	page = ZomboidForge,
+	translation = ZomboidForge_bloaterSpawn,
+}
+
+option TLOUZombies.BloaterChance
+{
+	type = integer,
+	min = 0,
+	max = 1000,
+	default = 10,
+	page = ZomboidForge,
 	translation = TLOU_Bloater,
-}
-
-option TLOUZombies.StalkerStart
-{
-	type = integer,
-	min = 0,
-	max = 36500,
-	default = 0,
-	page = TLOU_Zombies,
-	translation = TLOU_StalkerStart,
-
-}
-
-option TLOUZombies.StalkerEnd
-{
-	type = integer,
-	min = 1,
-	max = 36500,
-	default = 1,
-	page = TLOU_Zombies,
-	translation = TLOU_StalkerEnd,
-
-}
-
-option TLOUZombies.ClickerStart
-{
-	type = integer,
-	min = 0,
-	max = 36500,
-	default = 0,
-	page = TLOU_Zombies,
-	translation = TLOU_ClickerStart,
-
-}
-
-option TLOUZombies.ClickerEnd
-{
-	type = integer,
-	min = 1,
-	max = 36500,
-	default = 1,
-	page = TLOU_Zombies,
-	translation = TLOU_ClickerEnd,
-
-}
-
-option TLOUZombies.BloaterStart
-{
-	type = integer,
-	min = 0,
-	max = 36500,
-	default = 0,
-	page = TLOU_Zombies,
-	translation = TLOU_BloaterStart,
-
-}
-
-option TLOUZombies.BloaterEnd
-{
-	type = integer,
-	min = 1,
-	max = 36500,
-	default = 1,
-	page = TLOU_Zombies,
-	translation = TLOU_BloaterEnd,
-
 }
 
 option TLOUZombies.RunnerVision
@@ -228,7 +184,7 @@ option TLOUZombies.BloaterHealth
 	translation = TLOU_BloaterHP,
 }
 
-option TLOU_Overhaul.CordycepsSpawn
+option TLOUZombies.CordycepsSpawn
 {
 	type = boolean,
 	default = true,
@@ -236,7 +192,7 @@ option TLOU_Overhaul.CordycepsSpawn
 	translation = TLOU_CordycepsSpawn,
 }
 
-option TLOU_Overhaul.CordycepsSpawnRate_Runner
+option TLOUZombies.CordycepsSpawnRate_Runner
 {
 	type = integer, 
 	min = 0, 
@@ -246,7 +202,7 @@ option TLOU_Overhaul.CordycepsSpawnRate_Runner
 	translation = TLOU_CordycepsSpawnRate_Runner,
 }
 
-option TLOU_Overhaul.CordycepsSpawnRate_Stalker
+option TLOUZombies.CordycepsSpawnRate_Stalker
 {
 	type = integer, 
 	min = 0, 
@@ -256,7 +212,7 @@ option TLOU_Overhaul.CordycepsSpawnRate_Stalker
 	translation = TLOU_CordycepsSpawnRate_Stalker,
 }
 
-option TLOU_Overhaul.CordycepsSpawnRate_Clicker
+option TLOUZombies.CordycepsSpawnRate_Clicker
 {
 	type = integer, 
 	min = 0, 
@@ -266,7 +222,7 @@ option TLOU_Overhaul.CordycepsSpawnRate_Clicker
 	translation = TLOU_CordycepsSpawnRate_Clicker,
 }
 
-option TLOU_Overhaul.CordycepsSpawnRate_Bloater
+option TLOUZombies.CordycepsSpawnRate_Bloater
 {
 	type = integer, 
 	min = 0, 
@@ -277,10 +233,30 @@ option TLOU_Overhaul.CordycepsSpawnRate_Bloater
 }
 
 
-option ZomboidForge.nametags
+option ZomboidForge.Nametags
 {
 	type = boolean,
 	default = true,
 	page = ZomboidForge,
 	translation = ZomboidForge_nametags,
+}
+
+
+
+option ZomboidForge.NormalSpawn
+{
+	type = boolean,
+	default = false,
+	page = ZomboidForge,
+	translation = ZomboidForge_normalSpawn,
+}
+
+option ZomboidForge.NormalChance
+{
+	type = integer,
+	min = 0,
+	max = 1000,
+	default = 500,
+	page = ZomboidForge,
+	translation = ZomboidForge_normalChance,
 }
