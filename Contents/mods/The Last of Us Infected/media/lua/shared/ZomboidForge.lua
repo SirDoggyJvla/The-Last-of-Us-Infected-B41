@@ -268,7 +268,6 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         local zombieVisual = zombie:getHumanVisual()
         local currentHair = zombieVisual:getHairModel()
         --local hairChoice = false
-        print(ZDataTable[key])
         local hairChoice = false
         if ZDataTable[key] then
             hairChoice = ZomboidForge.RandomizeTable(ZDataTable,key,currentHair)
@@ -494,7 +493,7 @@ ZomboidForge.ZombieUpdate = function(zombie)
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
-    
+
     local PersistentZData = ZFModData.PersistentZData[trueID]
     local ZType = PersistentZData.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -518,11 +517,11 @@ ZomboidForge.ZombieUpdate = function(zombie)
     end
 
     local object = zombie.THUMP_FLAG_GENERIC
-    zombie:addLineChatElement("value = "..tostring(zombie:getThumpTarget()))
+    --zombie:addLineChatElement("value = "..tostring(zombie:getThumpTarget()))
     --zombie:setThumpCondition(0)
     --zombie:setThumpCondition(0,100)
-    zombie:setThumpTimer(0)
-    zombie:updateVocalProperties()
+    --zombie:setThumpTimer(0)
+    --zombie:updateVocalProperties()
     --zombie:addLineChatElement("value = "..tostring(zombie:getThumpCondition()))
 
     -- for oneshot Bloaters:
@@ -633,93 +632,37 @@ end
 
 --#region Tools
 
---- Bitwise handling of pID from Chuck.
---
--- [Discord discussion](https://discord.com/channels/908422782554107904/908459714248048730/1209705754517573752)
--- 
--- [Bitwise operators in Lua](https://stackoverflow.com/questions/5977654/how-do-i-use-the-bitwise-operator-xor-in-lua)
-ZomboidForge.bit = {}
-
--- Performs bitwise operation `OR`
----@param a integer bitwise decimal
----@param b integer bitwise decimal
----@return integer c Bitwise.OR(a,b)
-function ZomboidForge.bit.OR(a,b)
-    local p,c=1,0
-    while a+b>0 do
-        local ra,rb=a%2,b%2
-        if ra+rb>0 then c=c+p end
-        a,b,p=(a-ra)/2,(b-rb)/2,p*2
-    end
-    return c
-end
-
--- Performs bitwise operation `AND`
----@param a integer bitwise decimal
----@param b integer bitwise decimal
----@return integer c Bitwise.AND(a,b)
-function ZomboidForge.bit.AND(a,b)
-    local p,c=1,0
-    while a>0 and b>0 do
-        local ra,rb=a%2,b%2
-        if ra+rb>1 then c=c+p end
-        a,b,p=(a-ra)/2,(b-rb)/2,p*2
-    end
-    return c
-end
-
--- Performs bitwise operation `NOT`
----@param n integer bitwise decimal
----@return integer c Bitwise.NOT(n)
-function ZomboidForge.bit.NOT(n)
-    local p,c=1,0
-    while n>0 do
-        local r=n%2
-        if r<1 then c=c+p end
-        n,p=(n-r)/2,p*2
-    end
-    return c
-end
-
 -- Based on Chuck's work. Outputs the `trueID` of a `Zombie`.
---
--- ```lua
---      bitHat = bit.NOT(32768)         --common bit of hat changes
---      trueID = bit.AND(pID,bitHat)
--- ```
+-- Thx to the help of Shurutsue.
 --
 -- When hat of a zombie falls off, it changes it's `persistentOutfitID` but those two `pIDs` are linked.
--- This allows to access the trueID of a zombie which links pIDs with and without fallen hat.
--- The trueID is stored to make sure the bitwise functions are not constantly called to improve performances.
+-- This allows to access the trueID of a `Zombie` (the original pID with hat) from both pIDs.
+-- The trueID is stored to improve performances and is accessed from the fallen hat pID and the pID sent
+-- through this function detects if it's the trueID.
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@return integer trueID
 ZomboidForge.pID = function(zombie)
     local pID = zombie:getPersistentOutfitID()
-    local pID_new = 0
 
-    -- female zombies have negative pID
-    -- those need to be passed through a NOT bitwise function
-    if pID < 0 then
-        pID_new = -pID
-    else
-        pID_new = pID
-    end
-
-    local found = ZomboidForge.TrueID[pID]
+    local found = ZomboidForge.TrueID[pID] and pID or ZomboidForge.HatFallen[pID]
     if found then 
-        --zombie:addLineChatElement("pID = "..pID.."\ntrueID = "..found)
-        return found 
+        zombie:addLineChatElement("pID = "..tostring(pID)..
+            "\npID table = "..tostring(found))
+        return found
     end
 
-    local bit = ZomboidForge.bit
-    -- store bit.hat
-    ZomboidForge.bit.hat = ZomboidForge.bit.hat or bit.NOT(32768)
-    local bitHat = ZomboidForge.bit.hat
+    local bits = string.split(string.reverse(Long.toUnsignedString(pID, 2)), "")
+    while #bits < 16 do bits[#bits+1] = 0 end
 
-    local trueID = bit.AND(pID_new,bitHat)
-    --local hatID = (trueID~=pID_new and pID_new) or bit.Or(pID_new,32768)
+    -- trueID
+    bits[16] = 0
+    local trueID = Long.parseUnsignedLong(string.reverse(table.concat(bits, "")), 2)
+    ZomboidForge.TrueID[trueID] = true
 
-    --print("pID = "..pID.."   trueID = "..trueID)
+    -- hatFallenID
+    bits[16] = 1
+    ZomboidForge.HatFallen[Long.parseUnsignedLong(string.reverse(table.concat(bits, "")), 2)] = trueID
+
 
     ZomboidForge.TrueID[pID] = trueID
     return trueID

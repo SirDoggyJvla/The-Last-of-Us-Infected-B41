@@ -6,5 +6,6 @@ ZomboidForge.ZTypes = ZomboidForge.ZTypes or {}
 ZomboidForge.ShowNametag = ZomboidForge.ShowNametag or {}
 ZomboidForge.PersistentOutfitID = {}
 ZomboidForge.TrueID = {}
+ZomboidForge.HatFallen = {}
 
 return ZomboidForge
