@@ -130,6 +130,7 @@ ZomboidForge.InitTLOUInfected = function()
 				},
 				customBehavior = {
 					"SetStalkerSounds",
+					"HideIndoors",
 				},
 			}
 		)
@@ -193,6 +194,7 @@ ZomboidForge.InitTLOUInfected = function()
 				customBehavior = {
 					"SetClickerClothing",
 					"SetClickerSounds",
+					"HideIndoors",
 				},
 			}
 		)
@@ -245,6 +247,7 @@ ZomboidForge.InitTLOUInfected = function()
 				},
 				customBehavior = {
 					"SetBloaterSounds",
+					"HideIndoors",
 				},
 			}
 		)
@@ -317,14 +320,27 @@ end
 
 --- Custom behavior
 
--- onDeath of a clicker
+--#region Custom behavior: `OnDeath loot`
+
+-- Replace fungi hat clothing with fungi hat food type on a `Clicker`'s death.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.OnClickerDeath = function(zombie,ZType)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
 	inventory:AddItems("Hat_Fungi_Loot",1)
 end
 
--- add cordyceps mushrooms
+-- Add cordyceps mushrooms from Braven's Cordyceps Spore Zones when activated to various infected loot.
+-- Purely for aesthetic and immersion.
+-- Cordyceps loot count :
+--
+-- 		`Runner = 1 to 3`
+-- 		`Stalker = 1 to 5`
+-- 		`Clicker = 3 to 10`
+-- 		`Bloater = 5 to 15`
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.OnInfectedDeath = function(zombie,ZType)
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_Overhaul.CordycepsSpawn then
 		-- add fungi hat food type to inventory
@@ -345,8 +361,14 @@ ZomboidForge.OnInfectedDeath = function(zombie,ZType)
 		end
 	end
 end
+--#endregion
 
--- set runner sounds
+
+--#region Custom behavior: `SetInfectedSounds`
+
+-- Set `Runner` sounds.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
@@ -360,7 +382,9 @@ ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 	end
 end
 
--- set stalker sounds
+-- Set `Stalker` sounds.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
@@ -373,7 +397,10 @@ ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 		end
 	end
 end
--- set clicker sounds
+
+-- Set `Clicker` sounds.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
@@ -382,7 +409,10 @@ ZomboidForge.SetClickerSounds = function(zombie,ZType)
 		end
 	end
 end
--- set bloater sounds
+
+-- Set `Bloater` sounds.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetBloaterSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
@@ -391,6 +421,10 @@ ZomboidForge.SetBloaterSounds = function(zombie,ZType)
 		end
 	end
 end
+
+--#endregion
+
+--#region Custom behavior: `SetClickerClothing`
 
 -- clothing priority to replace
 TLOU_infected.clothingPriority = {
@@ -440,11 +474,13 @@ TLOU_infected.clothingPriority = {
 	["Jacket"] = 43,
 }
 
--- set clicker clothing by visually replacing one of its clothing
+-- Set clicker clothing by visually replacing one of its clothing based on the priority list of clothings to replace.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	local visual = zombie:getItemVisuals()
 	-- scroll through every clothing and replace it
-	if visual:size() > 0 then
+	if visual and visual:size() > 0 then
 		local hasHat_Fungi = false
 		local priority = 100
 		local itemReset = nil
@@ -471,16 +507,86 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	end
 end
 
+--#endregion
+
+--#region Custom behavior: `HideIndoors`
+
+-- Main function to handle `Zombie` behavior to go hide inside the closest building.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.HideIndoors = function(zombie,ZType)
-	if zombie:isCharacterOutside() then
-		zombie:addLineChatElement("isOutside")
-		
+	local building = zombie:getBuilding()
+	local cell = zombie:getCell()
+    --local buildingSq = zombie:getCell():getGridSquare(buildingDef:getX(), buildingDef:getY(), zCoord)
+	--building = ZomboidForge.GetClosestBuilding()
+	--print(zombie:getFamiliarBuildings())
+	if ZomboidForge.IsCharacterOutside(zombie) then
+		zombie:addLineChatElement(
+			"isOutside"..
+			"\nCell = "..tostring(cell)
+			--"\nClosest building = "..tostring(building)
+		)
 	else
-		zombie:addLineChatElement("isInside")
+		--local buildingDef = building:getDef()
+		--print(building.ID)
+		zombie:addLineChatElement(
+			"IsInside"..
+			"\nCell = "..tostring(cell)
+			--"\nClosest building = "..tostring(building)..
+			--"\nbuildingDef = "..tostring(buildingDef)
+		)
 	end
 end
 
-ZomboidForge.isCharacterOutside = function(character)
+ZomboidForge.LureZombie = function(zombie)
+    local targetsq = zombie:getCurrentSquare();
+
+    if isDay() then
+        targetsq = getSquareInClosestBuilding(zombie);
+    else
+        targetsq = getRandomOutdoorSquare(zombie);
+    end
+
+    if targetsq == nil then return; end
+
+    if targetSquareIsFar(zombie,targetsq) == true then
+        randomLureZombieFar(zombie);
+    elseif coinFlip() then
+        lureZombieToSoundSquare(zombie, targetsq);
+    else
+        lureZombieToLocationSquare(zombie, targetsq);
+    end
+end
+
+
+ZomboidForge.IsCharacterOutside = function(character)
     local currentSquare = character:getCurrentSquare();
     return currentSquare:isOutside();
 end
+
+-- calculate the closeset building in the list
+ZomboidForge.GetClosestBuilding = function(character, onlyUnexplored) --isAllExplored()
+	local sourcesq = character:getCurrentSquare()
+    local closest = nil
+    local closestDist = 1000000
+
+    if isBuildingListEmpty() == true then
+        closest = sourcesq;
+    else
+        for id, b in pairs(building_table) do
+            if not onlyUnexplored and not b:isAllExplored() then --get nearest unexplored building
+                local sq = b:getRandomRoom():getRandomFreeSquare();
+                if sq ~= nil then 
+                    local dist = IsoUtils.DistanceTo(sourcesq:getX(), sourcesq:getY(), sq:getX() , sq:getY())
+                    if dist < closestDist then
+                        closest = sq;
+                        closestDist = dist;
+                    end
+                end
+            end
+        end
+    end
+    return closest
+end
+
+--#endregion
