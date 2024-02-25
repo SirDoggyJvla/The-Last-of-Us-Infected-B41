@@ -441,7 +441,7 @@ TLOU_infected.clothingPriority = {
 }
 
 -- set clicker clothing by visually replacing one of its clothing
-function ZomboidForge.SetClickerClothing(zombie,ZType)
+ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	local visual = zombie:getItemVisuals()
 	-- scroll through every clothing and replace it
 	if visual:size() > 0 then
@@ -469,4 +469,18 @@ function ZomboidForge.SetClickerClothing(zombie,ZType)
 			zombie:resetModel()
 		end
 	end
+end
+
+ZomboidForge.HideIndoors = function(zombie,ZType)
+	if zombie:isCharacterOutside() then
+		zombie:addLineChatElement("isOutside")
+		
+	else
+		zombie:addLineChatElement("isInside")
+	end
+end
+
+ZomboidForge.isCharacterOutside = function(character)
+    local currentSquare = character:getCurrentSquare();
+    return currentSquare:isOutside();
 end

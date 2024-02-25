@@ -528,6 +528,7 @@ ZomboidForge.ZombieUpdate = function(zombie)
     -- methods:
     -- getThumpCondition()  --> outputs HP of structure
     -- getThumpTimer()      --> no idea, could be used maybe
+    -- getThumpCondition()  --> supposed to output zombie thump target
 
     -- could detect zombie is thumping with thumpcondition
     -- if detected then run script to check every tiles around
@@ -646,8 +647,8 @@ ZomboidForge.pID = function(zombie)
 
     local found = ZomboidForge.TrueID[pID] and pID or ZomboidForge.HatFallen[pID]
     if found then 
-        zombie:addLineChatElement("pID = "..tostring(pID)..
-            "\npID table = "..tostring(found))
+        --zombie:addLineChatElement("pID = "..tostring(pID)..
+        --    "\npID table = "..tostring(found))
         return found
     end
 
