@@ -299,9 +299,8 @@ end
 
 -- player attacked a clicker
 function ZomboidForge.ClickerHit(player, zombie, HandWeapon, damage)
-
 	if SandboxVars.TLOUZombies.NoPushClickers then
-		if HandWeapon:getDisplayName() == "Bare Hands" then
+		if HandWeapon:getFullType() == "Base.BareHands" then
 			zombie:setOnlyJawStab(true)
 		else
 			zombie:setOnlyJawStab(false)
