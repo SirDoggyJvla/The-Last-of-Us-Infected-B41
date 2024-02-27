@@ -14,28 +14,34 @@ This file defines the core of the mod of The Last of Us Infected Fork
 
 --- Import functions localy for performances reasons
 local table = table -- Lua's table module
-local ipairs = ipairs -- ipair function
-local ZombRand = ZombRand -- java random function
+local ipairs = ipairs -- ipairs function
+local pairs = pairs -- pairs function
+local ZombRand = ZombRand -- java function
 local print = print -- print function
+local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 
 --- setup local functions
-local TLOU_infected = {}
+ZomboidForge.TLOU_infected = ZomboidForge.TLOU_infected or {}
 
 --- Create zombie types
 ZomboidForge.InitTLOUInfected = function()
-	TLOU_infected.lootchance = {
+	ZomboidForge.TLOU_infected.lootchance = {
 		runner = SandboxVars.TLOUZombies.CordycepsSpawnRate_Runner,
 		stalker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Stalker,
 		clicker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Clicker,
 		bloater = SandboxVars.TLOUZombies.CordycepsSpawnRate_Bloater,
 	}
 
+	ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOUZombies.OnlyUnexplored
+	ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOUZombies.MaxDistanceToCheck
+
     -- RUNNER
 	if SandboxVars.TLOUZombies.RunnerSpawn then
-		table.insert(ZomboidForge.ZTypes,
+		--table.insert(ZomboidForge.ZTypes,
+		ZomboidForge.ZTypes.TLOU_Runner =
 			{
 				-- base informations
 				name = "IGUI_TLOU_Runner",
@@ -80,12 +86,13 @@ ZomboidForge.InitTLOUInfected = function()
 					"SetRunnerSounds",
 				},
 			}
-		)
+		--)
 	end
 
     -- STALKER
 	if SandboxVars.TLOUZombies.StalkerSpawn then
-		table.insert(ZomboidForge.ZTypes,
+		--table.insert(ZomboidForge.ZTypes,
+		ZomboidForge.ZTypes.TLOU_Stalker =
 			{
 				-- base informations
 				name = "IGUI_TLOU_Stalker",
@@ -133,12 +140,13 @@ ZomboidForge.InitTLOUInfected = function()
 					"HideIndoors",
 				},
 			}
-		)
+		--)
 	end
 
     -- CLICKER
 	if SandboxVars.TLOUZombies.ClickerSpawn then
-		table.insert(ZomboidForge.ZTypes,
+		ZomboidForge.ZTypes.TLOU_Clicker =
+		--table.insert(ZomboidForge.ZTypes,
 			{
 				-- base informations
 				name = "IGUI_TLOU_Clicker",
@@ -197,12 +205,13 @@ ZomboidForge.InitTLOUInfected = function()
 					"HideIndoors",
 				},
 			}
-		)
+		--)
 	end
 
     -- BLOATER
 	if SandboxVars.TLOUZombies.BloaterSpawn then
-		table.insert(ZomboidForge.ZTypes,
+		--table.insert(ZomboidForge.ZTypes,
+		ZomboidForge.ZTypes.TLOU_Bloater =
 			{
 				-- base informations
 				name = "IGUI_TLOU_Bloater",
@@ -250,7 +259,7 @@ ZomboidForge.InitTLOUInfected = function()
 					"HideIndoors",
 				},
 			}
-		)
+		--)
 	end
 end
 
@@ -339,6 +348,7 @@ end
 -- 		`Stalker = 1 to 5`
 -- 		`Clicker = 3 to 10`
 -- 		`Bloater = 5 to 15`
+--
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.OnInfectedDeath = function(zombie,ZType)
@@ -349,7 +359,7 @@ ZomboidForge.OnInfectedDeath = function(zombie,ZType)
 
 		-- roll to inventory
 		local rand = ZombRand(1,100)
-		local lootchance = TLOU_infected.lootchance
+		local lootchance = ZomboidForge.TLOU_infected.lootchance
 		if ZombieTable.isRunner and lootchance.runner >= rand then
 			inventory:AddItems("Cordyceps", ZombRand(1,3))
 		elseif ZombieTable.isStalker and lootchance.stalker >= rand then
@@ -362,7 +372,6 @@ ZomboidForge.OnInfectedDeath = function(zombie,ZType)
 	end
 end
 --#endregion
-
 
 --#region Custom behavior: `SetInfectedSounds`
 
@@ -427,7 +436,7 @@ end
 --#region Custom behavior: `SetClickerClothing`
 
 -- clothing priority to replace
-TLOU_infected.clothingPriority = {
+ZomboidForge.TLOU_infected.ClothingPriority = {
 	["Hat"] = 1,
 	["Mask"] = 2,
 	["Eyes"] = 3,
@@ -490,7 +499,7 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 				break
 			end
 			local bodyLocation = item:getScriptItem():getBodyLocation()
-			local priorityTest = TLOU_infected.clothingPriority[bodyLocation]
+			local priorityTest = ZomboidForge.TLOU_infected.ClothingPriority[bodyLocation]
 			if item:getItemType() == "Base.Hat_Fungi" then
 				hasHat_Fungi = true
 				break
@@ -517,38 +526,34 @@ end
 ZomboidForge.HideIndoors = function(zombie,ZType)
 	local building = zombie:getBuilding()
 	local cell = zombie:getCell()
-    --local buildingSq = zombie:getCell():getGridSquare(buildingDef:getX(), buildingDef:getY(), zCoord)
-	--building = ZomboidForge.GetClosestBuilding()
-	--print(zombie:getFamiliarBuildings())
-	if ZomboidForge.IsCharacterOutside(zombie) then
-		zombie:addLineChatElement(
-			"isOutside"..
-			"\nCell = "..tostring(cell)
-			--"\nClosest building = "..tostring(building)
-		)
+	if not building then
+		ZomboidForge.LureZombie(zombie)
 	else
-		--local buildingDef = building:getDef()
-		--print(building.ID)
+		local sourcesq = zombie:getCurrentSquare()
+		local buildingDef = building:getDef()
+		local key = buildingDef:getKeyId()
+	
 		zombie:addLineChatElement(
-			"IsInside"..
-			"\nCell = "..tostring(cell)
-			--"\nClosest building = "..tostring(building)..
-			--"\nbuildingDef = "..tostring(buildingDef)
+			"IsInside = "..tostring(building)..
+			"\nbuildingDef = "..tostring(buildingDef)..
+			"\nkey = "..tostring(key)
 		)
 	end
 end
 
 ZomboidForge.LureZombie = function(zombie)
-    local targetsq = zombie:getCurrentSquare();
-
-    if isDay() then
-        targetsq = getSquareInClosestBuilding(zombie);
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
+	local targetsq = nil
+    if ZFModData.IsDay then
+        targetsq = ZomboidForge.GetClosestSquare(zombie)
     else
-        targetsq = getRandomOutdoorSquare(zombie);
+		print("is not day")
+        --targetsq = getRandomOutdoorSquare(zombie,"Night")
     end
 
     if targetsq == nil then return; end
 
+	--[[
     if targetSquareIsFar(zombie,targetsq) == true then
         randomLureZombieFar(zombie);
     elseif coinFlip() then
@@ -556,22 +561,32 @@ ZomboidForge.LureZombie = function(zombie)
     else
         lureZombieToLocationSquare(zombie, targetsq);
     end
-end
-
-
-ZomboidForge.IsCharacterOutside = function(character)
-    local currentSquare = character:getCurrentSquare();
-    return currentSquare:isOutside();
+	]]
 end
 
 -- calculate the closeset building in the list
-ZomboidForge.GetClosestBuilding = function(character, onlyUnexplored) --isAllExplored()
+ZomboidForge.GetClosestSquare = function(character) --isAllExplored()
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
 	local sourcesq = character:getCurrentSquare()
-    local closest = nil
-    local closestDist = 1000000
 
-    if isBuildingListEmpty() == true then
-        closest = sourcesq;
+	local squareMoveTo = ZomboidForge.GetClosestBuilding(sourcesq)
+
+	if squareMoveTo then
+		character:addLineChatElement(
+			"BUILDING FOUND"
+		)
+	else
+		character:addLineChatElement(
+			"Building not found"
+		)
+	end
+	
+
+
+
+	--[[
+    if not ZFModData.BuildingList then
+        closest = sourcesq
     else
         for id, b in pairs(building_table) do
             if not onlyUnexplored and not b:isAllExplored() then --get nearest unexplored building
@@ -586,7 +601,152 @@ ZomboidForge.GetClosestBuilding = function(character, onlyUnexplored) --isAllExp
             end
         end
     end
-    return closest
+	]]
+end
+
+ZomboidForge.TLOU_infected.ChunkCheck = {}
+ZomboidForge.TLOU_infected.ChunkCheck.FirstCheck = {
+	{1,0},
+	{-1,0},
+	{0,1},
+	{0,-1},
+	{1,1},
+	{1,-1},
+	{-1,1},
+	{-1,-1},
+}
+ZomboidForge.TLOU_infected.ChunkCheck.SecondCheck = {
+	{1,1},
+	{1,-1},
+	{-1,1},
+	{1,-1},
+}
+
+ZomboidForge.GetClosestBuilding = function(sourcesq)
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
+	if not sourcesq or not ZFModData.BuildingList then return end
+
+	local closestSquare = nil
+    local closestDist = 100000
+
+	local MaxChunk = ZomboidForge.TLOU_infected.MaxDistanceToCheck/10
+	local chunkID = nil
+	local wx = 0
+	local wy = 0
+
+	local x_sourcesq = sourcesq:getX()
+	local y_sourcesq = sourcesq:getY()
+
+	local chunk_origin = sourcesq:getChunk()
+	local chunkID_origin = ZomboidForge.GetChunkID(chunk_origin)
+	local wx_origin = chunk_origin.wx
+	local wy_origin = chunk_origin.wy
+
+
+	closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID_origin,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+	if closestSquare then return closestSquare end
+
+	for i = 1,MaxChunk do
+		for _,j in ipairs(ZomboidForge.TLOU_infected.ChunkCheck.FirstCheck) do
+			wx = wx_origin + i * j[1]
+			wy = wy_origin + i * j[2]
+			chunkID = tostring(wx).."x"..tostring(wy)
+			closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+		end
+		for _,j in ipairs(ZomboidForge.TLOU_infected.ChunkCheck.SecondCheck) do
+			for k = 1,i do
+				wx = wx_origin + j[1] * k
+				wy = wy_origin + j[2] * i
+				chunkID = tostring(wx).."x"..tostring(wy)
+				closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+
+				wx = wx_origin + j[1] * i
+				wy = wy_origin + j[2] * k
+				chunkID = tostring(wx).."x"..tostring(wy)
+				closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+			end
+		end
+
+		if closestSquare then return closestSquare end
+	end
+end
+
+
+ZomboidForge.GetChunkID = function(chunk)
+	return tostring(chunk.wx).."x"..tostring(chunk.wy)
+end
+
+ZomboidForge.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
+	local squareCheck = nil
+	local distance = nil
+	local building = nil
+
+	if ZFModData.BuildingList[chunkID] then
+		for _,buildingData in pairs(ZFModData.BuildingList[chunkID]) do
+			building = getSquare(buildingData[1],buildingData[2],0):getBuilding()
+			squareCheck = building:getRandomRoom():getRandomFreeSquare()
+			if not squareCheck then return closestDist, closestSquare end
+			distance = IsoUtils.DistanceTo(x_sourcesq, y_sourcesq, squareCheck:getX() , squareCheck:getY())
+
+			if not (ZomboidForge.TLOU_infected.OnlyUnexplored and building:isAllExplored()) then
+			elseif not (ZomboidForge.TLOU_infected.OnlyUnexplored and building:isAllExplored()) and distance < closestDist then
+				closestDist = distance
+				closestSquare = squareCheck
+			end
+		end
+	end
+	return closestDist, closestSquare
+end
+
+
+ZomboidForge.IsDay = function()
+	local gametime = GameTime:getInstance();
+	local month = gametime:getMonth()
+
+	local season = nil
+	if month == 2 or month == 3 or month == 4 then
+		season = "Spring";
+	elseif month == 5 or month == 6 or month == 7 then
+		season = "Summer";
+	elseif month == 8 or month == 9 or month == 10 then
+		season = "Autumn";
+	elseif month == 11 or month == 12 or month == 1 then
+		season = "Winter";
+	end
+
+	local currentHour = math.floor(GameTime:getInstance():getTimeOfDay())
+
+	local IsDay = false
+	if (season == "Spring" and currentHour >= 6 and currentHour <= 21) or
+    (season == "Summer" and currentHour >= 6 and currentHour <= 22) or
+    (season == "Autumn" and currentHour >= 6 and currentHour <= 21) or
+    (season == "Winter" and currentHour >= 8 and currentHour <= 17) then
+		IsDay = true
+	end
+
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
+	ZFModData.IsDay = IsDay
+end
+
+-- Adds detected buildings to the list of available buildings in a chunk
+ZomboidForge.AddBuildingList = function(square)
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
+	ZFModData.BuildingList = ZFModData.BuildingList or {}
+	local building = square:getBuilding()
+	if not building then return end
+	local buildingID = building:getDef():getKeyId()
+	local chunk = square:getChunk()
+	local chunkID = ZomboidForge.ChunkID(chunk)
+	ZFModData.BuildingList[chunkID] = ZFModData.BuildingList[chunkID] or {}
+	if not ZFModData.BuildingList[chunkID][buildingID] then
+		local room = building:getRandomRoom()
+		local squareBuilding = room:getRandomFreeSquare()
+		if squareBuilding then
+			print("adding building")
+			ZFModData.BuildingList[chunkID][buildingID] = {squareBuilding:getX(),squareBuilding:getY()}
+		end
+	end
 end
 
 --#endregion

@@ -13,9 +13,11 @@ This file defines the core of the mod Zomboid Forge
 
 --- Import functions localy for performances reasons
 local table = table -- Lua's table module
-local ipairs = ipairs -- ipair function
+local ipairs = ipairs -- ipairs function
+local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
 local print = print -- print function
+local tostring = tostring --tostring function
 
 --- main module for use in storing informations and pass along other files
 --local ZomboidForge = {}
@@ -143,12 +145,12 @@ ZomboidForge.OnLoad = function()
     end
 
     -- get numbers of Zombie Types
-    ZomboidForge.TotalZTypes = #ZomboidForge.ZTypes
+    --ZomboidForge.TotalZTypes = #ZomboidForge.ZTypes
 
     -- calculate total chance
     ZomboidForge.TotalChance = 0
-    for i = 1,ZomboidForge.TotalZTypes do
-        ZombieTable = ZomboidForge.ZTypes[i]
+    for ZTypes,ZombieTable in pairs(ZomboidForge.ZTypes) do
+    --for i = 1,ZomboidForge.TotalZTypes do
         ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZombieTable.chance
     end
 end
@@ -175,13 +177,15 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
     ZFModData.test = true
 
     -- attribute zombie type if not set
-    if not PersistentZData.ZType then
+    local ZType = PersistentZData.ZType
+    if not ZType or not ZomboidForge.ZTypes[ZType] then
     --if not PersistentZData.ZType or not ZomboidForge.ZTypes[PersistentZData.ZType] then
         local rand = ZombRand(ZomboidForge.TotalChance)
-        for i = 1,ZomboidForge.TotalZTypes do
-            rand = rand - ZomboidForge.ZTypes[i].chance
+        for ZTypes,ZombieTable in pairs(ZomboidForge.ZTypes) do
+        --for i = 1,ZomboidForge.TotalZTypes do
+            rand = rand - ZombieTable.chance
             if rand <= 0 then
-                PersistentZData.ZType = i
+                PersistentZData.ZType = ZTypes
                 break
             end
         end
@@ -232,7 +236,7 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     -- set zombie clothing
     if #ZombieTable.outfit > 0 then
         local currentOutfit = zombie:getOutfitName()
-        local outfitChoice = ZomboidForge.RandomizeTable(ZType,"outfit",currentOutfit)
+        local outfitChoice = ZomboidForge.RandomizeTable(ZombieTable,"outfit",currentOutfit)
         if outfitChoice then
             local old_trueID = trueID
             zombie:dressInNamedOutfit(outfitChoice)
@@ -284,10 +288,9 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
 
     -- set hair color
     if #ZombieTable.hairColor > 0 then
-        local ZDataTable = ZombieTable
         local zombieVisual = zombie:getHumanVisual()
         local currentHairColor = zombieVisual:getHairColor()
-        local hairColorChoice = ZomboidForge.RandomizeTable(ZDataTable,"hairColor",currentHairColor)
+        local hairColorChoice = ZomboidForge.RandomizeTable(ZombieTable,"hairColor",currentHairColor)
         if hairColorChoice then
             zombieVisual:setHairColor(hairColorChoice)
             zombie:resetModel()
@@ -570,6 +573,7 @@ end
 ZomboidForge.ZombieAttack = function(zombie,ZType)
     local player = zombie:getTarget()
     if player and player:isCharacter() then
+        local ZombieTable = ZomboidForge.ZTypes[ZType]
         ZomboidForge.ShowZombieName(player, zombie)
         if ZombieTable.funcattack then
             for i=1,#ZombieTable.funcattack do
