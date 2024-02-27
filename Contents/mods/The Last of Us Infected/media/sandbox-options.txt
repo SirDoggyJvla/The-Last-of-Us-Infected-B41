@@ -240,6 +240,14 @@ option TLOUZombies.OnlyUnexplored
 	translation = TLOU_IgnoreUnexplored,
 }
 
+option TLOUZombies.WanderAtNight
+{
+	type = boolean,
+	default = true,
+	page = TLOU_Zombies,
+	translation = TLOU_WanderAtNight,
+}
+
 option TLOUZombies.MaxDistanceToCheck
 {
 	type = integer, 

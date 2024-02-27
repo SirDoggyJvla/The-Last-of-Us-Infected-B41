@@ -14,7 +14,7 @@ local ZomboidForge = require "ZomboidForge_module"
 Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)
 
 --- Add buildings to the list of buildings available to check for zombies
-Events.LoadGridsquare.Add(ZomboidForge.AddBuildingList)
+Events.LoadGridsquare.Add(ZomboidForge.TLOU_infected.AddBuildingList)
 
 --- Add a check if it's day every hours
-Events.EveryHours.Add(ZomboidForge.IsDay)
+Events.EveryHours.Add(ZomboidForge.TLOU_infected.IsDay)

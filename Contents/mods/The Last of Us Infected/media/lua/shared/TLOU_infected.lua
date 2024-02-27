@@ -36,6 +36,7 @@ ZomboidForge.InitTLOUInfected = function()
 	}
 
 	ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOUZombies.OnlyUnexplored
+	ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOUZombies.WanderAtNight
 	ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOUZombies.MaxDistanceToCheck
 
     -- RUNNER
@@ -263,7 +264,7 @@ ZomboidForge.InitTLOUInfected = function()
 	end
 end
 
---- Attack functions
+--#region Attack functions
 
 -- clicker attacks a player
 function ZomboidForge.ClickerAttack(player,zombie)
@@ -326,6 +327,7 @@ function ZomboidForge.BloaterHit(player, zombie, HandWeapon, damage)
 
 	zombie:setHitTime(0)
 end
+--#endregion
 
 --- Custom behavior
 
@@ -520,90 +522,71 @@ end
 
 --#region Custom behavior: `HideIndoors`
 
--- Main function to handle `Zombie` behavior to go hide inside the closest building.
+local timeCheck = 100
+-- Main function to handle `Zombie` behavior to go hide inside the closest building or wander during night.
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.HideIndoors = function(zombie,ZType)
-	local building = zombie:getBuilding()
-	local cell = zombie:getCell()
-	if not building then
-		ZomboidForge.LureZombie(zombie)
-	else
+	-- if zombie is already in building, completely skip
+	if zombie:getBuilding() then return end
+
+	-- get zombie pID and info
+	local trueID = ZomboidForge.pID(zombie)
+	ZomboidForge.TLOU_infected[trueID] = ZomboidForge.TLOU_infected[trueID] or {}
+
+	-- update lure counter
+	local lureCounter = ZomboidForge.TLOU_infected[trueID].LureCounter
+	if lureCounter and lureCounter >= 0 then
+		ZomboidForge.TLOU_infected[trueID].LureCounter = lureCounter - 1
+		return
+	elseif not lureCounter then
+		ZomboidForge.TLOU_infected[trueID].LureCounter = timeCheck
+		return
+	end
+
+	-- lure zombie either to a building or make it wander if it's daytime
+	ZomboidForge.TLOU_infected.LureZombie(zombie)
+
+	ZomboidForge.TLOU_infected[trueID].LureCounter = timeCheck
+end
+
+-- Lure `Zombie` to the building during daytime or make it wander around during night time.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+ZomboidForge.TLOU_infected.LureZombie = function(zombie)
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+    if TLOU_ModData.IsDay or not ZomboidForge.TLOU_infected.WanderAtNight then
 		local sourcesq = zombie:getCurrentSquare()
-		local buildingDef = building:getDef()
-		local key = buildingDef:getKeyId()
-	
-		zombie:addLineChatElement(
-			"IsInside = "..tostring(building)..
-			"\nbuildingDef = "..tostring(buildingDef)..
-			"\nkey = "..tostring(key)
-		)
-	end
+		local squareMoveTo = ZomboidForge.TLOU_infected.GetClosestBuilding(sourcesq)
+		if not squareMoveTo then return end
+		zombie:pathToSound(squareMoveTo:getX(), squareMoveTo:getY() ,squareMoveTo:getZ())
+    else
+		local maxDistance = ZomboidForge.TLOU_infected.MaxDistanceToCheck
+		local x = zombie:getX() + ZombRand(10,maxDistance) * ZomboidForge.TLOU_infected.CoinFlip()
+		local y = zombie:getY() + ZombRand(10,maxDistance) * ZomboidForge.TLOU_infected.CoinFlip()
+        zombie:pathToSound(x, y ,0)
+    end
 end
 
-ZomboidForge.LureZombie = function(zombie)
-	local ZFModData = ModData.getOrCreate("ZomboidForge")
-	local targetsq = nil
-    if ZFModData.IsDay then
-        targetsq = ZomboidForge.GetClosestSquare(zombie)
-    else
-		print("is not day")
-        --targetsq = getRandomOutdoorSquare(zombie,"Night")
-    end
-
-    if targetsq == nil then return; end
-
-	--[[
-    if targetSquareIsFar(zombie,targetsq) == true then
-        randomLureZombieFar(zombie);
-    elseif coinFlip() then
-        lureZombieToSoundSquare(zombie, targetsq);
-    else
-        lureZombieToLocationSquare(zombie, targetsq);
-    end
-	]]
+-- Retrieves the ID of a chunk, from it's coordinates `wx` and `wy`
+---@param chunk IsoChunk
+---@return string chunkID
+ZomboidForge.TLOU_infected.GetChunkID = function(chunk)
+	return tostring(chunk.wx).."x"..tostring(chunk.wy)
 end
 
--- calculate the closeset building in the list
-ZomboidForge.GetClosestSquare = function(character) --isAllExplored()
-	local ZFModData = ModData.getOrCreate("ZomboidForge")
-	local sourcesq = character:getCurrentSquare()
+-- Coin flips either `1` or `-1`
+---@return integer coinFlip
+ZomboidForge.TLOU_infected.CoinFlip = function()
+    local randomNumber = ZombRand(2)
 
-	local squareMoveTo = ZomboidForge.GetClosestBuilding(sourcesq)
-
-	if squareMoveTo then
-		character:addLineChatElement(
-			"BUILDING FOUND"
-		)
-	else
-		character:addLineChatElement(
-			"Building not found"
-		)
-	end
-	
-
-
-
-	--[[
-    if not ZFModData.BuildingList then
-        closest = sourcesq
+    if randomNumber == 0 then
+        return -1
     else
-        for id, b in pairs(building_table) do
-            if not onlyUnexplored and not b:isAllExplored() then --get nearest unexplored building
-                local sq = b:getRandomRoom():getRandomFreeSquare();
-                if sq ~= nil then 
-                    local dist = IsoUtils.DistanceTo(sourcesq:getX(), sourcesq:getY(), sq:getX() , sq:getY())
-                    if dist < closestDist then
-                        closest = sq;
-                        closestDist = dist;
-                    end
-                end
-            end
-        end
+        return 1
     end
-	]]
 end
 
+-- Lists to allow easier writing of the code checking buildings
 ZomboidForge.TLOU_infected.ChunkCheck = {}
 ZomboidForge.TLOU_infected.ChunkCheck.FirstCheck = {
 	{1,0},
@@ -622,75 +605,99 @@ ZomboidForge.TLOU_infected.ChunkCheck.SecondCheck = {
 	{1,-1},
 }
 
-ZomboidForge.GetClosestBuilding = function(sourcesq)
-	local ZFModData = ModData.getOrCreate("ZomboidForge")
-	if not sourcesq or not ZFModData.BuildingList then return end
+-- Determines the closest square within a building.
+-- Checks in spiral around the original square `sourcesq` and stops when the closest building within
+-- a ring of `i` chunk size (up to `maxChunk` size) is found.
+---@param sourcesq IsoGridSquare
+---@return IsoGridSquare|nil closestSquare
+ZomboidForge.TLOU_infected.GetClosestBuilding = function(sourcesq)
+	-- skip if no buildings available
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+	if not sourcesq or not TLOU_ModData.BuildingList then return end
 
+	-- initialize data checks
+	local closestDist = 100000
 	local closestSquare = nil
-    local closestDist = 100000
 
-	local MaxChunk = ZomboidForge.TLOU_infected.MaxDistanceToCheck/10
-	local chunkID = nil
-	local wx = 0
-	local wy = 0
-
+	-- get coordinates of sourcesq to check distances
 	local x_sourcesq = sourcesq:getX()
 	local y_sourcesq = sourcesq:getY()
 
+	-- get original chunk of sourcesq and it's data
 	local chunk_origin = sourcesq:getChunk()
-	local chunkID_origin = ZomboidForge.GetChunkID(chunk_origin)
+	local chunkID_origin = ZomboidForge.TLOU_infected.GetChunkID(chunk_origin)
 	local wx_origin = chunk_origin.wx
 	local wy_origin = chunk_origin.wy
 
+	-- data to retrieve chunkID by calculating wx and wy positions
+	local wx = nil
+	local wy = nil
+	local chunkID = nil
 
-	closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID_origin,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+	-- check if building is in central chunk then stops everything there if detected
+	closestDist, closestSquare = ZomboidForge.TLOU_infected.CheckBuildingDistance(chunkID_origin,closestDist,closestSquare,x_sourcesq,y_sourcesq)
 	if closestSquare then return closestSquare end
 
-	for i = 1,MaxChunk do
+	-- iterates through max distance
+	local maxChunk = ZomboidForge.TLOU_infected.MaxDistanceToCheck/10
+	for i = 1,maxChunk do
+		-- check main lines x and y chunks
 		for _,j in ipairs(ZomboidForge.TLOU_infected.ChunkCheck.FirstCheck) do
 			wx = wx_origin + i * j[1]
 			wy = wy_origin + i * j[2]
 			chunkID = tostring(wx).."x"..tostring(wy)
-			closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+			closestDist, closestSquare = ZomboidForge.TLOU_infected.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
 		end
+		-- check side chunks
 		for _,j in ipairs(ZomboidForge.TLOU_infected.ChunkCheck.SecondCheck) do
 			for k = 1,i do
 				wx = wx_origin + j[1] * k
 				wy = wy_origin + j[2] * i
 				chunkID = tostring(wx).."x"..tostring(wy)
-				closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+				closestDist, closestSquare = ZomboidForge.TLOU_infected.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
 
 				wx = wx_origin + j[1] * i
 				wy = wy_origin + j[2] * k
 				chunkID = tostring(wx).."x"..tostring(wy)
-				closestDist, closestSquare = ZomboidForge.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+				closestDist, closestSquare = ZomboidForge.TLOU_infected.CheckBuildingDistance(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
 			end
 		end
 
+		-- stops early if found, no point in going further since it will look at chunks further
 		if closestSquare then return closestSquare end
 	end
+	return closestSquare
 end
 
-
-ZomboidForge.GetChunkID = function(chunk)
-	return tostring(chunk.wx).."x"..tostring(chunk.wy)
-end
-
-ZomboidForge.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
-	local ZFModData = ModData.getOrCreate("ZomboidForge")
+-- Check building distance from `sourcesq` position and returns closest square and distance from `sourcesq`.
+---@param chunkID string
+---@param closestDist double|nil
+---@param closestSquare IsoGridSquare|nil
+---@param x_sourcesq double
+---@param y_sourcesq double
+---@return double|nil closestDist
+---@return IsoGridSquare|nil closestSquare
+ZomboidForge.TLOU_infected.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 	local squareCheck = nil
 	local distance = nil
 	local building = nil
 
-	if ZFModData.BuildingList[chunkID] then
-		for _,buildingData in pairs(ZFModData.BuildingList[chunkID]) do
-			building = getSquare(buildingData[1],buildingData[2],0):getBuilding()
+	if TLOU_ModData.BuildingList[chunkID] then
+		for _,buildingData in pairs(TLOU_ModData.BuildingList[chunkID]) do
+			local square = getSquare(buildingData[1],buildingData[2],0)
+			if not square then return closestDist, closestSquare end
+			building = square:getBuilding()
 			squareCheck = building:getRandomRoom():getRandomFreeSquare()
 			if not squareCheck then return closestDist, closestSquare end
 			distance = IsoUtils.DistanceTo(x_sourcesq, y_sourcesq, squareCheck:getX() , squareCheck:getY())
 
-			if not (ZomboidForge.TLOU_infected.OnlyUnexplored and building:isAllExplored()) then
-			elseif not (ZomboidForge.TLOU_infected.OnlyUnexplored and building:isAllExplored()) and distance < closestDist then
+			-- check if distance < closestDist, if true then next test
+			-- if OnlyUnexplored is false, then ignore the rest and pass
+			-- if OnlyUnexplored is true, check if whole building is explored, if true then don't pass, if false then pass
+			if distance < closestDist and
+			not (ZomboidForge.TLOU_infected.OnlyUnexplored and (not ZomboidForge.TLOU_infected.OnlyUnexplored or not building:isAllExplored()))
+			then
 				closestDist = distance
 				closestSquare = squareCheck
 			end
@@ -699,11 +706,14 @@ ZomboidForge.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,
 	return closestDist, closestSquare
 end
 
-
-ZomboidForge.IsDay = function()
+-- Checks if it's daytime by taking into account the seasons and updates the `IsDay` check.
+ZomboidForge.TLOU_infected.IsDay = function()
+	-- get gametime
 	local gametime = GameTime:getInstance();
 	local month = gametime:getMonth()
+	local currentHour = math.floor(gametime:getTimeOfDay())
 
+	-- check season
 	local season = nil
 	if month == 2 or month == 3 or month == 4 then
 		season = "Spring";
@@ -715,8 +725,7 @@ ZomboidForge.IsDay = function()
 		season = "Winter";
 	end
 
-	local currentHour = math.floor(GameTime:getInstance():getTimeOfDay())
-
+	-- check if it's day based on season and current time
 	local IsDay = false
 	if (season == "Spring" and currentHour >= 6 and currentHour <= 21) or
     (season == "Summer" and currentHour >= 6 and currentHour <= 22) or
@@ -725,26 +734,35 @@ ZomboidForge.IsDay = function()
 		IsDay = true
 	end
 
-	local ZFModData = ModData.getOrCreate("ZomboidForge")
-	ZFModData.IsDay = IsDay
+	-- update IsDay check
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+	TLOU_ModData.IsDay = IsDay
 end
 
--- Adds detected buildings to the list of available buildings in a chunk
-ZomboidForge.AddBuildingList = function(square)
-	local ZFModData = ModData.getOrCreate("ZomboidForge")
-	ZFModData.BuildingList = ZFModData.BuildingList or {}
+-- Adds detected buildings to the list of available buildings in a chunk.
+ZomboidForge.TLOU_infected.AddBuildingList = function(square)
+	-- get moddata and check if BuildingList exists, else initialize it
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+	TLOU_ModData.BuildingList = TLOU_ModData.BuildingList or {}
+
+	-- check if square is in building
 	local building = square:getBuilding()
 	if not building then return end
+
+	-- get building ID via it's KeyID which is persistent
 	local buildingID = building:getDef():getKeyId()
+
+	-- get chunk ID
 	local chunk = square:getChunk()
-	local chunkID = ZomboidForge.ChunkID(chunk)
-	ZFModData.BuildingList[chunkID] = ZFModData.BuildingList[chunkID] or {}
-	if not ZFModData.BuildingList[chunkID][buildingID] then
+	local chunkID = ZomboidForge.TLOU_infected.GetChunkID(chunk)
+
+	-- check if building is already in BuildingList, if not add its coordinates to the list
+	TLOU_ModData.BuildingList[chunkID] = TLOU_ModData.BuildingList[chunkID] or {}
+	if not TLOU_ModData.BuildingList[chunkID][buildingID] then
 		local room = building:getRandomRoom()
 		local squareBuilding = room:getRandomFreeSquare()
 		if squareBuilding then
-			print("adding building")
-			ZFModData.BuildingList[chunkID][buildingID] = {squareBuilding:getX(),squareBuilding:getY()}
+			TLOU_ModData.BuildingList[chunkID][buildingID] = {squareBuilding:getX(),squareBuilding:getY()}
 		end
 	end
 end
