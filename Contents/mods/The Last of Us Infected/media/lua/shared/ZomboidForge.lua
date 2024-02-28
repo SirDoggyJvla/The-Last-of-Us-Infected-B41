@@ -519,32 +519,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
         ZomboidForge[ZombieTable.customBehavior[i]](zombie,ZType)
     end
 
-    local object = zombie.THUMP_FLAG_GENERIC
-    --zombie:addLineChatElement("value = "..tostring(zombie:getThumpTarget()))
-    --zombie:setThumpCondition(0)
-    --zombie:setThumpCondition(0,100)
-    --zombie:setThumpTimer(0)
-    --zombie:updateVocalProperties()
-    --zombie:addLineChatElement("value = "..tostring(zombie:getThumpCondition()))
-
-    -- for oneshot Bloaters:
-    -- methods:
-    -- getThumpCondition()  --> outputs HP of structure
-    -- getThumpTimer()      --> no idea, could be used maybe
-    -- getThumpCondition()  --> supposed to output zombie thump target
-
-    -- could detect zombie is thumping with thumpcondition
-    -- if detected then run script to check every tiles around
-    -- for each structures around, do structure:getThumpableFor(zombie)
-    -- whatever it outputs, if it being thumped by zombie then destroy structure
-
-    -- check ThumpFrame from AnimSet in ThumpState.java
-    -- getThumpTarget gives out thump target
-    -- get structure target from that ?
-
-
-    -- makes hairs chech male and female
-
     -- run zombie attack functions
     if zombie:isAttacking() then
         local target = zombie:getTarget()

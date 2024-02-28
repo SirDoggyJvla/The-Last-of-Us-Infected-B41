@@ -132,12 +132,12 @@ option TLOUZombies.BloaterHearing
 	valueTranslation = TLOU_HearingEnum,
 }
 
-option TLOUZombies.StalkersHide
+option TLOUZombies.HideIndoors
 {
 	type = boolean,
 	default = true,
 	page = TLOU_Zombies,
-	translation = TLOU_StalkersHide,
+	translation = TLOU_HideIndoors,
 }
 
 option TLOUZombies.NoPushClickers
@@ -162,6 +162,14 @@ option TLOUZombies.OneShotClickers
 	default = true,
 	page = TLOU_Zombies,
 	translation = TLOU_OneShotClickers,
+}
+
+option TLOUZombies.StrongBloater
+{
+	type = boolean,
+	default = true,
+	page = TLOU_Zombies,
+	translation = TLOU_StrongBloater,
 }
 
 option TLOUZombies.ClickerHealth

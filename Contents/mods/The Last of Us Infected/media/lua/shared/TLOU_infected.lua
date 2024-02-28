@@ -138,7 +138,6 @@ ZomboidForge.InitTLOUInfected = function()
 				},
 				customBehavior = {
 					"SetStalkerSounds",
-					"HideIndoors",
 				},
 			}
 		--)
@@ -203,7 +202,6 @@ ZomboidForge.InitTLOUInfected = function()
 				customBehavior = {
 					"SetClickerClothing",
 					"SetClickerSounds",
-					"HideIndoors",
 				},
 			}
 		--)
@@ -257,14 +255,34 @@ ZomboidForge.InitTLOUInfected = function()
 				},
 				customBehavior = {
 					"SetBloaterSounds",
-					"HideIndoors",
 				},
 			}
 		--)
 	end
+
+	if SandboxVars.TLOUZombies.HideIndoors then
+		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
+			"HideIndoors"
+		)
+
+		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
+			"HideIndoors"
+		)
+
+		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+			"HideIndoors"
+		)
+	end
+
+	if SandboxVars.TLOUZombies.StrongBloater then
+		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+			"StrongBloater"
+		)
+	end
+
 end
 
---#region Attack functions
+--#region Attack and Onhit functions
 
 -- clicker attacks a player
 function ZomboidForge.ClickerAttack(player,zombie)
@@ -374,6 +392,7 @@ ZomboidForge.OnInfectedDeath = function(zombie,ZType)
 end
 --#endregion
 
+--- UPDATE THE WAY INFECTED SOUNDS ARE DONE TO STOP THEM FROM UPDATING WHEN ZOMBIE ALREADY HAS VOCALS
 --#region Custom behavior: `SetInfectedSounds`
 
 -- Set `Runner` sounds.
@@ -381,6 +400,7 @@ end
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
+		print("is runner")
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
 			zombie:setAge(-2)
 			if zombie:isFemale() then
@@ -414,6 +434,8 @@ end
 ZomboidForge.SetClickerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
 		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+			print("playing combined")
+			print(zombie:getEmitter())
 			zombie:setAge(-2)
 			zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
 		end
@@ -765,5 +787,72 @@ ZomboidForge.TLOU_infected.AddBuildingList = function(square)
 		end
 	end
 end
+
+--#endregion
+
+--#region Custom behavior: `DoorOneShot`
+
+
+ZomboidForge.StrongBloater = function(zombie,ZType)
+	-- run code if infected has thumping target
+	local thumped = zombie:getThumpTarget()
+	if not thumped then return end
+
+	-- get zombie info
+	local trueID = ZomboidForge.pID(zombie)
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+	TLOU_ModData.Infected = TLOU_ModData.Infected or {}
+	TLOU_ModData.Infected[trueID] = TLOU_ModData.Infected[trueID] or {}
+
+	-- update thumped only if infected is thumping
+	local thumpCheck = TLOU_ModData.Infected[trueID].thumpCheck
+	if thumpCheck == zombie:getTimeThumping() then
+		return
+	elseif zombie:getTimeThumping() == 0 then
+		return
+	end
+	TLOU_ModData.Infected[trueID].thumpCheck = zombie:getTimeThumping()
+
+	-- check barricades damage those if present
+	local barricade = nil
+	if thumped:isBarricaded() then
+		for i = 1,200 do
+			barricade = thumped:getBarricadeForCharacter(zombie)
+			if not barricade then
+				barricade = thumped:getBarricadeOppositeCharacter(zombie)
+				if not barricade then break end
+			end
+			barricade:Thump(zombie)
+		end
+
+	-- update health
+	else
+		local health = nil
+		-- need to make a difference between each classes
+		if instanceof(thumped,"IsoThumpable") then
+			health = thumped:getHealth()
+			if thumped:isDoor() then
+				thumped:setHealth(health-200)
+			elseif thumped:isWindow() then
+				thumped:destroy()
+			else
+				thumped:setHealth(health-100)
+			end
+		elseif instanceof(thumped,"IsoDoor") then
+			health = thumped:getHealth()
+			thumped:setHealth(health-100)
+		elseif instanceof(thumped,"IsoWindow") then
+			thumped:smashWindow()
+		end
+	end
+end
+--#endregion
+
+--#region Custom behavior: `InfectedHP`
+
+ZomboidForge.InfectedHP = function(zombie,ZType)
+
+end
+
 
 --#endregion
