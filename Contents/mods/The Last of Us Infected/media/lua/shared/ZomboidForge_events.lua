@@ -25,3 +25,6 @@ Events.OnZombieUpdate.Add(ZomboidForge.ZombieUpdate)
 Events.OnWeaponHitCharacter.Add(ZomboidForge.OnHit)
 Events.OnZombieDead.Add(ZomboidForge.OnDeath)
 Events.OnPlayerUpdate.Add(ZomboidForge.GetZombieOnPlayerMouse)
+
+Events.OnServerCommand.Add(ZomboidForge.OnServerCommand)
+Events.OnClientCommand.Add(ZomboidForge.OnClientCommand)

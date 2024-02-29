@@ -189,9 +189,9 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
                 break
             end
         end
+        ZType = PersistentZData.ZType
     end
 
-    local ZType = PersistentZData.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
     -- become reanimated zombie
@@ -199,8 +199,8 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
         zombie:setReanimatedPlayer(true)
     end
 
-    -- set zombie age
-    if zombie:getAge() > -1 then	
+    -- set zombie age and reset emitters
+    if zombie:getAge() ~= -1 then
 		zombie:setAge(-1)
 	end
 
@@ -521,8 +521,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
 
     -- run zombie attack functions
     if zombie:isAttacking() then
-        local target = zombie:getTarget()
-        zombie:addLineChatElement("target = "..tostring(target))
         ZomboidForge.ZombieAttack(zombie,ZType)
     end
 end
@@ -570,6 +568,7 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
 
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
+
         if ZType then
             if ZombieTable and ZombieTable.funconhit then
                 for i=1,#ZombieTable.funconhit do
@@ -578,12 +577,13 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
             end
             ZomboidForge.ShowZombieName(attacker, victim)
         end
-    end
 
-    local zombieVisual = victim:getHumanVisual()
-    local hairChoice = "MaleHair_Baldspot"
-    zombieVisual:setHairModel(hairChoice)
-    victim:resetModel()
+        -- skip if no HP stat or HP is 1
+        if ZombieTable.HP and not ZombieTable.HP == 1 then
+            local HP = PersistentZData.HP or ZombieTable.HP
+            damage = ZombieTable.customDamage(attacker, victim, handWeapon, damage) or damage
+        end
+    end
 end
 
 --- OnDeath functions
@@ -607,6 +607,9 @@ ZomboidForge.OnDeath = function(zombie)
     for i = 1,#ZombieTable.onDeath do
         ZomboidForge[ZombieTable.onDeath[i]](zombie,ZType)
     end
+
+    -- reset emitters
+    zombie:getEmitter():stopAll()
 end
 
 --#region Tools

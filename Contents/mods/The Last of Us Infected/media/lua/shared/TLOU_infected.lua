@@ -191,8 +191,12 @@ ZomboidForge.InitTLOUInfected = function()
 				outline = {0, 0, 0,},
 
 				-- attack functions
-				funcattack = {"ClickerAttack"},
-				funconhit = {"ClickerHit"},
+				funcattack = {
+					"ClickerAttack",
+				},
+				funconhit = {
+					"ClickerHit",
+				},
 
 				-- custom behavior
 				onDeath = {
@@ -246,8 +250,13 @@ ZomboidForge.InitTLOUInfected = function()
 				outline = {0, 0, 0,},
 
 				-- attack functions
-				funcattack = {"BloaterAttack"},
-				funconhit = {"BloaterHit"},
+				funcattack = {
+					"BloaterAttack",
+				},
+				funconhit = {
+					"BloaterHit",
+				},
+				customDamage = ZomboidForge.BloaterDamage,
 
 				-- custom behavior
 				onDeath = {
@@ -279,7 +288,6 @@ ZomboidForge.InitTLOUInfected = function()
 			"StrongBloater"
 		)
 	end
-
 end
 
 --#region Attack and Onhit functions
@@ -328,21 +336,81 @@ end
 
 -- player attacked a bloater
 function ZomboidForge.BloaterHit(player, zombie, HandWeapon, damage)
-
-	zombie:setOnlyJawStab(true)
-
-	if zombie:isOnFire() then
-		zombie:setHealth(zombie:getHealth() - (damage * 3))
-	else
-		zombie:setHealth(zombie:getHealth() - damage)
+	-- can't be pushed
+	if not zombie:isOnlyJawStab() then
+		zombie:setOnlyJawStab(true)
 	end
 
-	if zombie:getHealth() <= 0 and not player:isGodMod() then 
+	--zombie:setHealth()
+	if not zombie:getHitTime() == 0 then
+		zombie:setHitTime(0)
+	end
+end
+
+-- damage to bloater from player
+function ZomboidForge.BloaterDamage(player, zombie, HandWeapon, damage)
+
+	print(damage)
+	local stringZ = "BloaterDamage"
+
+	-- get zombie info
+	local trueID = ZomboidForge.pID(zombie)
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+	TLOU_ModData.Infected = TLOU_ModData.Infected or {}
+	TLOU_ModData.Infected[trueID] = TLOU_ModData.Infected[trueID] or {}
+	local ZombieInfo = TLOU_ModData.Infected[trueID]
+
+	local ZombieTable = ZomboidForge.ZTypes["TLOU_Bloater"]
+	local setHP = ZombieTable.HP
+
+	-- initialize zombie health
+	local HP = ZombieInfo.HP or setHP
+
+	-- can't be pushed
+	if not zombie:isOnlyJawStab() then
+		stringZ = stringZ.."\nSetOnlyJawStab"
+		zombie:setOnlyJawStab(true)
+	end
+
+	-- apply damages
+	HP = HP
+
+	ZombieInfo.HP = HP
+	print(HP)
+
+	-- set zombie health
+	if not (HP <= 0) then
+		stringZ = stringZ.."\nHP = "..tostring(zombie:getHealth())
+		zombie:setHealth(500)
+	else
+		stringZ = stringZ.."\nHP is 0"
+		ZombieInfo.HP = nil
 		zombie:setOnlyJawStab(false)
 		zombie:Kill(player)
 	end
 
-	zombie:setHitTime(0)
+
+
+
+
+	if zombie:isOnFire() then
+		stringZ = stringZ.."\nIs on fire"
+		zombie:setHealth(zombie:getHealth() - (damage * 3))
+	else
+		stringZ = stringZ.."\nIs not on fire"
+		zombie:setHealth(zombie:getHealth() - damage)
+	end
+
+	if zombie:getHealth() <= 0 then 
+		
+		zombie:setOnlyJawStab(false)
+		zombie:Kill(player)
+	end
+
+	--zombie:setHealth()
+	zombie:setHitTime(10)
+
+	zombie:addLineChatElement(stringZ)
 end
 --#endregion
 
@@ -392,23 +460,21 @@ ZomboidForge.OnInfectedDeath = function(zombie,ZType)
 end
 --#endregion
 
---- UPDATE THE WAY INFECTED SOUNDS ARE DONE TO STOP THEM FROM UPDATING WHEN ZOMBIE ALREADY HAS VOCALS
 --#region Custom behavior: `SetInfectedSounds`
 
 -- Set `Runner` sounds.
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetRunnerSounds = function(zombie,ZType)
-	if zombie:getAge() == -1 then
-		print("is runner")
-		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+	if zombie:getAge() == -1  then
+		--if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleA") or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleA") then
 			zombie:setAge(-2)
 			if zombie:isFemale() then
 				zombie:getEmitter():playVocals("Zombie/Voice/FemaleA")
 			else 
 				zombie:getEmitter():playVocals("Zombie/Voice/MaleA")
 			end
-		end
+		--end
 	end
 end
 
@@ -417,14 +483,14 @@ end
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
-		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+		--if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
 			zombie:setAge(-2)
 			if zombie:isFemale() then
 				zombie:getEmitter():playVocals("Zombie/Voice/FemaleB")
 			else
 				zombie:getEmitter():playVocals("Zombie/Voice/MaleB")
 			end
-		end
+		--end
 	end
 end
 
@@ -433,12 +499,10 @@ end
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
-		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
-			print("playing combined")
-			print(zombie:getEmitter())
+		--if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
 			zombie:setAge(-2)
 			zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
-		end
+		--end
 	end
 end
 
@@ -447,10 +511,10 @@ end
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetBloaterSounds = function(zombie,ZType)
 	if zombie:getAge() == -1 then
-		if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
+		--if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
 			zombie:setAge(-2)
 			zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
-		end
+		--end
 	end
 end
 
@@ -848,11 +912,3 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 end
 --#endregion
 
---#region Custom behavior: `InfectedHP`
-
-ZomboidForge.InfectedHP = function(zombie,ZType)
-
-end
-
-
---#endregion
