@@ -238,15 +238,9 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         local currentOutfit = zombie:getOutfitName()
         local outfitChoice = ZomboidForge.RandomizeTable(ZombieTable,"outfit",currentOutfit)
         if outfitChoice then
-            local old_trueID = trueID
             zombie:dressInNamedOutfit(outfitChoice)
 	        zombie:reloadOutfit()
             trueID = ZomboidForge.pID(zombie)
-            if not (old_trueID == trueID) then
-                print("trueID was changed")
-                print("old = "..old_trueID)
-                print("new = "..trueID)
-            end
         else
             IsSet = IsSet + 1
         end
@@ -509,11 +503,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
         ZomboidForge.SetZombieData(zombie,ZType)
     end
 
-    -- check zombie health
-    if not zombie:getModData()['checkHP'] then
-        ZomboidForge.CheckZombieHealth(zombie,ZType)
-    end
-
     -- run custom behavior functions for this zombie
     for i = 1,#ZombieTable.customBehavior do
         ZomboidForge[ZombieTable.customBehavior[i]](zombie,ZType)
@@ -523,18 +512,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
     if zombie:isAttacking() then
         ZomboidForge.ZombieAttack(zombie,ZType)
     end
-end
-
---- Check HP of zombie is set.
---- NEEDS REWORK
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
----@param ZType integer     --Zombie Type ID
-ZomboidForge.CheckZombieHealth = function(zombie,ZType)
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-    if zombie:getHealth() ~= ZombieTable.HP then
-        zombie:setHealth(ZombieTable.HP)
-    end
-    zombie:getModData()['checkHP'] = true
 end
 
 --- `Zombie` attacking `Player`. 
@@ -558,6 +535,8 @@ end
 --- `Player` attacking `Zombie`. 
 -- 
 -- Trigger `funconhit` of `Zombie` depending on `ZType`.
+--
+-- Handles the custom HP of zombies and apply custom damage depending on the customDamage function.
 ---@param attacker IsoPlayer|IsoLivingCharacter|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param victim IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
@@ -579,9 +558,27 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
         end
 
         -- skip if no HP stat or HP is 1
-        if ZombieTable.HP and not ZombieTable.HP == 1 then
+        if ZombieTable.HP and not (ZombieTable.HP == 1) then
+            -- get or set HP amount
             local HP = PersistentZData.HP or ZombieTable.HP
-            damage = ZombieTable.customDamage(attacker, victim, handWeapon, damage) or damage
+
+            -- get damage if exists
+            if ZombieTable.customDamage then
+                damage = ZomboidForge[ZombieTable.customDamage](attacker, victim, handWeapon, damage)
+            end
+            HP = HP - damage
+
+            -- set zombie health or kill zombie
+            if (HP <= 0) then
+                victim:setOnlyJawStab(false)
+                victim:Kill(attacker)
+            else
+                -- Makes sure the Zombie doesn't get oneshoted by whatever bullshit weapon
+                -- someone might use.
+                -- Updates the HP counter of PersistentZData
+                victim:setHealth(1000)
+                PersistentZData.HP = HP
+            end
         end
     end
 end
@@ -610,6 +607,9 @@ ZomboidForge.OnDeath = function(zombie)
 
     -- reset emitters
     zombie:getEmitter():stopAll()
+
+    -- delete zombie data
+    PersistentZData = nil
 end
 
 --#region Tools

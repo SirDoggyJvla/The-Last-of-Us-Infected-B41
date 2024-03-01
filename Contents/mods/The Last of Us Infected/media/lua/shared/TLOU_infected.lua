@@ -256,7 +256,7 @@ ZomboidForge.InitTLOUInfected = function()
 				funconhit = {
 					"BloaterHit",
 				},
-				customDamage = ZomboidForge.BloaterDamage,
+				customDamage = "BloaterDamage",
 
 				-- custom behavior
 				onDeath = {
@@ -347,70 +347,18 @@ function ZomboidForge.BloaterHit(player, zombie, HandWeapon, damage)
 	end
 end
 
--- damage to bloater from player
+-- set damage to bloater from player
 function ZomboidForge.BloaterDamage(player, zombie, HandWeapon, damage)
-
-	print(damage)
-	local stringZ = "BloaterDamage"
-
-	-- get zombie info
-	local trueID = ZomboidForge.pID(zombie)
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-	TLOU_ModData.Infected = TLOU_ModData.Infected or {}
-	TLOU_ModData.Infected[trueID] = TLOU_ModData.Infected[trueID] or {}
-	local ZombieInfo = TLOU_ModData.Infected[trueID]
-
-	local ZombieTable = ZomboidForge.ZTypes["TLOU_Bloater"]
-	local setHP = ZombieTable.HP
-
-	-- initialize zombie health
-	local HP = ZombieInfo.HP or setHP
-
-	-- can't be pushed
-	if not zombie:isOnlyJawStab() then
-		stringZ = stringZ.."\nSetOnlyJawStab"
-		zombie:setOnlyJawStab(true)
+	-- maximum damage output
+	if damage >= 3 then
+		damage = 3
 	end
 
-	-- apply damages
-	HP = HP
-
-	ZombieInfo.HP = HP
-	print(HP)
-
-	-- set zombie health
-	if not (HP <= 0) then
-		stringZ = stringZ.."\nHP = "..tostring(zombie:getHealth())
-		zombie:setHealth(500)
-	else
-		stringZ = stringZ.."\nHP is 0"
-		ZombieInfo.HP = nil
-		zombie:setOnlyJawStab(false)
-		zombie:Kill(player)
-	end
-
-
-
-
-
+	-- if Zombie is on fire, deal more damage even past max damage output
 	if zombie:isOnFire() then
-		stringZ = stringZ.."\nIs on fire"
-		zombie:setHealth(zombie:getHealth() - (damage * 3))
-	else
-		stringZ = stringZ.."\nIs not on fire"
-		zombie:setHealth(zombie:getHealth() - damage)
+		damage = damage * 3
 	end
-
-	if zombie:getHealth() <= 0 then 
-		
-		zombie:setOnlyJawStab(false)
-		zombie:Kill(player)
-	end
-
-	--zombie:setHealth()
-	zombie:setHitTime(10)
-
-	zombie:addLineChatElement(stringZ)
+	return damage
 end
 --#endregion
 
@@ -614,6 +562,9 @@ local timeCheck = 100
 ZomboidForge.HideIndoors = function(zombie,ZType)
 	-- if zombie is already in building, completely skip
 	if zombie:getBuilding() then return end
+
+	-- ignore if zombie has target
+	if zombie:getTarget() then return end
 
 	-- get zombie pID and info
 	local trueID = ZomboidForge.pID(zombie)
