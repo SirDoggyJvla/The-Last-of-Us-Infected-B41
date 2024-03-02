@@ -4,7 +4,14 @@
 --[[  \__/||     |__/ \_/\__|\__| \/   \_|  \/ |\__|  ]]--
 --[[                     \__|\__|_/                   ]]--
 --[[ ================================================ ]]--
---- Import ZomboidForge module
+--[[
+
+This file defines the events used by Zomboid Forge
+
+]]--
+--[[ ================================================ ]]--
+
+--- import module
 local ZomboidForge = require "ZomboidForge_module"
 
 --- Local module

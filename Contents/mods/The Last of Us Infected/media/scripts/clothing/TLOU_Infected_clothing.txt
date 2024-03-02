@@ -25,7 +25,7 @@ module Base
 		DisplayCategory = Clothing,
 		Type = Clothing,
 		ClothingItem = Hat_Fungi,
-		BodyLocation = Hat,
+		BodyLocation = FullHat,
 		BloodLocation = Head,
 		Icon = ficon,
 		CanHaveHoles = false,

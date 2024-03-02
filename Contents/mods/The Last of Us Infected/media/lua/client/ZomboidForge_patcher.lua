@@ -1,6 +1,23 @@
+--[[ ================================================ ]]--
+--[[  /~~\'      |~~\                  ~~|~    |      ]]--
+--[[  '--.||/~\  |   |/~\/~~|/~~|\  /    | \  /|/~~|  ]]--
+--[[  \__/||     |__/ \_/\__|\__| \/   \_|  \/ |\__|  ]]--
+--[[                     \__|\__|_/                   ]]--
+--[[ ================================================ ]]--
+--[[
+
+This file patches base functions of the game to make sure emitters of zombies are removed once
+the zombies are deleted via the admin and debug tools.
+
+This allows modders to implement their own custom vocals and emitters without having any issues.
+
+]]--
+--[[ ================================================ ]]--
+
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 
+--- Import original methods and keep them stored
 ZomboidForge.Patcher = {}
 ZomboidForge.Patcher.DebugContextMenu = {}
 ZomboidForge.Patcher.AdminContextMenu = {}
@@ -22,6 +39,8 @@ ZomboidForge.Patcher.RemoveAllEmitters = function()
     end
 end
 
+-- replace vanilla methods to remove all emitters before
+-- DebugContextMenu.lua
 function DebugContextMenu.OnRemoveAllZombies(zombie)
     ZomboidForge.Patcher.RemoveAllEmitters()
 
@@ -32,6 +51,7 @@ function DebugContextMenu.OnRemoveAllZombiesClient(zombie)
 
     ZomboidForge.Patcher.DebugContextMenu.OnRemoveAllZombiesClient(zombie)
 end
+-- AdminContextMenu.lua
 function AdminContextMenu.OnRemoveAllZombiesClient(zombie)
     ZomboidForge.Patcher.RemoveAllEmitters()
 
@@ -39,11 +59,13 @@ function AdminContextMenu.OnRemoveAllZombiesClient(zombie)
 end
 
 
+-- keep stored vanilla methods for removal of emitters
 ZomboidForge.Patcher.ISSpawnHordeUI = {}
 
 ZomboidForge.Patcher.ISSpawnHordeUI.onRemoveZombies = ISSpawnHordeUI.onRemoveZombies
 
 -- Remove emitters of zombies in radius getting deleted.
+-- ISSpawnHordeUI.lua
 function ISSpawnHordeUI:onRemoveZombies()
 	local radius = self:getRadius() + 1;
 	for x=self.selectX-radius, self.selectX + radius do
@@ -53,7 +75,16 @@ function ISSpawnHordeUI:onRemoveZombies()
 				for i=sq:getMovingObjects():size()-1,0,-1 do
 					local testZed = sq:getMovingObjects():get(i);
 					if instanceof(testZed, "IsoZombie") then
+                        -- remove all emitters
                         testZed:getEmitter():stopAll()
+
+                        -- get zombie data
+                        local trueID = ZomboidForge.pID(testZed)
+                        local ZFModData = ModData.getOrCreate("ZomboidForge")
+
+                        -- delete zombie data
+                        ZFModData.PersistentZData[trueID] = nil
+                        ZomboidForge.PersistentOutfitID[trueID] = nil
 					end
 				end
 			end

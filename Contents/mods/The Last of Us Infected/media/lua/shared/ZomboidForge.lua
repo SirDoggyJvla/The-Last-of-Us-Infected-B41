@@ -240,7 +240,6 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         if outfitChoice then
             zombie:dressInNamedOutfit(outfitChoice)
 	        zombie:reloadOutfit()
-            trueID = ZomboidForge.pID(zombie)
         else
             IsSet = IsSet + 1
         end
@@ -325,8 +324,14 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
+    if ZombieTable.HP and not (ZombieTable.HP == 1) then
+    
+    else
+        IsSet = IsSet + 1
+    end
+
     -- update IsDataSet
-    if IsSet >= 7 then
+    if IsSet >= 8 then
         nonPersistentZData.IsDataSet = true
     end
 end
@@ -485,8 +490,8 @@ ZomboidForge.ZombieUpdate = function(zombie)
     end
 
     -- check if zombie IsInitialized
-    local IsInitialized = nonPersistentZData.IsInitialized
-    if not IsInitialized then
+    if not nonPersistentZData.IsInitialized then
+        nonPersistentZData.IsInitialized = false
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
@@ -609,7 +614,8 @@ ZomboidForge.OnDeath = function(zombie)
     zombie:getEmitter():stopAll()
 
     -- delete zombie data
-    PersistentZData = nil
+    ZFModData.PersistentZData[trueID] = nil
+    ZomboidForge.PersistentOutfitID[trueID] = nil
 end
 
 --#region Tools

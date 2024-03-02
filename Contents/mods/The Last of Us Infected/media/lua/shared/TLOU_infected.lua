@@ -522,13 +522,24 @@ ZomboidForge.TLOU_infected.ClothingPriority = {
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerClothing = function(zombie,ZType)
+	-- get zombie info
+	local trueID = ZomboidForge.pID(zombie)
+	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+	local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID] or {}
+
+	-- if already has hat fungi then skip
+	local hasHat_Fungi = nonPersistentZData.hasHat_Fungi or false
+	if hasHat_Fungi then return end
+
+	-- get clothing visuals from zombie
 	local visual = zombie:getItemVisuals()
+	if not visual then return end
+
 	-- scroll through every clothing and replace it
-	if visual and visual:size() > 0 then
-		local hasHat_Fungi = false
+	if visual:size() > 0 then
 		local priority = 100
 		local itemReset = nil
-		for i = 1, visual:size()-1 do
+		for i = 0, visual:size()-1 do
 			local item = visual:get(i)
 			if not item then
 				break
@@ -542,20 +553,31 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 				-- if not, then add one to the item
 				priority = priorityTest
 				itemReset = item
+				hasHat_Fungi = false
 			end
 		end
 		if not hasHat_Fungi and itemReset then
 			itemReset:setItemType("Base.Hat_Fungi")
+			itemReset:setClothingItemName("Hat_Fungi")
 			zombie:resetModel()
 		end
+
+	-- if no visuals were found then add a visual item which is the Hat Fungi
+	else
+		local itemVisual = ItemVisual.new()
+		itemVisual:setItemType("Base.Hat_Fungi")
+		itemVisual:setClothingItemName("Hat_Fungi")
+		visual:add(itemVisual)
+		zombie:resetModel()
 	end
+	ZomboidForge.PersistentOutfitID[trueID].hasHat_Fungi = hasHat_Fungi
 end
 
 --#endregion
 
 --#region Custom behavior: `HideIndoors`
 
-local timeCheck = 100
+local timeCheck = 500
 -- Main function to handle `Zombie` behavior to go hide inside the closest building or wander during night.
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
@@ -844,6 +866,7 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 	else
 		local health = nil
 		-- need to make a difference between each classes
+		-- IsoThumpable is player built
 		if instanceof(thumped,"IsoThumpable") then
 			health = thumped:getHealth()
 			if thumped:isDoor() then
@@ -853,9 +876,13 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 			else
 				thumped:setHealth(health-100)
 			end
+
+		-- IsoDoor is map structure
 		elseif instanceof(thumped,"IsoDoor") then
 			health = thumped:getHealth()
 			thumped:setHealth(health-100)
+
+		-- IsoWindow is map structure
 		elseif instanceof(thumped,"IsoWindow") then
 			thumped:smashWindow()
 		end

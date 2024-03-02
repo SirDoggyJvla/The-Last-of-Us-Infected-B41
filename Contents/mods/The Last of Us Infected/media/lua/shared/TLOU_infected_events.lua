@@ -4,6 +4,13 @@
 --[[  \__/||     |__/ \_/\__|\__| \/   \_|  \/ |\__|  ]]--
 --[[                     \__|\__|_/                   ]]--
 --[[ ================================================ ]]--
+--[[
+
+This file defines the events used by The Last of Us Infected based on Zomboid Forge framework.
+
+]]--
+--[[ ================================================ ]]--
+
 --- Makes sure TLOU_infected is loaded before
 require "TLOU_infected"
 
