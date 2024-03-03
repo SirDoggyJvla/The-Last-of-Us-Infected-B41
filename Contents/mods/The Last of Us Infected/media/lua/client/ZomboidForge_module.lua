@@ -21,4 +21,7 @@ ZomboidForge.PersistentOutfitID = {}
 ZomboidForge.TrueID = {}
 ZomboidForge.HatFallen = {}
 
+-- initialize command module
+ZomboidForge.Command = {}
+
 return ZomboidForge

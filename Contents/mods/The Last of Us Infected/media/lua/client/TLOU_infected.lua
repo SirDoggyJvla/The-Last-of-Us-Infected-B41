@@ -25,6 +25,7 @@ local ZomboidForge = require "ZomboidForge_module"
 
 --- setup local functions
 ZomboidForge.TLOU_infected = ZomboidForge.TLOU_infected or {}
+local timeCheck = 500
 
 --- Create zombie types
 ZomboidForge.InitTLOUInfected = function()
@@ -415,19 +416,32 @@ end
 
 --#region Custom behavior: `SetInfectedSounds`
 
+-- For debug purposes, allows to check vocals of a zombie.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+ZomboidForge.VerifyEmitter = function(zombie)
+	local stringZ = "Emitters:"
+	stringZ = stringZ.."\nMaleA = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/MaleA"))
+	stringZ = stringZ.."\nFemaleA = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/FemaleA"))
+	stringZ = stringZ.."\nMaleB = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/MaleB"))
+	stringZ = stringZ.."\nFemaleB = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/FemaleB"))
+	stringZ = stringZ.."\nMaleC = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/MaleC"))
+	stringZ = stringZ.."\nFemaleC = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/FemaleC"))
+	return stringZ
+end
+
 -- Set `Runner` sounds.
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetRunnerSounds = function(zombie,ZType)
-	if zombie:getAge() == -1  then
-		--if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleA") or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleA") then
-			zombie:setAge(-2)
-			if zombie:isFemale() then
-				zombie:getEmitter():playVocals("Zombie/Voice/FemaleA")
-			else 
-				zombie:getEmitter():playVocals("Zombie/Voice/MaleA")
-			end
-		--end
+	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleA") and not zombie:isFemale()
+	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleA") and zombie:isFemale() then
+		zombie:setAge(-2)
+		zombie:getEmitter():stopAll()
+		if zombie:isFemale() then
+			zombie:getEmitter():playVocals("Zombie/Voice/FemaleA")
+		else 
+			zombie:getEmitter():playVocals("Zombie/Voice/MaleA")
+		end
 	end
 end
 
@@ -435,15 +449,15 @@ end
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetStalkerSounds = function(zombie,ZType)
-	if zombie:getAge() == -1 then
-		--if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
-			zombie:setAge(-2)
-			if zombie:isFemale() then
-				zombie:getEmitter():playVocals("Zombie/Voice/FemaleB")
-			else
-				zombie:getEmitter():playVocals("Zombie/Voice/MaleB")
-			end
-		--end
+	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleB") and not zombie:isFemale()
+	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleB") and zombie:isFemale() then
+		zombie:setAge(-2)
+		zombie:getEmitter():stopAll()
+		if zombie:isFemale() then
+			zombie:getEmitter():playVocals("Zombie/Voice/FemaleB")
+		else
+			zombie:getEmitter():playVocals("Zombie/Voice/MaleB")
+		end
 	end
 end
 
@@ -451,11 +465,10 @@ end
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerSounds = function(zombie,ZType)
-	if zombie:getAge() == -1 then
-		--if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
-			zombie:setAge(-2)
-			zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
-		--end
+	if not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleC")then
+		zombie:setAge(-2)
+		zombie:getEmitter():stopAll()
+		zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
 	end
 end
 
@@ -463,11 +476,10 @@ end
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetBloaterSounds = function(zombie,ZType)
-	if zombie:getAge() == -1 then
-		--if zombie:getEmitter():isPlaying("MaleZombieCombined") or zombie:getEmitter():isPlaying("FemaleZombieCombined") then
-			zombie:setAge(-2)
-			zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
-		--end
+	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleC") then
+		zombie:setAge(-2)
+		zombie:getEmitter():stopAll()
+		zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
 	end
 end
 
@@ -529,12 +541,20 @@ ZomboidForge.TLOU_infected.ClothingPriority = {
 ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	-- get zombie info
 	local trueID = ZomboidForge.pID(zombie)
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-	local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID] or {}
+	ZomboidForge.PersistentOutfitID[trueID] = ZomboidForge.PersistentOutfitID[trueID] or {}
+	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected or {}
 
 	-- if already has hat fungi then skip
-	local hasHat_Fungi = nonPersistentZData.hasHat_Fungi or false
+	local hasHat_Fungi = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.hasHat_Fungi
 	if hasHat_Fungi then return end
+
+	-- update lure counter
+	local clothingCounter = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.ClothingCounter or timeCheck
+	if clothingCounter and clothingCounter >= 0 then
+		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.ClothingCounter = clothingCounter - 1
+		return
+	end
+	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.ClothingCounter = timeCheck
 
 	-- get clothing visuals from zombie
 	local visual = zombie:getItemVisuals()
@@ -575,14 +595,24 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 		visual:add(itemVisual)
 		zombie:resetModel()
 	end
-	ZomboidForge.PersistentOutfitID[trueID].hasHat_Fungi = hasHat_Fungi
+	
+	-- update multiCheck counter
+	local multiCheck = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.multiCheck or 0
+	if multiCheck >= 10 then
+		-- stop checking for this zombie
+		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.hasHat_Fungi = hasHat_Fungi
+		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.multiCheck = nil
+	else
+		-- increment multiCheck counter
+		multiCheck = multiCheck + 1
+		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.multiCheck = multiCheck
+	end
 end
 
 --#endregion
 
 --#region Custom behavior: `HideIndoors`
 
-local timeCheck = 500
 -- Main function to handle `Zombie` behavior to go hide inside the closest building or wander during night.
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
@@ -595,22 +625,21 @@ ZomboidForge.HideIndoors = function(zombie,ZType)
 
 	-- get zombie pID and info
 	local trueID = ZomboidForge.pID(zombie)
-	ZomboidForge.TLOU_infected[trueID] = ZomboidForge.TLOU_infected[trueID] or {}
+	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected or {}
 
 	-- update lure counter
-	local lureCounter = ZomboidForge.TLOU_infected[trueID].LureCounter
+	local lureCounter = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter
 	if lureCounter and lureCounter >= 0 then
-		ZomboidForge.TLOU_infected[trueID].LureCounter = lureCounter - 1
+		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter = lureCounter - 1
 		return
 	elseif not lureCounter then
-		ZomboidForge.TLOU_infected[trueID].LureCounter = timeCheck
+		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter = timeCheck
 		return
 	end
+	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter = timeCheck
 
 	-- lure zombie either to a building or make it wander if it's daytime
 	ZomboidForge.TLOU_infected.LureZombie(zombie)
-
-	ZomboidForge.TLOU_infected[trueID].LureCounter = timeCheck
 end
 
 -- Lure `Zombie` to the building during daytime or make it wander around during night time.

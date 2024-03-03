@@ -464,7 +464,7 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
     -- for every stats available to update
     local ZombieTable = ZomboidForge.ZTypes[ZType]
     for k,_ in pairs(ZomboidForge.Stats) do
-        print(ZomboidForge.OriginalSandboxOptions[k])
+        --print(ZomboidForge.OriginalSandboxOptions[k])
         local classField = ZomboidForge.Stats[k].classField
         -- verifiable stats
         if classField then
@@ -771,7 +771,7 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 				if (movingObjects ~= nil) then
 					for i=0, movingObjects:size()-1 do
 						local zombie = movingObjects:get(i)
-						if zombie and instanceof(zombie, "IsoZombie") then
+						if zombie and instanceof(zombie, "IsoZombie") and zombie:isAlive() then
                             local trueID = ZomboidForge.pID(zombie)
                             local ZFModData = ModData.getOrCreate("ZomboidForge")
                             local PersistentZData = ZFModData.PersistentZData[trueID]
@@ -832,5 +832,3 @@ ZomboidForge.UpdateNametag = function()
 end
 
 --#endregion
-
---return ZomboidForge
