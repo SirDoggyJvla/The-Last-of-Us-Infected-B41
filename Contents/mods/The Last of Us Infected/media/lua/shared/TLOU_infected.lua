@@ -295,16 +295,18 @@ end
 -- clicker attacks a player
 function ZomboidForge.ClickerAttack(player,zombie)
 	if player and player:isAlive() then
+		--clicker grabs player
+		if SandboxVars.TLOUZombies.GrabbyClickers and not player:isGodMod() then
+			player:setSlowFactor(1)
+			player:setSlowTimer(1)
+		end
+
+		-- kill player if oneshot clickers
 		if SandboxVars.TLOUZombies.OneShotClickers then 
 			if player:hasHitReaction() and not player:isGodMod() then
 				--player:setDeathDragDown(true)
 				player:Kill(zombie)
 			end
-		end
-		--clicker grabs player
-		if SandboxVars.TLOUZombies.GrabbyClickers and not player:isGodMod() then
-			player:setSlowFactor(1)
-			player:setSlowTimer(1)
 		end
 	end
 end
@@ -312,11 +314,14 @@ end
 -- bloater attacks a player
 function ZomboidForge.BloaterAttack(player,zombie)
 	if player and player:isAlive() then
-		--bloater grabs player
-		player:setSlowFactor(1)
-		player:setSlowTimer(1)	
+		-- bloater grabs player
+		if not player:isGodMod() then
+			player:setSlowFactor(1)
+			player:setSlowTimer(1)
+		end
+
+		-- kill player
 		if player:hasHitReaction() and not player:isGodMod() then
-			--player:setDeathDragDown(true)
 			player:Kill(zombie)
 		end
 	end

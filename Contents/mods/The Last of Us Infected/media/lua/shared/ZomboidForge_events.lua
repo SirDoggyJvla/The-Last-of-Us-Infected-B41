@@ -28,6 +28,7 @@ Events.OnLoad.Add(ZFEvents.OnLoad)
 
 --- ZomboidForge functions
 Events.OnLoad.Add(ZomboidForge.OnLoad)
+Events.OnGameStart.Add(ZomboidForge.OnGameStart)
 Events.OnZombieUpdate.Add(ZomboidForge.ZombieUpdate)
 Events.OnWeaponHitCharacter.Add(ZomboidForge.OnHit)
 Events.OnZombieDead.Add(ZomboidForge.OnDeath)

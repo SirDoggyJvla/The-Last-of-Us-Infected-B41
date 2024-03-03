@@ -38,7 +38,7 @@ ZomboidForge.Stats = {
             [1] = 1, -- sprinter
             [2] = 2, -- fast shambler
             [3] = 3, -- shambler
-            -- [4] crawlers speed doesn't matter
+            [4] = 2, -- crawlers, speed doesn't matter
         },
     },
 
@@ -69,8 +69,7 @@ ZomboidForge.Stats = {
     -- defines cognition aka navigation of zombie
     --
     -- navigate = basic navigate.
-    -- It's a lie from the base game so doesn't matter which one
-    -- you chose
+    -- It's a lie from the base game so doesn't matter which one you chose
     cognition = {
         setSandboxOption = "ZombieLore.Cognition",
         classField = "cognition",
@@ -153,6 +152,63 @@ ZomboidForge.OnLoad = function()
     --for i = 1,ZomboidForge.TotalZTypes do
         ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZombieTable.chance
     end
+end
+
+--- OnLoad function to initialize the mod
+ZomboidForge.OnGameStart = function()
+    ZomboidForge.OriginalSandboxOptions = {
+        walktype = SandboxVars.ZombieLore.Speed,
+        strength = SandboxVars.ZombieLore.Strength,
+        toughness = SandboxVars.ZombieLore.Toughness,
+        cognition = SandboxVars.ZombieLore.Cognition,
+        memory = SandboxVars.ZombieLore.Memory,
+        sight = SandboxVars.ZombieLore.Sight,
+        hearing = SandboxVars.ZombieLore.Hearing,
+    }
+
+    -- Zomboid (base game zombies)
+	if SandboxVars.ZomboidForge.ZomboidSpawn then
+		--table.insert(ZomboidForge.ZTypes,
+		ZomboidForge.ZTypes.ZF_Zomboid =
+			{
+				-- base informations
+				name = "IGUI_ZF_Zomboid",
+				chance = SandboxVars.ZomboidForge.ZomboidChance,
+				outfit = {},
+				reanimatedPlayer = false,
+				skeleton = false,
+				hair = {},
+				hairColor = {},
+				beard = {},
+				beardColor = {},
+
+				-- stats
+				walktype = 1,
+				strength = 2,
+				toughness = 2,
+				cognition = 3,
+				memory = 2,
+				sight = SandboxVars.TLOUZombies.RunnerVision,
+				hearing = SandboxVars.TLOUZombies.RunnerHearing,
+				HP = 1,
+
+				noteeth = false,
+				transmission = false,
+
+				-- UI
+				color = {255, 255, 255,},
+				outline = {0, 0, 0,},
+
+				-- attack functions
+				funcattack = {},
+				funconhit = {},
+
+				-- custom behavior
+				onDeath = {},
+				customBehavior = {},
+			}
+		--)
+	end
 end
 
 
@@ -324,8 +380,12 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
-    if ZombieTable.HP and not (ZombieTable.HP == 1) then
-    
+    if ZombieTable.HP and not (ZombieTable.HP == 1) and zombie:isAlive() then
+        if zombie:getHealth() ~= 1000 then
+            zombie:setHealth(1000)
+        else
+            IsSet = IsSet + 1
+        end
     else
         IsSet = IsSet + 1
     end
@@ -401,67 +461,61 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
         statChecked = nonPersistentZData.statChecked
     end
 
-    -- multiCheck for unverifiable stats
-    local multiCheck = nonPersistentZData.multiCheck
-    if not multiCheck then
-        nonPersistentZData.multiCheck = {}
-        multiCheck = nonPersistentZData.multiCheck
-    end
-
     -- for every stats available to update
     local ZombieTable = ZomboidForge.ZTypes[ZType]
-    local ready = 0
     for k,_ in pairs(ZomboidForge.Stats) do
-        if not statChecked[k] then
-            local classField = ZomboidForge.Stats[k].classField
-            -- verifiable stats
-            if classField then
-                local stat = zombie[classField]
-                local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
-                if k == "walktype" and ZombieTable[k] and ZombieTable[k] == 4 then
-                    if zombie:isCanWalk() then
-                        zombie:setCanWalk(false)
-                    end
-                    if not zombie:isProne() then
-                        zombie:setFallOnFront(true)
-                    end
-                    if not zombie:isCrawling() then
-                        zombie:toggleCrawling()
-                    end
+        print(ZomboidForge.OriginalSandboxOptions[k])
+        local classField = ZomboidForge.Stats[k].classField
+        -- verifiable stats
+        if classField then
+            -- for walktype, 4 = crawler
+            if k == "walktype" and ZombieTable[k] and ZombieTable[k] == 4 then
+                if zombie:isCanWalk() then
+                    zombie:setCanWalk(false)
                 end
-                if not (stat == value) and ZombieTable[k] then
-                    local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
-                    getSandboxOptions():set(sandboxOption,ZombieTable[k])
-                    zombie:makeInactive(true)
-                    zombie:makeInactive(false)
+                if not zombie:isProne() then
+                    zombie:setFallOnFront(true)
                 end
+                if not zombie:isCrawling() then
+                    zombie:toggleCrawling()
+                end
+            end
 
-            -- unverifiable stats
-            elseif not classField then
+            -- verify current stats are the correct one, else update them
+            local stat = zombie[classField]
+            local value = ZomboidForge.Stats[k].returnValue[ZombieTable[k]]
+            if not (stat == value) and ZombieTable[k] then
                 local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
                 getSandboxOptions():set(sandboxOption,ZombieTable[k])
                 zombie:makeInactive(true)
                 zombie:makeInactive(false)
+            end
 
-            end
-            -- do multiCheck
-            if not multiCheck[k] then
-                multiCheck[k] = 0
-            end
-            if multiCheck[k] and multiCheck[k] < 10 then
-                multiCheck[k] = multiCheck[k] + 1
-            elseif multiCheck[k] and multiCheck[k] == 10 then
-                statChecked[k] = true
-                ready = ready + 1
-            end
-        else
-            ready = ready + 1
+            
+
+        -- unverifiable stats
+        elseif not classField then
+            local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
+            getSandboxOptions():set(sandboxOption,ZombieTable[k])
+            zombie:makeInactive(true)
+            zombie:makeInactive(false)
+
         end
     end
 
-    -- if every stats are checked
-    if ready == 8 then
+    -- update multiCheck counter for each stats
+    local multiCheck = nonPersistentZData.multiCheck
+    if not multiCheck then
+        multiCheck = 0
+    end
+    if multiCheck >= 10 then
+        -- stop checking stats for this zombie
         nonPersistentZData.GlobalCheck = true
+        nonPersistentZData.multiCheck = nil
+    else
+        -- increment multiCheck counter
+        multiCheck = multiCheck + 1
+        nonPersistentZData.multiCheck = multiCheck
     end
 end
 
@@ -742,7 +796,6 @@ ZomboidForge.UpdateNametag = function()
 	for trueID,ZData in pairs(ZomboidForge.ShowNametag) do
 		local zombie = ZData[1]
 		local interval = ZData[2]
-
         --local trueID = ZomboidForge.pID(zombie)
         local ZFModData = ModData.getOrCreate("ZomboidForge")
         local PersistentZData = ZFModData.PersistentZData[trueID]

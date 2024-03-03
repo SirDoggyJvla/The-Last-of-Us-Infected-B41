@@ -277,20 +277,20 @@ option ZomboidForge.Nametags
 
 
 
-option ZomboidForge.NormalSpawn
+option ZomboidForge.ZomboidSpawn
 {
 	type = boolean,
 	default = false,
 	page = ZomboidForge,
-	translation = ZomboidForge_normalSpawn,
+	translation = ZomboidForge_zomboidSpawn,
 }
 
-option ZomboidForge.NormalChance
+option ZomboidForge.ZomboidChance
 {
 	type = integer,
 	min = 0,
 	max = 1000,
 	default = 500,
 	page = ZomboidForge,
-	translation = ZomboidForge_normalChance,
+	translation = ZomboidForge_zomboidChance,
 }
