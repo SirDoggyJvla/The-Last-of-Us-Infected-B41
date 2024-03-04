@@ -392,7 +392,6 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     -- custom animation variable
     if ZombieTable.animationVariable then
         if not zombie:getVariableBoolean(ZombieTable.animationVariable) then
-            print("setting variable")
             zombie:setVariable(ZombieTable.animationVariable,'true')
             if isClient() then
                 sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
@@ -816,11 +815,13 @@ ZomboidForge.UpdateNametag = function()
 	for trueID,ZData in pairs(ZomboidForge.ShowNametag) do
 		local zombie = ZData[1]
 		local interval = ZData[2]
+
         --local trueID = ZomboidForge.pID(zombie)
         local ZFModData = ModData.getOrCreate("ZomboidForge")
         local PersistentZData = ZFModData.PersistentZData[trueID]
-        
+
         if not PersistentZData then return end
+
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
 		if interval>0 and ZomboidForge.ZTypes and ZombieTable then

@@ -11,13 +11,14 @@ This file defines the module of Zomboid Forge server side
 ]]--
 --[[ ================================================ ]]--
 
-if isClient() then return; end
+if isClient() then return end
 
 --- main module for use in storing informations and pass along other files
 local ZomboidForge_server = {}
 
 -- initialize command module
 ZomboidForge_server.Commands = {}
+ZomboidForge_server.Commands.AnimationHandler = {}
 
 -- module.Commands.module.command
 ZomboidForge_server.Commands.AnimationHandler.SetAnimationVariable = function(player, args)

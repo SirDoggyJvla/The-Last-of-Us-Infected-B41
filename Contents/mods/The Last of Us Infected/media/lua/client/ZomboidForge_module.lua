@@ -15,8 +15,8 @@ This file defines the module of Zomboid Forge
 local ZomboidForge = {}
 
 -- initialize variables within ZomboidForge
-ZomboidForge.ZTypes = ZomboidForge.ZTypes or {}
-ZomboidForge.ShowNametag = ZomboidForge.ShowNametag or {}
+ZomboidForge.ZTypes = {}
+ZomboidForge.ShowNametag = {}
 ZomboidForge.PersistentOutfitID = {}
 ZomboidForge.TrueID = {}
 ZomboidForge.HatFallen = {}

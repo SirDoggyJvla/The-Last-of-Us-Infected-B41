@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
-	<m_Name>clickerWalk</m_Name>
+	<m_Name>clickerWalk1</m_Name>
 	<m_AnimName>clickerWalk1</m_AnimName>
-	<m_SpeedScale>0.6</m_SpeedScale>
+	<m_SpeedScale>1.1</m_SpeedScale>
 	<m_Conditions />
 
 	<!-- 
