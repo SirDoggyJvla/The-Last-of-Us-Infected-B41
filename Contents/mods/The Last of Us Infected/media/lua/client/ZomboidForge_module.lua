@@ -22,6 +22,7 @@ ZomboidForge.TrueID = {}
 ZomboidForge.HatFallen = {}
 
 -- initialize command module
-ZomboidForge.Command = {}
+ZomboidForge.Commands = {}
+ZomboidForge.Commands.AnimationHandler = {}
 
 return ZomboidForge

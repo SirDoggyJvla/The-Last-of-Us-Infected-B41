@@ -19,9 +19,6 @@ local ZombRand = ZombRand -- java function
 local print = print -- print function
 local tostring = tostring --tostring function
 
---- main module for use in storing informations and pass along other files
---local ZomboidForge = {}
-
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 
@@ -380,6 +377,8 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
+    -- set zombie HP extremely high to make sure it doesn't get oneshoted if it has custom
+    -- HP, handled via the attack functions
     if ZombieTable.HP and not (ZombieTable.HP == 1) and zombie:isAlive() then
         if zombie:getHealth() ~= 1000 then
             zombie:setHealth(1000)
@@ -390,9 +389,34 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
+    -- custom animation variable
+    if ZombieTable.animationVariable then
+        if not zombie:getVariableBoolean(ZombieTable.animationVariable) then
+            print("setting variable")
+            zombie:setVariable(ZombieTable.animationVariable,'true')
+            if isClient() then
+                sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
+            end
+        else
+            IsSet = IsSet + 1
+        end
+    else
+        IsSet = IsSet + 1
+    end
+
     -- update IsDataSet
-    if IsSet >= 8 then
+    if IsSet >= 9 then
         nonPersistentZData.IsDataSet = true
+    end
+end
+
+ZomboidForge.Commands.AnimationHandler.SetAnimationVariable = function(args)
+    -- get zombie info
+    local zombie = args.zombie
+    if getPlayer() ~= getPlayerByOnlineID(args.id) then
+        if zombie then
+            zombie:setVariable(args.animationVariable,'true')
+        end
     end
 end
 
@@ -402,7 +426,6 @@ end
 ---@param current any       --Used to verify `current` from `Zombie` is not in table
 ---@return any              --Random choice within ZData
 ZomboidForge.RandomizeTable = function(ZDataTable,ZData,current)
-    --local ZombieTable = ZomboidForge.ZTypes[ZType]
     local ZDataTable_check = ZDataTable[ZData]; if not ZDataTable_check then return end
     local size = #ZDataTable_check
 
@@ -491,15 +514,12 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
                 zombie:makeInactive(false)
             end
 
-            
-
         -- unverifiable stats
         elseif not classField then
             local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
             getSandboxOptions():set(sandboxOption,ZombieTable[k])
             zombie:makeInactive(true)
             zombie:makeInactive(false)
-
         end
     end
 

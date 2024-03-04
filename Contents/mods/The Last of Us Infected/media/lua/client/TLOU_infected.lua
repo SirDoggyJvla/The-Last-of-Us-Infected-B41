@@ -170,6 +170,7 @@ ZomboidForge.InitTLOUInfected = function()
 					"",
 				},
 				beardColor = {},
+				animationVariable = "isClicker",
 
 				-- stats
 				walktype = 2,
