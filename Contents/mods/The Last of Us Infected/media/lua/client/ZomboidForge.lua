@@ -414,7 +414,7 @@ ZomboidForge.Commands.AnimationHandler.SetAnimationVariable = function(args)
     local zombie = args.zombie
     if getPlayer() ~= getPlayerByOnlineID(args.id) then
         if zombie then
-            zombie:setVariable(args.animationVariable,'true')
+            zombie:setVariable(args.animationVariable,args.state)
         end
     end
 end

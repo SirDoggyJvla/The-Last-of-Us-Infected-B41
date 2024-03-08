@@ -208,6 +208,7 @@ ZomboidForge.InitTLOUInfected = function()
 				customBehavior = {
 					"SetClickerClothing",
 					"SetClickerSounds",
+					"ClickerAgro",
 				},
 			}
 		--)
@@ -864,7 +865,9 @@ end
 
 --#region Custom behavior: `DoorOneShot`
 
-
+-- Manage Bloater strength against structures by making them extra strong.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.StrongBloater = function(zombie,ZType)
 	-- run code if infected has thumping target
 	local thumped = zombie:getThumpTarget()
@@ -925,3 +928,23 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 end
 --#endregion
 
+--#region Custom behavior: `DoorOneShot`
+
+-- Manage Clicker agro to change their animation when 
+-- they run after a player.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
+ZomboidForge.ClickerAgro = function(zombie,ZType)
+	local target = zombie:getTarget()
+	if zombie:getTarget() and not zombie:getVariableBoolean("ClickerAgro") then
+		zombie:setVariable("ClickerAgro",'true')
+		if isClient() then
+			sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = true})
+		end
+	elseif not zombie:getTarget() and zombie:getVariableBoolean("ClickerAgro") then
+		zombie:setVariable("ClickerAgro",'false')
+		if isClient() then
+			sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = false})
+		end
+	end
+end

@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
-	<m_Name>clickerWalk1</m_Name>
-	<m_AnimName>clickerWalk1</m_AnimName>
-	<m_SpeedScale>1.5</m_SpeedScale>
+	<m_Name>clickerWalk5</m_Name>
+	<m_AnimName>clickerWalk5</m_AnimName>
+	<m_SpeedScale>2</m_SpeedScale>
 	<m_Conditions />
 
 	
 	<m_Conditions>
 		<m_Name>zombieWalkType</m_Name>
 		<m_Type>STRING</m_Type>
-		<m_StringValue>1</m_StringValue>
+		<m_StringValue>5</m_StringValue>
 	</m_Conditions>
 	
 

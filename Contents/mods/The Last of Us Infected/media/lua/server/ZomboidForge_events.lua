@@ -22,7 +22,7 @@ ZomboidForge_server.Commands.AnimationHandler = {}
 
 -- module.Commands.module.command
 ZomboidForge_server.Commands.AnimationHandler.SetAnimationVariable = function(player, args)
-	sendServerCommand('AnimationHandler', 'SetAnimationVariable', {id = player:getOnlineID(), animationVariable = args.animationVariable, zombie =  args.zombie})
+	sendServerCommand('AnimationHandler', 'SetAnimationVariable', {id = player:getOnlineID(), animationVariable = args.animationVariable, zombie =  args.zombie, state = args.state})
 end
 
 Events.OnClientCommand.Add(function(module, command, player, args)
