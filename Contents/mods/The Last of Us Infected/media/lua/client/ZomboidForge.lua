@@ -140,8 +140,8 @@ ZomboidForge.OnLoad = function()
         ZFModData.PersistentZData = {}
     end
 
-    -- get numbers of Zombie Types
-    --ZomboidForge.TotalZTypes = #ZomboidForge.ZTypes
+    -- reset non persistent data
+    ZomboidForge.NonPersistentZData = {}
 
     -- calculate total chance
     ZomboidForge.TotalChance = 0
@@ -257,9 +257,10 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
 		zombie:setAge(-1)
 	end
 
-    ZomboidForge.PersistentOutfitID[trueID].IsInitialized = true
+    ZomboidForge.NonPersistentZData[trueID].IsInitialized = true
 end
 
+local timeStatCheck = 500
 --- Used to set the various data of a zombie, skipping the unneeded parts or already done. Order of data set:
 --
 --          `Zombie stats`
@@ -274,7 +275,22 @@ end
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetZombieData = function(zombie,ZType)
     local trueID = ZomboidForge.pID(zombie)
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
+    local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
+
+    -- counter to update
+    local UpdateCounter = nonPersistentZData.UpdateCounter
+    if UpdateCounter and UpdateCounter > 0 then
+        -- start counting
+        nonPersistentZData.UpdateCounter = UpdateCounter - 1
+        return
+    elseif UpdateCounter then
+        -- back to start
+        nonPersistentZData.UpdateCounter = timeStatCheck
+    elseif not UpdateCounter then
+        -- to have a first check instantly
+        nonPersistentZData.UpdateCounter = -1
+    end
+
     local IsSet = 0
 
     -- get ZType data
@@ -304,7 +320,7 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     -- set to skeleton
     if ZombieTable.skeleton and not zombie:isSkeleton() then
         zombie:setSkeleton(true)
-    elseif zombie:isSkeleton() then
+    else
         IsSet = IsSet + 1
     end
 
@@ -403,7 +419,7 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         IsSet = IsSet + 1
     end
 
-    -- update IsDataSet
+    -- update IsDataSet if every data are set
     if IsSet >= 9 then
         nonPersistentZData.IsDataSet = true
     end
@@ -442,7 +458,6 @@ ZomboidForge.RandomizeTable = function(ZDataTable,ZData,current)
     return false
 end
 
-local timeStatCheck = 500
 -- Updates stats of `Zombie`.
 -- Stats are checked and updated if needed 10 times. They are updated every `timeStatCheck` ticks.
 --
@@ -456,24 +471,10 @@ local timeStatCheck = 500
 ZomboidForge.CheckZombieStats = function(zombie,ZType)
     -- get zombie info
     local trueID = ZomboidForge.pID(zombie)
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
+    local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
 
     -- GlobalCheck, if true then stats are already checked
     if nonPersistentZData.GlobalCheck then return end
-
-    -- counter to update
-    local UpdateCounter = nonPersistentZData.UpdateCounter
-    if UpdateCounter and UpdateCounter > 0 then
-        -- start counting
-        nonPersistentZData.UpdateCounter = UpdateCounter - 1
-        return
-    elseif UpdateCounter then
-        -- back to start
-        nonPersistentZData.UpdateCounter = timeStatCheck
-    elseif not UpdateCounter then
-        -- to have a first check instantly
-        nonPersistentZData.UpdateCounter = -1
-    end
 
     -- get info if stat already checked for each stats
     -- else initialize it
@@ -556,10 +557,10 @@ ZomboidForge.ZombieUpdate = function(zombie)
     local ZFModData = ModData.getOrCreate("ZomboidForge")
 
     -- get nonPersistentZData checked at every save reload and initialize it if not already done
-    local nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
+    local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
     if not nonPersistentZData then
-        ZomboidForge.PersistentOutfitID[trueID] = {}
-        nonPersistentZData = ZomboidForge.PersistentOutfitID[trueID]
+        ZomboidForge.NonPersistentZData[trueID] = {}
+        nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
     end
 
     -- check if zombie IsInitialized
@@ -574,6 +575,11 @@ ZomboidForge.ZombieUpdate = function(zombie)
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
     if not ZombieTable then return end
+
+    local target = zombie:getTarget()
+    if target then
+        print(target)
+    end
 
     -- set zombie data
     local IsDataSet = nonPersistentZData.IsDataSet
@@ -688,7 +694,7 @@ ZomboidForge.OnDeath = function(zombie)
 
     -- delete zombie data
     ZFModData.PersistentZData[trueID] = nil
-    ZomboidForge.PersistentOutfitID[trueID] = nil
+    ZomboidForge.NonPersistentZData[trueID] = nil
 end
 
 --#region Tools
@@ -809,7 +815,7 @@ end
 
 
 -- Updates zombie tag showing for each players. 
--- Could probably be improved upon since currently the behavior is not perfect in multiplayer.
+-- Could probably be improved upon since currently the behavior is possibly not perfect in multiplayer.
 -- Specifically with `ShowZombieName`.
 ZomboidForge.UpdateNametag = function()
 	for trueID,ZData in pairs(ZomboidForge.ShowNametag) do
@@ -820,7 +826,10 @@ ZomboidForge.UpdateNametag = function()
         local ZFModData = ModData.getOrCreate("ZomboidForge")
         local PersistentZData = ZFModData.PersistentZData[trueID]
 
-        if not PersistentZData then return end
+        if not PersistentZData then
+            ZomboidForge.ShowNametag[trueID] = nil
+            return
+        end
 
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -848,6 +857,8 @@ ZomboidForge.UpdateNametag = function()
 			else
 				ZomboidForge.ShowNametag[trueID] = nil
 			end
+        else
+            ZomboidForge.ShowNametag[trueID] = nil
 		end
 	end
 end

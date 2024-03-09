@@ -17,7 +17,7 @@ local ZomboidForge = {}
 -- initialize variables within ZomboidForge
 ZomboidForge.ZTypes = {}
 ZomboidForge.ShowNametag = {}
-ZomboidForge.PersistentOutfitID = {}
+ZomboidForge.NonPersistentZData = {}
 ZomboidForge.TrueID = {}
 ZomboidForge.HatFallen = {}
 

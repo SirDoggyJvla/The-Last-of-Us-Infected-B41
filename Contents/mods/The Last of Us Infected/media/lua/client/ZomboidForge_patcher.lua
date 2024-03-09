@@ -91,7 +91,7 @@ function ISSpawnHordeUI:onRemoveZombies()
 
                         -- delete zombie data
                         ZFModData.PersistentZData[trueID] = nil
-                        ZomboidForge.PersistentOutfitID[trueID] = nil
+                        ZomboidForge.NonPersistentZData[trueID] = nil
 					end
 				end
 			end

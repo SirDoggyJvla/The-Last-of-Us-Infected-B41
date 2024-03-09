@@ -543,20 +543,20 @@ ZomboidForge.TLOU_infected.ClothingPriority = {
 ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	-- get zombie info
 	local trueID = ZomboidForge.pID(zombie)
-	ZomboidForge.PersistentOutfitID[trueID] = ZomboidForge.PersistentOutfitID[trueID] or {}
-	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected or {}
+	ZomboidForge.NonPersistentZData[trueID] = ZomboidForge.NonPersistentZData[trueID] or {}
+	ZomboidForge.NonPersistentZData[trueID].TLOU_infected = ZomboidForge.NonPersistentZData[trueID].TLOU_infected or {}
 
 	-- if already has hat fungi then skip
-	local hasHat_Fungi = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.hasHat_Fungi
+	local hasHat_Fungi = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi
 	if hasHat_Fungi then return end
 
 	-- update lure counter
-	local clothingCounter = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.ClothingCounter or timeCheck
+	local clothingCounter = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.ClothingCounter or timeCheck
 	if clothingCounter and clothingCounter >= 0 then
-		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.ClothingCounter = clothingCounter - 1
+		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.ClothingCounter = clothingCounter - 1
 		return
 	end
-	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.ClothingCounter = timeCheck
+	ZomboidForge.NonPersistentZData[trueID].TLOU_infected.ClothingCounter = timeCheck
 
 	-- get clothing visuals from zombie
 	local visual = zombie:getItemVisuals()
@@ -599,15 +599,15 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	end
 	
 	-- update multiCheck counter
-	local multiCheck = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.multiCheck or 0
+	local multiCheck = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck or 0
 	if multiCheck >= 10 then
 		-- stop checking for this zombie
-		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.hasHat_Fungi = hasHat_Fungi
-		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.multiCheck = nil
+		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi = hasHat_Fungi
+		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck = nil
 	else
 		-- increment multiCheck counter
 		multiCheck = multiCheck + 1
-		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.multiCheck = multiCheck
+		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck = multiCheck
 	end
 end
 
@@ -627,18 +627,18 @@ ZomboidForge.HideIndoors = function(zombie,ZType)
 
 	-- get zombie pID and info
 	local trueID = ZomboidForge.pID(zombie)
-	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected or {}
+	ZomboidForge.NonPersistentZData[trueID].TLOU_infected = ZomboidForge.NonPersistentZData[trueID].TLOU_infected or {}
 
 	-- update lure counter
-	local lureCounter = ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter
+	local lureCounter = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter
 	if lureCounter and lureCounter >= 0 then
-		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter = lureCounter - 1
+		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter = lureCounter - 1
 		return
 	elseif not lureCounter then
-		ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter = timeCheck
+		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter = timeCheck
 		return
 	end
-	ZomboidForge.PersistentOutfitID[trueID].TLOU_infected.LureCounter = timeCheck
+	ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter = timeCheck
 
 	-- lure zombie either to a building or make it wander if it's daytime
 	ZomboidForge.TLOU_infected.LureZombie(zombie)
@@ -948,3 +948,4 @@ ZomboidForge.ClickerAgro = function(zombie,ZType)
 		end
 	end
 end
+--#endregion
