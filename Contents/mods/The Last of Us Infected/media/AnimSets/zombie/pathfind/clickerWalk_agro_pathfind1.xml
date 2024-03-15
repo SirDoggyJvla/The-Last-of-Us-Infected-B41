@@ -1,18 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
-	<m_Name>clickerLunge2</m_Name>
-	<m_AnimName>clickerLunge2</m_AnimName>
-	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
-	<m_SpeedScale>0.9</m_SpeedScale>
-	
+	<m_Name>clickerWalk_agro_pathfind1</m_Name>
+	<m_AnimName>clickerWalk_agro1</m_AnimName>
+	<m_SpeedScale>2</m_SpeedScale>
 	<m_Conditions />
+
 	<m_Conditions>
-		<m_Name>zombieWalkType</m_Name>
-		<m_Type>STRING</m_Type>
-		<m_StringValue>3</m_StringValue>
+		<m_Name>bMoving</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>
+
 	<m_Conditions>
 		<m_Name>isClicker</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+	<m_Conditions>
+		<m_Name>ClickerAgro</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>

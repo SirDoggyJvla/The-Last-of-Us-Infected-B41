@@ -3,8 +3,10 @@
 	<m_Name>clickerIdle2</m_Name>
 	<m_AnimName>clickerIdle2</m_AnimName>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
-	<m_SpeedScale>0.5</m_SpeedScale>
 	<m_BlendTime>0.10</m_BlendTime> 
+	<m_SpeedScale>1.5</m_SpeedScale>
+	<m_SpeedScaleRandomMultiplierMin>1.0</m_SpeedScaleRandomMultiplierMin>
+	<m_SpeedScaleRandomMultiplierMax>1.7</m_SpeedScaleRandomMultiplierMax>
 
 	<m_Conditions>
 		<m_Name>zombieWalkType</m_Name>
