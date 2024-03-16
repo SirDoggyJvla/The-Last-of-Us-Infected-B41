@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
 	<m_Name>start</m_Name>
-	<m_AnimName>Bob_ValultOver_Run</m_AnimName>
+	<m_AnimName>ClimbFenceStarted</m_AnimName>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
 	<m_Looped>false</m_Looped>
 	<m_EarlyTransitionOut>true</m_EarlyTransitionOut>
