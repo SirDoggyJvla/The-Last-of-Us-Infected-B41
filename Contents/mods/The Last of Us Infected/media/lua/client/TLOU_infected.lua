@@ -81,9 +81,7 @@ ZomboidForge.InitTLOUInfected = function()
 				funconhit = {},
 
 				-- custom behavior
-				onDeath = {
-					"OnInfectedDeath",
-				},
+				onDeath = {},
 				customBehavior = {
 					"SetRunnerSounds",
 				},
@@ -134,11 +132,10 @@ ZomboidForge.InitTLOUInfected = function()
 				funconhit = {},
 
 				-- custom behavior
-				onDeath = {
-					"OnInfectedDeath",
-				},
+				onDeath = {},
 				customBehavior = {
 					"SetStalkerSounds",
+					"RemoveBandages",
 				},
 			}
 		--)
@@ -203,12 +200,12 @@ ZomboidForge.InitTLOUInfected = function()
 				-- custom behavior
 				onDeath = {
 					"OnClickerDeath",
-					"OnInfectedDeath",
 				},
 				customBehavior = {
 					"SetClickerClothing",
 					"SetClickerSounds",
 					"ClickerAgro",
+					"RemoveBandages",
 				},
 			}
 		--)
@@ -262,11 +259,10 @@ ZomboidForge.InitTLOUInfected = function()
 				customDamage = "BloaterDamage",
 
 				-- custom behavior
-				onDeath = {
-					"OnInfectedDeath",
-				},
+				onDeath = {},
 				customBehavior = {
 					"SetBloaterSounds",
+					"RemoveBandages",
 				},
 			}
 		--)
@@ -291,6 +287,24 @@ ZomboidForge.InitTLOUInfected = function()
 			"StrongBloater"
 		)
 	end
+
+	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_Overhaul.CordycepsSpawn then
+		table.insert(ZomboidForge.ZTypes.TLOU_Runner.onDeath,
+			"OnInfectedDeath_cordyceps"
+		)
+
+		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.onDeath,
+			"OnInfectedDeath_cordyceps"
+		)
+
+		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.onDeath,
+			"OnInfectedDeath_cordyceps"
+		)
+
+		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.onDeath,
+			"OnInfectedDeath_cordyceps"
+		)
+	end
 end
 
 --#region Attack and Onhit functions
@@ -306,7 +320,7 @@ function ZomboidForge.ClickerAttack(player,zombie)
 
 		-- kill player if oneshot clickers
 		if SandboxVars.TLOUZombies.OneShotClickers then 
-			if player:hasHitReaction() and not player:isGodMod() then
+			if player:hasHitReaction() and not player:isGodMod() or instanceof(player, "IsoZombie") then
 				--player:setDeathDragDown(true)
 				player:Kill(zombie)
 			end
@@ -329,7 +343,6 @@ function ZomboidForge.BloaterAttack(player,zombie)
 		end
 	end
 end
-
 
 -- player attacked a clicker
 function ZomboidForge.ClickerHit(player, zombie, HandWeapon, damage)
@@ -370,6 +383,18 @@ function ZomboidForge.BloaterDamage(player, zombie, HandWeapon, damage)
 end
 --#endregion
 
+-- custom targeting of Clickers to make them attack other zombies when blind
+--[[
+	
+if storeZombie and storeZombie ~= zombie and zombie:getTarget() ~= storeZombie then
+	zombie:setTarget(storeZombie)
+	zombie:setAttackedBy(storeZombie)
+	print("setting target")
+end
+storeZombie = zombie
+zombie:addLineChatElement(tostring(zombie:getTarget()))
+]]
+
 --- Custom behavior
 
 --#region Custom behavior: `OnDeath loot`
@@ -381,6 +406,7 @@ ZomboidForge.OnClickerDeath = function(zombie,ZType)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
 	inventory:AddItems("Hat_Fungi_Loot",1)
+	print("done")
 end
 
 -- Add cordyceps mushrooms from Braven's Cordyceps Spore Zones when activated to various infected loot.
@@ -394,26 +420,40 @@ end
 --
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
-ZomboidForge.OnInfectedDeath = function(zombie,ZType)
-	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_Overhaul.CordycepsSpawn then
-		-- add fungi hat food type to inventory
-		local inventory = zombie:getInventory()
-		local ZombieTable = ZomboidForge.ZTypes[ZType]
+ZomboidForge.OnInfectedDeath_cordyceps = function(zombie,ZType)
+	-- add fungi hat food type to inventory
+	local inventory = zombie:getInventory()
+	local ZombieTable = ZomboidForge.ZTypes[ZType]
 
-		-- roll to inventory
-		local rand = ZombRand(1,100)
-		local lootchance = ZomboidForge.TLOU_infected.lootchance
-		if ZombieTable.isRunner and lootchance.runner >= rand then
-			inventory:AddItems("Cordyceps", ZombRand(1,3))
-		elseif ZombieTable.isStalker and lootchance.stalker >= rand then
-			inventory:AddItems("Cordyceps", ZombRand(1,5))
-		elseif ZombieTable.isClicker and lootchance.clicker >= rand then
-			inventory:AddItems("Cordyceps", ZombRand(3,10))
-		elseif ZombieTable.isBloater and lootchance.bloater >= rand then
-			inventory:AddItems("Cordyceps", ZombRand(5,15))
-		end
+	-- roll to inventory
+	local rand = ZombRand(1,100)
+	local lootchance = ZomboidForge.TLOU_infected.lootchance
+	if ZombieTable.isRunner and lootchance.runner >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(1,3))
+	elseif ZombieTable.isStalker and lootchance.stalker >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(1,5))
+	elseif ZombieTable.isClicker and lootchance.clicker >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(3,10))
+	elseif ZombieTable.isBloater and lootchance.bloater >= rand then
+		inventory:AddItems("Cordyceps", ZombRand(5,15))
 	end
 end
+--#endregion
+
+--#region Custom behavior: `RemoveBandages`
+
+-- Remove visual bandages on Zombies who have some, else skip.
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
+ZomboidForge.RemoveBandages = function(zombie,ZType)
+	-- Remove bandages
+	local bodyVisuals = zombie:getHumanVisual():getBodyVisuals()
+	if bodyVisuals and bodyVisuals:size() > 0 then
+		zombie:getHumanVisual():getBodyVisuals():clear()
+		zombie:resetModel()
+	end
+end
+
 --#endregion
 
 --#region Custom behavior: `SetInfectedSounds`
@@ -595,9 +635,10 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 		itemVisual:setItemType("Base.Hat_Fungi")
 		itemVisual:setClothingItemName("Hat_Fungi")
 		visual:add(itemVisual)
+
 		zombie:resetModel()
 	end
-	
+
 	-- update multiCheck counter
 	local multiCheck = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck or 0
 	if multiCheck >= 10 then
@@ -928,7 +969,7 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 end
 --#endregion
 
---#region Custom behavior: `DoorOneShot`
+--#region Custom behavior: `ClickerAgro`
 
 -- Manage Clicker agro to change their animation when 
 -- they run after a player.
@@ -936,12 +977,12 @@ end
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.ClickerAgro = function(zombie,ZType)
 	local target = zombie:getTarget()
-	if zombie:getTarget() and not zombie:getVariableBoolean("ClickerAgro") then
+	if target and not zombie:getVariableBoolean("ClickerAgro") then
 		zombie:setVariable("ClickerAgro",'true')
 		if isClient() then
 			sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = true})
 		end
-	elseif not zombie:getTarget() and zombie:getVariableBoolean("ClickerAgro") then
+	elseif not target and zombie:getVariableBoolean("ClickerAgro") then
 		zombie:setVariable("ClickerAgro",'false')
 		if isClient() then
 			sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = false})

@@ -29,11 +29,6 @@ module Base
 		BloodLocation = Head,
 		Icon = ficon,
 		CanHaveHoles = false,
-		BiteDefense = 5,
-		ScratchDefense = 5,
-		Weight = 0.8,
-		Insulation = 0.75,
-		WindResistance = 0.45,
 		WorldStaticModel = W_Fungi,
     }
 

@@ -1,14 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
-	<m_Name>windowLunge</m_Name>
-	<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+	<m_Name>clickerFenceLunge</m_Name>
+	<m_AnimName>Bob_RunSltumble</m_AnimName>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
 	<m_Looped>false</m_Looped>
-	<m_SpeedScale>1.04</m_SpeedScale>
 	<m_BlendTime>0.40</m_BlendTime>
 	<m_Scalar>FenceLungeX</m_Scalar>
 	<m_Scalar2>FenceLungeY</m_Scalar2>
-		
+	
 	<m_Conditions>
 		<m_Name>isClicker</m_Name>
 		<m_Type>BOOL</m_Type>
@@ -16,47 +15,47 @@
 	</m_Conditions>
 
 	<m_Conditions>
-		<m_Name>ClimbWindowOutcome</m_Name>
-		<m_Type>STRING</m_Type>
-		<m_StringValue>lunge</m_StringValue>
-	</m_Conditions>
-	<m_Conditions>
-		<m_Name>ClimbWindowStarted</m_Name>
+		<m_Name>ClimbFenceStarted</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>
+	<m_Conditions>
+		<m_Name>ClimbFenceOutcome</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_StringValue>hola</m_StringValue>
+	</m_Conditions>
 	<m_2DBlends referenceID="1">
-		<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+		<m_AnimName>Bob_RunStumble</m_AnimName>
 		<m_XPos>0.00</m_XPos>
 		<m_YPos>0.00</m_YPos>
 		<m_SpeedScale>0.80</m_SpeedScale>
 	</m_2DBlends>
 	<m_2DBlends referenceID="2">
-		<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+		<m_AnimName>Bob_RunStumble</m_AnimName>
 		<m_XPos>-1.00</m_XPos>
 		<m_YPos>0.00</m_YPos>
 		<m_SpeedScale>0.80</m_SpeedScale>
 	</m_2DBlends>
 	<m_2DBlends referenceID="3">
-		<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+		<m_AnimName>Bob_RunStumble</m_AnimName>
 		<m_XPos>1.00</m_XPos>
 		<m_YPos>0.00</m_YPos>
 		<m_SpeedScale>0.80</m_SpeedScale>
 	</m_2DBlends>
 	<m_2DBlends referenceID="4">
-		<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+		<m_AnimName>Bob_RunStumble</m_AnimName>
 		<m_XPos>0.50</m_XPos>
 		<m_YPos>0.00</m_YPos>
 		<m_SpeedScale>0.80</m_SpeedScale>
 	</m_2DBlends>
 	<m_2DBlends referenceID="5">
-		<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+		<m_AnimName>Bob_RunStumble</m_AnimName>
 		<m_XPos>-0.50</m_XPos>
 		<m_YPos>0.00</m_YPos>
 		<m_SpeedScale>0.80</m_SpeedScale>
 	</m_2DBlends>
 	<m_2DBlends referenceID="6">
-		<m_AnimName>Bob_ValultOver_RunFail</m_AnimName>
+		<m_AnimName>Bob_RunStumble</m_AnimName>
 		<m_XPos>0.00</m_XPos>
 		<m_YPos>-0.04</m_YPos>
 		<m_SpeedScale>0.80</m_SpeedScale>
@@ -84,7 +83,7 @@
 	<m_Events>
 		<m_EventName>SetVariable</m_EventName>
 		<m_Time>End</m_Time>
-		<m_ParameterValue>ClimbWindowFinished=true</m_ParameterValue>
+		<m_ParameterValue>ClimbFenceFinished=true</m_ParameterValue>
 	</m_Events>
 	<m_Events>
 		<m_EventName>CheckAttack</m_EventName>
@@ -92,24 +91,14 @@
 		<m_ParameterValue></m_ParameterValue>
 	</m_Events>
 	<m_Events>
-		<m_EventName>OnFloor</m_EventName>
-		<m_TimePc>0.1</m_TimePc>
-		<m_ParameterValue>true</m_ParameterValue>
-	</m_Events>
-	<m_Events>
-		<m_EventName>OnFloor</m_EventName>
-		<m_TimePc>0.95</m_TimePc>
-		<m_ParameterValue>false</m_ParameterValue>
+		<m_EventName>SetState</m_EventName>
+		<m_TimePc>0.55</m_TimePc>
+		<m_ParameterValue>GettingUp</m_ParameterValue>
 	</m_Events>
 	<m_Events>
 		<m_EventName>SetState</m_EventName>
 		<m_TimePc>0.25</m_TimePc>
 		<m_ParameterValue>Attack</m_ParameterValue>
-	</m_Events>
-	<m_Events>
-		<m_EventName>SetState</m_EventName>
-		<m_TimePc>0.55</m_TimePc>
-		<m_ParameterValue>GettingUp</m_ParameterValue>
 	</m_Events>
 	<m_Events>
 		<m_EventName>PlaySound</m_EventName>

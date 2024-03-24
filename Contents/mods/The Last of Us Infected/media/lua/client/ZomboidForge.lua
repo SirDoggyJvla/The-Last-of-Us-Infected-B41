@@ -22,116 +22,6 @@ local tostring = tostring --tostring function
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 
---- Stats for each zombies. `key` of `Stats` are the variable to 
--- define with `key` value from `returnValue`. The `value` of `returnValue` 
--- associated to a `key` is the compared one with what the game returns 
--- from `isoZombie class fields`.
-ZomboidForge.Stats = {
-    -- defines walk speed of zombie
-    walktype = {
-        setSandboxOption = "ZombieLore.Speed",
-        --classField = "speedType",
-        returnValue = {
-            [1] = 1, -- sprinter
-            [2] = 2, -- fast shambler
-            [3] = 3, -- shambler
-            [4] = 2, -- crawlers, speed doesn't matter
-        },
-    },
-
-    -- defines the sight setting
-    sight = {
-        setSandboxOption = "ZombieLore.Sight",
-        classField = "sight",
-        returnValue = {
-            [1] = 1, -- Eagle
-            [2] = 2, -- Normal 
-            [3] = 3, -- Poor
-            --[4] = ZomboidForge.coinFlip(),
-        },
-    },
-
-    -- defines the sight setting
-    hearing = {
-        setSandboxOption = "ZombieLore.Hearing",
-        classField = "hearing",
-        returnValue = {
-            [1] = 1, -- Pinpoint
-            [2] = 2, -- Normal 
-            [3] = 3, -- Poor
-            --[4] = ZomboidForge.coinFlip(),
-        },
-    },
-
-    -- defines cognition aka navigation of zombie
-    --
-    -- navigate = basic navigate.
-    -- It's a lie from the base game so doesn't matter which one you chose
-    cognition = {
-        setSandboxOption = "ZombieLore.Cognition",
-        classField = "cognition",
-        returnValue = {
-            [1] = 1, -- can open doors
-            [2] = -1, -- navigate 
-            [3] = -1, -- basic navigate
-            --[4] = ZomboidForge.coinFlip(),
-        },
-    },
-
-    --- UNVERIFIABLE STATS
-    -- these stats can't be checked if already updated because
-    -- of how the fields are updated or if they don't have any
-    -- class fields to check them.
-    
-    -- defines the memory setting
-    memory = {
-        setSandboxOption = "ZombieLore.Memory",
-        --classField = "memory",
-        returnValue = {
-            [1] = 1250, -- long
-            [2] = 800, -- normal 
-            [3] = 500, -- short
-            [4] = 25, -- none
-        },
-    },
-
-    -- defines strength of zombie
-    -- undefined, causes issues when toughness is modified
-    strength = {
-        setSandboxOption = "ZombieLore.Strength",
-        --classField = "strength",
-        returnValue = {
-            [1] = 5, -- Superhuman
-            [2] = 3, -- Normal
-            [3] = 1, -- Weak
-        },
-    },
-
-    -- defines toughness of zombie
-    -- undefined
-    toughness = {
-        setSandboxOption = "ZombieLore.Toughness",
-        --classField = missing,
-        returnValue = {
-            [1] = 1,
-            [2] = 2,
-            [3] = 3,
-        },
-    },
-
-    -- defines the transmission setting
-    transmission = {
-        setSandboxOption = "ZombieLore.Transmission",
-        --classField = missing,
-        returnValue = {
-            [1] = 1, -- can open doors
-            [2] = 2, -- navigate 
-            [3] = 3, -- basic navigate
-            --[4] = ZomboidForge.coinFlip(),
-        },
-    },
-}
-
 --- OnLoad function to initialize the mod
 ZomboidForge.OnLoad = function()
     -- initialize ModData
@@ -165,7 +55,6 @@ ZomboidForge.OnGameStart = function()
 
     -- Zomboid (base game zombies)
 	if SandboxVars.ZomboidForge.ZomboidSpawn then
-		--table.insert(ZomboidForge.ZTypes,
 		ZomboidForge.ZTypes.ZF_Zomboid =
 			{
 				-- base informations
@@ -204,7 +93,6 @@ ZomboidForge.OnGameStart = function()
 				onDeath = {},
 				customBehavior = {},
 			}
-		--)
 	end
 end
 
@@ -576,11 +464,6 @@ ZomboidForge.ZombieUpdate = function(zombie)
 
     if not ZombieTable then return end
 
-    local target = zombie:getTarget()
-    if target then
-        print(target)
-    end
-
     -- set zombie data
     local IsDataSet = nonPersistentZData.IsDataSet
     if not IsDataSet then
@@ -604,13 +487,15 @@ end
 ---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.ZombieAttack = function(zombie,ZType)
-    local player = zombie:getTarget()
-    if player and player:isCharacter() then
+    local target = zombie:getTarget()
+    if target and target:isCharacter() then
         local ZombieTable = ZomboidForge.ZTypes[ZType]
-        ZomboidForge.ShowZombieName(player, zombie)
+        if instanceof(target, "IsoPlayer") then
+            ZomboidForge.ShowZombieName(target, zombie)
+        end
         if ZombieTable.funcattack then
             for i=1,#ZombieTable.funcattack do
-                ZomboidForge[ZombieTable.funcattack[i]](player,zombie,ZType)
+                ZomboidForge[ZombieTable.funcattack[i]](target,zombie,ZType)
             end
         end
     end
@@ -628,6 +513,7 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
         local trueID = ZomboidForge.pID(victim)
         local ZFModData = ModData.getOrCreate("ZomboidForge")
         local PersistentZData = ZFModData.PersistentZData[trueID]
+        if PersistentZData then return end
 
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -673,7 +559,8 @@ ZomboidForge.OnDeath = function(zombie)
     local trueID = ZomboidForge.pID(zombie)
     local ZFModData = ModData.getOrCreate("ZomboidForge")
     local PersistentZData = ZFModData.PersistentZData[trueID]
-    
+    if not PersistentZData then return end
+
     local ZType = PersistentZData.ZType
     -- initialize zombie type
     -- only a security for mods that insta-kill zombies on spawn
@@ -688,7 +575,6 @@ ZomboidForge.OnDeath = function(zombie)
     for i = 1,#ZombieTable.onDeath do
         ZomboidForge[ZombieTable.onDeath[i]](zombie,ZType)
     end
-
     -- reset emitters
     zombie:getEmitter():stopAll()
 
