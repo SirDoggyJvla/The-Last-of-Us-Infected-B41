@@ -96,7 +96,6 @@ ZomboidForge.OnGameStart = function()
 	end
 end
 
-
 --- Initialize a zombie if he's needed
 --
 --          `Zombie stats`
@@ -114,6 +113,7 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
     local ZFModData = ModData.getOrCreate("ZomboidForge")
     ZFModData.PersistentZData[trueID] = ZFModData.PersistentZData[trueID] or {}
     local PersistentZData = ZFModData.PersistentZData[trueID]
+    if not PersistentZData then return end
 
     ZFModData.test = true
 

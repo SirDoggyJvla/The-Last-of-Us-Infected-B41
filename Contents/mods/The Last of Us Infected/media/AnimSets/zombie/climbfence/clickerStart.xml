@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
 	<m_Name>clickerStart</m_Name>
-	<m_AnimName>Bob_ValultOver_Run</m_AnimName>
+	<m_AnimName>clickerStart</m_AnimName>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
 	<m_Looped>false</m_Looped>
 	<m_EarlyTransitionOut>true</m_EarlyTransitionOut>
-	<m_SpeedScale>0.80</m_SpeedScale>
+	<m_SpeedScale>1.28</m_SpeedScale>
 	<m_BlendTime>0.20</m_BlendTime>
 
 	<m_Conditions>
@@ -13,7 +13,7 @@
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>
-
+	
 	<m_Conditions>
 		<m_Name>ClimbFenceStarted</m_Name>
 		<m_Type>BOOL</m_Type>
