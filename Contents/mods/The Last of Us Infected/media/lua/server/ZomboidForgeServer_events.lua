@@ -6,29 +6,24 @@
 --[[ ================================================ ]]--
 --[[
 
-This file defines the module of Zomboid Forge server side
+This file defines the events of Zomboid Forge server side
 
 ]]--
 --[[ ================================================ ]]--
 
-if isClient() then return end
+--- Import functions localy for performances reasons
+local table = table -- Lua's table module
+local ipairs = ipairs -- ipairs function
+local pairs = pairs -- pairs function
+local ZombRand = ZombRand -- java function
+local print = print -- print function
+local tostring = tostring --tostring function
 
---- main module for use in storing informations and pass along other files
-local ZomboidForge_server = {}
-
--- initialize command module
-ZomboidForge_server.Commands = {}
-ZomboidForge_server.Commands.AnimationHandler = {}
-
--- module.Commands.module.command
-ZomboidForge_server.Commands.AnimationHandler.SetAnimationVariable = function(player, args)
-	sendServerCommand('AnimationHandler', 'SetAnimationVariable', {id = player:getOnlineID(), animationVariable = args.animationVariable, zombie =  args.zombie, state = args.state})
-end
+--- import module
+local ZomboidForge_server = require "ZomboidForgeServer_module"
 
 Events.OnClientCommand.Add(function(module, command, player, args)
 	if ZomboidForge_server.Commands[module] and ZomboidForge_server.Commands[module][command] then
 	    ZomboidForge_server.Commands[module][command](player, args)
 	end
 end)
-
-return ZomboidForge_server

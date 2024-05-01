@@ -400,7 +400,7 @@ zombie:addLineChatElement(tostring(zombie:getTarget()))
 --#region Custom behavior: `OnDeath loot`
 
 -- Replace fungi hat clothing with fungi hat food type on a `Clicker`'s death.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.OnClickerDeath = function(zombie,ZType)
 	-- add fungi hat food type to inventory
@@ -418,7 +418,7 @@ end
 -- 		`Clicker = 3 to 10`
 -- 		`Bloater = 5 to 15`
 --
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.OnInfectedDeath_cordyceps = function(zombie,ZType)
 	-- add fungi hat food type to inventory
@@ -443,7 +443,7 @@ end
 --#region Custom behavior: `RemoveBandages`
 
 -- Remove visual bandages on Zombies who have some, else skip.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.RemoveBandages = function(zombie,ZType)
 	-- Remove bandages
@@ -459,7 +459,7 @@ end
 --#region Custom behavior: `SetInfectedSounds`
 
 -- For debug purposes, allows to check vocals of a zombie.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ZomboidForge.VerifyEmitter = function(zombie)
 	local stringZ = "Emitters:"
 	stringZ = stringZ.."\nMaleA = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/MaleA"))
@@ -472,7 +472,7 @@ ZomboidForge.VerifyEmitter = function(zombie)
 end
 
 -- Set `Runner` sounds.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleA") and not zombie:isFemale()
@@ -488,7 +488,7 @@ ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 end
 
 -- Set `Stalker` sounds.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleB") and not zombie:isFemale()
@@ -504,7 +504,7 @@ ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 end
 
 -- Set `Clicker` sounds.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerSounds = function(zombie,ZType)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleC")then
@@ -515,7 +515,7 @@ ZomboidForge.SetClickerSounds = function(zombie,ZType)
 end
 
 -- Set `Bloater` sounds.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetBloaterSounds = function(zombie,ZType)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleC") then
@@ -578,7 +578,7 @@ ZomboidForge.TLOU_infected.ClothingPriority = {
 }
 
 -- Set clicker clothing by visually replacing one of its clothing based on the priority list of clothings to replace.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	-- get zombie info
@@ -657,7 +657,7 @@ end
 --#region Custom behavior: `HideIndoors`
 
 -- Main function to handle `Zombie` behavior to go hide inside the closest building or wander during night.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.HideIndoors = function(zombie,ZType)
 	-- if zombie is already in building, completely skip
@@ -686,7 +686,7 @@ ZomboidForge.HideIndoors = function(zombie,ZType)
 end
 
 -- Lure `Zombie` to the building during daytime or make it wander around during night time.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ZomboidForge.TLOU_infected.LureZombie = function(zombie)
 	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
     if TLOU_ModData.IsDay or not ZomboidForge.TLOU_infected.WanderAtNight then
@@ -907,10 +907,12 @@ end
 --#region Custom behavior: `DoorOneShot`
 
 -- Manage Bloater strength against structures by making them extra strong.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.StrongBloater = function(zombie,ZType)
 	-- run code if infected has thumping target
+
+
 	local thumped = zombie:getThumpTarget()
 	if not thumped then return end
 
@@ -929,9 +931,10 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 	end
 	TLOU_ModData.Infected[trueID].thumpCheck = zombie:getTimeThumping()
 
-	-- check barricades damage those if present
+	-- check barricades and damage those first if present
 	local barricade = nil
 	if thumped:isBarricaded() then
+		---@cast thumped BarricadeAble
 		for i = 1,200 do
 			barricade = thumped:getBarricadeForCharacter(zombie)
 			if not barricade then
@@ -941,12 +944,14 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 			barricade:Thump(zombie)
 		end
 
-	-- update health
+	-- damage structure getting thumped if no barricades
 	else
 		local health = nil
 		-- need to make a difference between each classes
 		-- IsoThumpable is player built
 		if instanceof(thumped,"IsoThumpable") then
+			---@cast thumped IsoThumpable
+
 			health = thumped:getHealth()
 			if thumped:isDoor() then
 				thumped:setHealth(health-200)
@@ -958,11 +963,15 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 
 		-- IsoDoor is map structure
 		elseif instanceof(thumped,"IsoDoor") then
+			---@cast thumped IsoDoor
+
 			health = thumped:getHealth()
 			thumped:setHealth(health-100)
 
 		-- IsoWindow is map structure
 		elseif instanceof(thumped,"IsoWindow") then
+			---@cast thumped IsoWindow
+
 			thumped:smashWindow()
 		end
 	end
@@ -973,7 +982,7 @@ end
 
 -- Manage Clicker agro to change their animation when 
 -- they run after a player.
----@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param zombie IsoZombie
 ---@param ZType integer     --Zombie Type ID
 ZomboidForge.ClickerAgro = function(zombie,ZType)
 	local target = zombie:getTarget()

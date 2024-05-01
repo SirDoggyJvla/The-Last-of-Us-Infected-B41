@@ -97,7 +97,7 @@ end
 --          `Zombie beard`
 --          `Zombie beard color`
 --
----@param zombie        IsoZombie
+---@param zombie IsoZombie
 ZomboidForge.ZombieInitiliaze = function(zombie)
     local trueID = ZomboidForge.pID(zombie)
 
@@ -148,8 +148,8 @@ local timeStatCheck = 500
 --          `Zombie beard`
 --          `Zombie beard color`
 --
----@param zombie        IsoZombie
----@param ZType         integer|nil         --Zombie Type ID
+---@param zombie IsoZombie
+---@param ZType integer|nil     --Zombie Type ID
 ZomboidForge.SetZombieData = function(zombie,ZType)
     local trueID = ZomboidForge.pID(zombie)
     local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
@@ -258,11 +258,22 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     end
 end
 
+-- Sets the animation variable of a zombie when on server.
+ZomboidForge.Commands.AnimationHandler.SetAnimationVariable = function(args)
+    -- get zombie info
+    local zombie = args.zombie
+    if getPlayer() ~= getPlayerByOnlineID(args.id) then
+        if zombie then
+            zombie:setVariable(args.animationVariable,args.state)
+        end
+    end
+end
+
 --- Randomly choses a `Zombie` `ZData` within a ZType data table if current is not already in the table.
----@param ZDataTable    table       --Zombie Table to randomize
----@param ZData         string      --Chosen data in ZType table
----@param current       any         --[opt] Used to verify `current` from `Zombie` is not in table
----@return any                      --Random choice within ZData
+---@param ZDataTable table  --Zombie Table to randomize
+---@param ZData string      --Chosen data in ZType table
+---@param current any       --[opt] Used to verify `current` from `Zombie` is not in table
+---@return any              --Random choice within ZData
 ZomboidForge.RandomizeTable = function(ZDataTable,ZData,current)
     local ZDataTable_get = ZDataTable[ZData]; if not ZDataTable_get then return end
     local size = #ZDataTable_get
@@ -290,8 +301,8 @@ end
 -- The other stats can't be checked so they are updated every checks, they are unverifiable stats.
 --
 -- Once every stats went through the 10 checks and are actually correct then
----@param zombie        IsoZombie
----@param ZType         integer     --Zombie Type ID
+---@param zombie IsoZombie
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.CheckZombieStats = function(zombie,ZType)
     -- get zombie info
     local trueID = ZomboidForge.pID(zombie)
@@ -371,7 +382,7 @@ end
 --      `Update zombie data and stats`
 --      `Run custom behavior`
 --      `Run zombie attack function`
----@param zombie        IsoZombie
+---@param zombie IsoZombie
 ZomboidForge.ZombieUpdate = function(zombie)
     -- get persistentOutfitID aka trueID
     local trueID = ZomboidForge.pID(zombie)
@@ -413,14 +424,13 @@ end
 --- `Zombie` attacking `Player`. 
 -- 
 -- Trigger `funcattack` of `Zombie` depending on `ZType`.
----@param zombie        IsoZombie
----@param ZType         integer     --Zombie Type ID
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@param ZType integer     --Zombie Type ID
 ZomboidForge.ZombieAttack = function(zombie,ZType)
     local target = zombie:getTarget()
     if target and target:isCharacter() then
         local ZombieTable = ZomboidForge.ZTypes[ZType]
         if instanceof(target, "IsoPlayer") then
-            ---@cast target IsoPlayer
             ZomboidForge.ShowZombieName(target, zombie)
         end
         if ZombieTable.funcattack then
@@ -436,8 +446,8 @@ end
 -- Trigger `funconhit` of `Zombie` depending on `ZType`.
 --
 -- Handles the custom HP of zombies and apply custom damage depending on the customDamage function.
----@param attacker      IsoPlayer
----@param victim        IsoZombie
+---@param attacker IsoPlayer
+---@param victim IsoZombie
 ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
     if victim:isZombie() then
         local trueID = ZomboidForge.pID(victim)
@@ -484,7 +494,7 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
 end
 
 --- OnDeath functions
----@param zombie        IsoZombie
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
 ZomboidForge.OnDeath = function(zombie)
     local trueID = ZomboidForge.pID(zombie)
     local ZFModData = ModData.getOrCreate("ZomboidForge")
@@ -522,8 +532,8 @@ end
 -- This allows to access the trueID of a `Zombie` (the original pID with hat) from both pIDs.
 -- The trueID is stored to improve performances and is accessed from the fallen hat pID and the pID sent
 -- through this function detects if it's the trueID.
----@param zombie        IsoZombie
----@return integer      trueID
+---@param zombie IsoZombie|IsoGameCharacter|IsoMovingObject|IsoObject
+---@return integer trueID
 ZomboidForge.pID = function(zombie)
     local pID = zombie:getPersistentOutfitID()
 
@@ -560,7 +570,6 @@ ZomboidForge.zeroTick = 0
 -- Added to `OnTick`
 --
 -- The part updating one zombie per tick was made by Albion.
----@param tick          int
 ZomboidForge.OnTick = function(tick)
     -- Update counter
     ZomboidForge.counterUpdater()
@@ -594,8 +603,8 @@ end
 
 -- Shows `Zombie` name with this command, can be triggered anytime. 
 -- Can also be called outside of the framework by addons.
----@param player        IsoPlayer
----@param zombie        IsoZombie
+---@param player IsoPlayer
+---@param zombie IsoZombie
 ZomboidForge.ShowZombieName = function(player,zombie)
 	if (ZombieForgeOptions and ZombieForgeOptions.NameTag)or(ZombieForgeOptions==nil) then
 		if player:isLocalPlayer() then
@@ -607,7 +616,7 @@ end
 
 -- Get `Zombie` on `Player` cursor.
 -- If `Zombie` found then update `ShowZombieName`.
----@param player        IsoPlayer
+---@param player IsoPlayer
 ZomboidForge.GetZombieOnPlayerMouse = function(player)
 	if (ZombieForgeOptions and ZombieForgeOptions.NameTag)or(ZombieForgeOptions==nil) then
 		if player:isLocalPlayer() and player:isAiming() then

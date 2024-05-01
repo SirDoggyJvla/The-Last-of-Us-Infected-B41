@@ -14,16 +14,21 @@ This file defines the module of Zomboid Forge
 --- main module for use in storing informations and pass along other files
 local ZomboidForge = {
     -- basic dictionaries for storing data
-    ZTypes = {},
-    ShowNametag = {},
-    NonPersistentZData = {},
-    TrueID = {},
-    HatFallen = {},
+    ZTypes =                    {},
+    ShowNametag =               {},
+    NonPersistentZData =        {},
+    TrueID =                    {},
+    HatFallen =                 {},
 
-    -- command module
+    -- command functions
     Commands = {
-        AnimationHandler = {},
+        AnimationHandler =      {},
+        ZF_ModData =            {},
     },
+
+    -- Counter of the ZomboidForge framework. Updates every OnTick
+    counter =                   500, -- default value, replaced OnGameStart
+
 
     --- Stats for each zombies. `key` of `Stats` are the variable to 
     -- define with `key` value from `returnValue`. The `value` of `returnValue` 

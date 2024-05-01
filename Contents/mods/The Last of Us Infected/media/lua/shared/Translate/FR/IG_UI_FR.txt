@@ -1,7 +1,0 @@
-IGUI_FR = {
-    -- infected types names
-	IGUI_TLOU_Runner = "Coureur",
-    IGUI_TLOU_Stalker = "Rodeur",
-    IGUI_TLOU_Clicker = "Claqueur",
-    IGUI_TLOU_Bloater = "Colosse",
-}

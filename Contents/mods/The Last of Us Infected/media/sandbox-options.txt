@@ -267,6 +267,16 @@ option TLOUZombies.MaxDistanceToCheck
 }
 
 
+option ZomboidForge.tickUpdater
+{
+	type = integer,
+	min = 0,
+	max = 2000,
+	default = 500,
+	page = ZomboidForge,
+	translation = ZomboidForge_tickUpdater,
+}
+
 option ZomboidForge.Nametags
 {
 	type = boolean,

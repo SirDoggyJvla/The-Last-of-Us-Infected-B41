@@ -32,6 +32,9 @@ Events.OnWeaponHitCharacter.Add(ZomboidForge.OnHit)
 Events.OnZombieDead.Add(ZomboidForge.OnDeath)
 Events.OnPlayerUpdate.Add(ZomboidForge.GetZombieOnPlayerMouse)
 
+--- Counter updater
+Events.OnTick.Add(ZomboidForge.OnTick)
+
 --- handling of commands sent 
 Events.OnServerCommand.Add(function(module, command, args)
 	if ZomboidForge.Commands[module] and ZomboidForge.Commands[module][command] then
