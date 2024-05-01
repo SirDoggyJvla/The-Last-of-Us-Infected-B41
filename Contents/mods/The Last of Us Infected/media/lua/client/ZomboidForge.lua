@@ -18,6 +18,7 @@ local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
 local print = print -- print function
 local tostring = tostring --tostring function
+local Long = Long --Long for pID
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
@@ -266,7 +267,9 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
 
     -- custom animation variable
     if ZombieTable.animationVariable then
+        zombie:addLineChatElement("animation variable = "..tostring(zombie:getVariableBoolean(ZombieTable.animationVariable)))
         if not zombie:getVariableBoolean(ZombieTable.animationVariable) then
+            zombie:addLineChatElement("updating animation")
             zombie:setVariable(ZombieTable.animationVariable,'true')
             if isClient() then
                 sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
@@ -566,9 +569,7 @@ ZomboidForge.pID = function(zombie)
     local pID = zombie:getPersistentOutfitID()
 
     local found = ZomboidForge.TrueID[pID] and pID or ZomboidForge.HatFallen[pID]
-    if found then 
-        --zombie:addLineChatElement("pID = "..tostring(pID)..
-        --    "\npID table = "..tostring(found))
+    if found then
         return found
     end
 
@@ -576,14 +577,13 @@ ZomboidForge.pID = function(zombie)
     while #bits < 16 do bits[#bits+1] = 0 end
 
     -- trueID
-    bits[16] = 0
+    bits[16] = "0"
     local trueID = Long.parseUnsignedLong(string.reverse(table.concat(bits, "")), 2)
     ZomboidForge.TrueID[trueID] = true
 
     -- hatFallenID
-    bits[16] = 1
+    bits[16] = "1"
     ZomboidForge.HatFallen[Long.parseUnsignedLong(string.reverse(table.concat(bits, "")), 2)] = trueID
-
 
     ZomboidForge.TrueID[pID] = trueID
     return trueID
@@ -603,6 +603,7 @@ ZomboidForge.OnTick = function(tick)
     -- Update counter
     ZomboidForge.counterUpdater()
 
+    -- initialize zombie list
     if not zombieList then
         zombieList = getPlayer():getCell():getZombieList()
     end
@@ -611,6 +612,7 @@ ZomboidForge.OnTick = function(tick)
     local zombieIndex = tick - ZomboidForge.zeroTick
     if zombieList:size() > zombieIndex then
         local zombie = zombieList:get(zombieIndex)
+        zombie:addLineChatElement("updating")
         ZomboidForge.SetZombieData(zombie,nil)
     else
         ZomboidForge.zeroTick = tick + 1

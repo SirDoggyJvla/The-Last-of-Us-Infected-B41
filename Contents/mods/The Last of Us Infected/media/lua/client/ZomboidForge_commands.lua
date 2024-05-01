@@ -22,11 +22,29 @@ local tostring = tostring --tostring function
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 
+local zombieList
+---@param onlineID          int
+---@return IsoZombie
+ZomboidForge.getZombieByOnlineID = function(onlineID)
+    -- initialize zombie list
+    if not zombieList then
+        zombieList = getPlayer():getCell():getZombieList()
+    end
+
+    -- get zombie if in player's cell
+    for i = 0,zombieList:size()-1 do
+        local zombie = zombieList:get(i)
+        if zombie:getOnlineID() == onlineID then
+            return zombie
+        end
+    end
+end
+
 -- Sends a request to server to update every clients animationVariable for every clients.
 ---@param args          table
 ZomboidForge.Commands.AnimationHandler.SetAnimationVariable = function(args)
     -- get zombie info
-    local zombie = args.zombie
+    local zombie = ZomboidForge.getZombieByOnlineID(args.zombie)
     if getPlayer() ~= getPlayerByOnlineID(args.id) then
         if zombie then
             zombie:setVariable(args.animationVariable,args.state)
