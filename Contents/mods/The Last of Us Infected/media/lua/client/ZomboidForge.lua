@@ -35,7 +35,7 @@ ZomboidForge.OnLoad = function()
 
     -- calculate total chance
     ZomboidForge.TotalChance = 0
-    for ZTypes,ZombieTable in pairs(ZomboidForge.ZTypes) do
+    for _,ZombieTable in pairs(ZomboidForge.ZTypes) do
     --for i = 1,ZomboidForge.TotalZTypes do
         ZomboidForge.TotalChance = ZomboidForge.TotalChance + ZombieTable.chance
     end
@@ -106,16 +106,29 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
     local PersistentZData = ZFModData.PersistentZData[trueID]
     if not PersistentZData then return end
 
-    -- attribute zombie type if not set
+    -- attribute zombie type if not set by weighted random
     local ZType = PersistentZData.ZType
     if not ZType or not ZomboidForge.ZTypes[ZType] then
-    --if not PersistentZData.ZType or not ZomboidForge.ZTypes[PersistentZData.ZType] then
+        -- chose a random number based on max total weight
         local rand = ZombRand(ZomboidForge.TotalChance)
-        for ZTypes,ZombieTable in pairs(ZomboidForge.ZTypes) do
-        --for i = 1,ZomboidForge.TotalZTypes do
+
+        -- test one by one each types and attribute if pass
+        for testingZType,ZombieTable in pairs(ZomboidForge.ZTypes) do
             rand = rand - ZombieTable.chance
             if rand <= 0 then
-                PersistentZData.ZType = ZTypes
+                -- attribute a ZType to the zombie
+                PersistentZData.ZType = testingZType
+
+                ZomboidForge.ModData_Client2Server(
+                    {
+                        modData = "ZomboidForge",
+                        category = "PersistentZData",
+                        key = trueID,
+                        data = {
+                            ZType = testingZType,
+                        },
+                    }
+                )
                 break
             end
         end
@@ -138,7 +151,9 @@ ZomboidForge.ZombieInitiliaze = function(zombie)
 end
 
 local timeStatCheck = 500
---- Used to set the various data of a zombie, skipping the unneeded parts or already done. Order of data set:
+--- Used to set the various data of a zombie, skipping the unneeded parts or already done. 
+--
+-- Order of data set:
 --
 --          `Zombie stats`
 --          `Zombie outfit`
@@ -147,14 +162,16 @@ local timeStatCheck = 500
 --          `Zombie hair color`
 --          `Zombie beard`
 --          `Zombie beard color`
+--          `HP`
+--          `Zombie animation variable`
 --
 ---@param zombie        IsoZombie
----@param ZType         integer|nil         --Zombie Type ID
+---@param ZType         integer|nil [opt] Zombie Type ID
 ZomboidForge.SetZombieData = function(zombie,ZType)
     local trueID = ZomboidForge.pID(zombie)
     local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
 
-    -- if no ZType given
+    -- if no ZType given, access it
     if not ZType then
         local PersistentZData = ModData.getOrCreate("ZomboidForge").PersistentZData[trueID]
         if not PersistentZData then return end
@@ -443,7 +460,7 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
         local trueID = ZomboidForge.pID(victim)
         local ZFModData = ModData.getOrCreate("ZomboidForge")
         local PersistentZData = ZFModData.PersistentZData[trueID]
-        if PersistentZData then return end
+        if not PersistentZData then return end
 
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -458,7 +475,7 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
         end
 
         -- skip if no HP stat or HP is 1
-        if ZombieTable.HP and ZombieTable.HP ~= 1 then
+        if ZombieTable.HP and ZombieTable.HP ~= 1 and handWeapon:getFullType() ~= "Base.BareHands" then
             -- get or set HP amount
             local HP = PersistentZData.HP or ZombieTable.HP
 
@@ -478,6 +495,17 @@ ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
                 -- Updates the HP counter of PersistentZData
                 victim:setHealth(1000)
                 PersistentZData.HP = HP
+
+                ZomboidForge.ModData_Client2Server(
+                    {
+                        modData = "ZomboidForge",
+                        category = "PersistentZData",
+                        key = trueID,
+                        data = {
+                            HP = HP,
+                        },
+                    }
+                )
             end
         end
     end
@@ -510,6 +538,16 @@ ZomboidForge.OnDeath = function(zombie)
 
     -- delete zombie data
     ZFModData.PersistentZData[trueID] = nil
+
+    ZomboidForge.ModData_Client2Server(
+        {
+            modData = "ZomboidForge",
+            category = "PersistentZData",
+            key = trueID,
+            data = nil,
+        }
+    )
+
     ZomboidForge.NonPersistentZData[trueID] = nil
 end
 
@@ -670,6 +708,8 @@ end
 -- Updates zombie tag showing for each players. 
 -- Could probably be improved upon since currently the behavior is possibly not perfect in multiplayer.
 -- Specifically with `ShowZombieName`.
+--
+-- From CDDA Zombies
 ZomboidForge.UpdateNametag = function()
 	for trueID,ZData in pairs(ZomboidForge.ShowNametag) do
 		local zombie = ZData[1]
@@ -686,7 +726,7 @@ ZomboidForge.UpdateNametag = function()
 
         local ZType = PersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
-		if interval>0 and ZomboidForge.ZTypes and ZombieTable then
+		if interval>0 and ZombieTable then
 			local player = getPlayer()
 			if zombie:isAlive() and player:CanSee(zombie) then
 				zombie:getModData().userName = zombie:getModData().userName or TextDrawObject.new()

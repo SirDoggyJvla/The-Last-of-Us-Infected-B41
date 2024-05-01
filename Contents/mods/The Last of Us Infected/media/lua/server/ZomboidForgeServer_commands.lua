@@ -32,19 +32,41 @@ end
 
 -- Update data received from client to store in server's mod data
 -- and send the data to every other clients to store in their own mod data.
----@param _			nil
+---@param player	IsoPlayer	--player unused
 ---@param args		table
-ZomboidForge_server.Commands.ZF_ModData.ModData_Client2Server = function(_, args)
+ZomboidForge_server.Commands.ZF_ModData.ModData_Client2Server = function(player, args)
 	local ModData = ModData.getOrCreate(args.modData)
-	ModData[args.category][args.key] = args.data
 
-	
+	-- Initialize mod data tables if not already
+	if not ModData[args.category] then
+		ModData[args.category] = {}
+		ModData[args.category][args.key] = {}
+	elseif not ModData[args.category][args.key] then
+		ModData[args.category][args.key] = {}
+	end
+
+	-- Add data to mod data
+	-- If data = table then add every entries else add just the data to the key
+	if type(args.data) == "table" then
+		for k,v in pairs(args.data) do
+			ModData[args.category][args.key][k] = v
+		end
+	else
+		ModData[args.category][args.key] = args.data
+	end
+
+	-- Tell every other clients to update their mod data
+	ZomboidForge_server.Commands.ZF_ModData.ModData_Server2Clients(player,args)
 end
 
 -- Send data from server to every clients to store in their mod data.
----@param _			nil
+---@param player	IsoPlayer	--player unused
 ---@param args		table
-ZomboidForge_server.Commands.ZF_ModData.ModData_Server2Clients = function(_,args)
+ZomboidForge_server.Commands.ZF_ModData.ModData_Server2Clients = function(player,args)
+	-- Used for players to ignore updating their mod data if they are the source of this update
+	args.playerID = player:getOnlineID()
+
+	-- Call clients to update their mod data with the data received by server
 	sendClientCommand('ZF_ModData', 'ModData_Server2Client', args)
 end
 

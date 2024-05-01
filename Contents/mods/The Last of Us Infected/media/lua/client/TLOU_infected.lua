@@ -345,9 +345,9 @@ function ZomboidForge.BloaterAttack(player,zombie)
 end
 
 -- player attacked a clicker
-function ZomboidForge.ClickerHit(player, zombie, HandWeapon, damage)
+function ZomboidForge.ClickerHit(player, zombie, handWeapon, damage)
 	if SandboxVars.TLOUZombies.NoPushClickers then
-		if HandWeapon:getFullType() == "Base.BareHands" then
+		if handWeapon:getFullType() == "Base.BareHands" then
 			zombie:setOnlyJawStab(true)
 		else
 			zombie:setOnlyJawStab(false)
@@ -356,7 +356,7 @@ function ZomboidForge.ClickerHit(player, zombie, HandWeapon, damage)
 end
 
 -- player attacked a bloater
-function ZomboidForge.BloaterHit(player, zombie, HandWeapon, damage)
+function ZomboidForge.BloaterHit(player, zombie, handWeapon, damage)
 	-- can't be pushed
 	if not zombie:isOnlyJawStab() then
 		zombie:setOnlyJawStab(true)
@@ -369,7 +369,7 @@ function ZomboidForge.BloaterHit(player, zombie, HandWeapon, damage)
 end
 
 -- set damage to bloater from player
-function ZomboidForge.BloaterDamage(player, zombie, HandWeapon, damage)
+function ZomboidForge.BloaterDamage(player, zombie, handWeapon, damage)
 	-- maximum damage output
 	if damage >= 3 then
 		damage = 3

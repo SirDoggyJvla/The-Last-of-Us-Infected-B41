@@ -92,6 +92,15 @@ function ISSpawnHordeUI:onRemoveZombies()
                         -- delete zombie data
                         ZFModData.PersistentZData[trueID] = nil
                         ZomboidForge.NonPersistentZData[trueID] = nil
+
+                        ZomboidForge.ModData_Client2Server(
+                            {
+                                modData = "ZomboidForge",
+                                category = "PersistentZData",
+                                key = trueID,
+                                data = nil,
+                            }
+                        )
 					end
 				end
 			end
