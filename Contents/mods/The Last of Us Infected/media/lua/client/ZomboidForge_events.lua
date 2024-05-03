@@ -12,6 +12,7 @@ This file defines the events used by Zomboid Forge
 --[[ ================================================ ]]--
 
 --- import module
+require "ZomboidForge"
 local ZomboidForge = require "ZomboidForge_module"
 
 --- Events added OnLoad

@@ -18,7 +18,7 @@ require "TLOU_infected"
 local ZomboidForge = require "ZomboidForge_module"
 
 --- ZomboidForge.TLOU_infected functions
-Events.OnGameStart.Add(ZomboidForge.InitTLOUInfected)
+Events.OnGameStart.Add(ZomboidForge.Initialize_TLOUInfected)
 
 --- Add buildings to the list of buildings available to check for zombies
 Events.LoadGridsquare.Add(ZomboidForge.TLOU_infected.AddBuildingList)

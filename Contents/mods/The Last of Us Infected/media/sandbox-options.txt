@@ -266,6 +266,16 @@ option TLOUZombies.MaxDistanceToCheck
 	translation = TLOU_MaxDistanceToCheck,
 }
 
+option TLOUZombies.HideIndoorsUpdates
+{
+	type = integer,
+	min = 15,
+	max = 720,
+	default = 30,
+	page = TLOU_Zombies,
+	translation = ZomboidForge_hideIndoorsUpdates,
+}
+
 
 option ZomboidForge.tickUpdater
 {

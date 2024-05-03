@@ -23,19 +23,43 @@ local tostring = tostring --tostring function
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 
+--- import GameTime localy for performance reasons
+local gametime = GameTime:getInstance()
+
 --- setup local functions
-ZomboidForge.TLOU_infected = ZomboidForge.TLOU_infected or {}
-local timeCheck = 500
+ZomboidForge.TLOU_infected = {}
+
+-- Sandbox options imported localy for performance reasons
+-- used here for file reloads in-game
+ZomboidForge.TLOU_infected.lootchance = {
+	TLOU_Runner = SandboxVars.TLOUZombies.CordycepsSpawnRate_Runner,
+	TLOU_Stalker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Stalker,
+	TLOU_Clicker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Clicker,
+	TLOU_Bloater = SandboxVars.TLOUZombies.CordycepsSpawnRate_Bloater,
+}
+ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOUZombies.HideIndoorsUpdates * 1.2)
+ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOUZombies.OnlyUnexplored
+ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOUZombies.WanderAtNight
+ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOUZombies.MaxDistanceToCheck
 
 --- Create zombie types
-ZomboidForge.InitTLOUInfected = function()
-	ZomboidForge.TLOU_infected.lootchance = {
-		runner = SandboxVars.TLOUZombies.CordycepsSpawnRate_Runner,
-		stalker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Stalker,
-		clicker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Clicker,
-		bloater = SandboxVars.TLOUZombies.CordycepsSpawnRate_Bloater,
+ZomboidForge.Initialize_TLOUInfected = function()
+	-- roll lootcount functions depending on infected type
+	ZomboidForge.TLOU_infected.roll_lootcount = {
+		TLOU_Runner = function() return ZombRand(1,3) end,
+		TLOU_Stalker = function() return ZombRand(1,5) end,
+		TLOU_Clicker = function() return ZombRand(3,5) end,
+		TLOU_Bloater = function() return ZombRand(5,15) end,
 	}
 
+	-- Sandbox options imported localy for performance reasons
+	ZomboidForge.TLOU_infected.lootchance = {
+		TLOU_Runner = SandboxVars.TLOUZombies.CordycepsSpawnRate_Runner,
+		TLOU_Stalker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Stalker,
+		TLOU_Clicker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Clicker,
+		TLOU_Bloater = SandboxVars.TLOUZombies.CordycepsSpawnRate_Bloater,
+	}
+	ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOUZombies.HideIndoorsUpdates * 1.2)
 	ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOUZombies.OnlyUnexplored
 	ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOUZombies.WanderAtNight
 	ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOUZombies.MaxDistanceToCheck
@@ -82,7 +106,9 @@ ZomboidForge.InitTLOUInfected = function()
 
 				-- custom behavior
 				onDeath = {},
-				customBehavior = {
+				customBehavior = {},
+
+				customData = {
 					"SetRunnerSounds",
 				},
 			}
@@ -133,7 +159,9 @@ ZomboidForge.InitTLOUInfected = function()
 
 				-- custom behavior
 				onDeath = {},
-				customBehavior = {
+				customBehavior = {},
+
+				customData = {
 					"SetStalkerSounds",
 					"RemoveBandages",
 				},
@@ -202,9 +230,12 @@ ZomboidForge.InitTLOUInfected = function()
 					"OnClickerDeath",
 				},
 				customBehavior = {
+					"ClickerAgro",
+				},
+
+				customData = {
 					"SetClickerClothing",
 					"SetClickerSounds",
-					"ClickerAgro",
 					"RemoveBandages",
 				},
 			}
@@ -260,7 +291,9 @@ ZomboidForge.InitTLOUInfected = function()
 
 				-- custom behavior
 				onDeath = {},
-				customBehavior = {
+				customBehavior = {},
+
+				customData = {
 					"SetBloaterSounds",
 					"RemoveBandages",
 				},
@@ -268,6 +301,7 @@ ZomboidForge.InitTLOUInfected = function()
 		--)
 	end
 
+	-- if infected should hide indoors in daytime
 	if SandboxVars.TLOUZombies.HideIndoors then
 		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
 			"HideIndoors"
@@ -282,12 +316,14 @@ ZomboidForge.InitTLOUInfected = function()
 		)
 	end
 
+	-- if Bloaters are allowed to deal more damage to structures
 	if SandboxVars.TLOUZombies.StrongBloater then
 		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
 			"StrongBloater"
 		)
 	end
 
+	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_Overhaul.CordycepsSpawn then
 		table.insert(ZomboidForge.ZTypes.TLOU_Runner.onDeath,
 			"OnInfectedDeath_cordyceps"
@@ -320,7 +356,7 @@ function ZomboidForge.ClickerAttack(player,zombie)
 
 		-- kill player if oneshot clickers
 		if SandboxVars.TLOUZombies.OneShotClickers then 
-			if player:hasHitReaction() and not player:isGodMod() or instanceof(player, "IsoZombie") then
+			if player:hasHitReaction() and not player:isGodMod() then
 				--player:setDeathDragDown(true)
 				player:Kill(zombie)
 			end
@@ -362,8 +398,7 @@ function ZomboidForge.BloaterHit(player, zombie, handWeapon, damage)
 		zombie:setOnlyJawStab(true)
 	end
 
-	--zombie:setHealth()
-	if not zombie:getHitTime() == 0 then
+	if zombie:getHitTime() ~= 0 then
 		zombie:setHitTime(0)
 	end
 end
@@ -377,8 +412,9 @@ function ZomboidForge.BloaterDamage(player, zombie, handWeapon, damage)
 
 	-- if Zombie is on fire, deal more damage even past max damage output
 	if zombie:isOnFire() then
-		damage = damage * 3
+		return damage * 3
 	end
+
 	return damage
 end
 --#endregion
@@ -400,13 +436,12 @@ zombie:addLineChatElement(tostring(zombie:getTarget()))
 --#region Custom behavior: `OnDeath loot`
 
 -- Replace fungi hat clothing with fungi hat food type on a `Clicker`'s death.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.OnClickerDeath = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.OnClickerDeath = function(zombie,_)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
 	inventory:AddItems("Hat_Fungi_Loot",1)
-	print("done")
 end
 
 -- Add cordyceps mushrooms from Braven's Cordyceps Spore Zones when activated to various infected loot.
@@ -418,24 +453,14 @@ end
 -- 		`Clicker = 3 to 10`
 -- 		`Bloater = 5 to 15`
 --
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
+---@param zombie 		IsoZombie
+---@param ZType 		string   	--Zombie Type ID
 ZomboidForge.OnInfectedDeath_cordyceps = function(zombie,ZType)
-	-- add fungi hat food type to inventory
-	local inventory = zombie:getInventory()
-	local ZombieTable = ZomboidForge.ZTypes[ZType]
-
 	-- roll to inventory
 	local rand = ZombRand(1,100)
-	local lootchance = ZomboidForge.TLOU_infected.lootchance
-	if ZombieTable.isRunner and lootchance.runner >= rand then
-		inventory:AddItems("Cordyceps", ZombRand(1,3))
-	elseif ZombieTable.isStalker and lootchance.stalker >= rand then
-		inventory:AddItems("Cordyceps", ZombRand(1,5))
-	elseif ZombieTable.isClicker and lootchance.clicker >= rand then
-		inventory:AddItems("Cordyceps", ZombRand(3,10))
-	elseif ZombieTable.isBloater and lootchance.bloater >= rand then
-		inventory:AddItems("Cordyceps", ZombRand(5,15))
+	if ZomboidForge.TLOU_infected.lootchance[ZType] >= rand then
+		--zombie:getInventory():AddItems("Cordyceps", ZombRand(ZomboidForge.TLOU_infected.lootcount_min[ZType],ZomboidForge.TLOU_infected.lootcount_max[ZType]))
+		zombie:getInventory():AddItems("Cordyceps", ZomboidForge.TLOU_infected.roll_lootcount[ZType]())
 	end
 end
 --#endregion
@@ -443,9 +468,9 @@ end
 --#region Custom behavior: `RemoveBandages`
 
 -- Remove visual bandages on Zombies who have some, else skip.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.RemoveBandages = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.RemoveBandages = function(zombie,_)
 	-- Remove bandages
 	local bodyVisuals = zombie:getHumanVisual():getBodyVisuals()
 	if bodyVisuals and bodyVisuals:size() > 0 then
@@ -459,7 +484,8 @@ end
 --#region Custom behavior: `SetInfectedSounds`
 
 -- For debug purposes, allows to check vocals of a zombie.
----@param zombie IsoZombie
+---@param zombie 		IsoZombie
+---@return string
 ZomboidForge.VerifyEmitter = function(zombie)
 	local stringZ = "Emitters:"
 	stringZ = stringZ.."\nMaleA = "..tostring(zombie:getEmitter():isPlaying("Zombie/Voice/MaleA"))
@@ -472,9 +498,9 @@ ZomboidForge.VerifyEmitter = function(zombie)
 end
 
 -- Set `Runner` sounds.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.SetRunnerSounds = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.SetRunnerSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleA") and not zombie:isFemale()
 	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleA") and zombie:isFemale() then
 		zombie:setAge(-2)
@@ -488,9 +514,9 @@ ZomboidForge.SetRunnerSounds = function(zombie,ZType)
 end
 
 -- Set `Stalker` sounds.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.SetStalkerSounds = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.SetStalkerSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleB") and not zombie:isFemale()
 	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleB") and zombie:isFemale() then
 		zombie:setAge(-2)
@@ -504,9 +530,9 @@ ZomboidForge.SetStalkerSounds = function(zombie,ZType)
 end
 
 -- Set `Clicker` sounds.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.SetClickerSounds = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.SetClickerSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleC")then
 		zombie:setAge(-2)
 		zombie:getEmitter():stopAll()
@@ -515,9 +541,9 @@ ZomboidForge.SetClickerSounds = function(zombie,ZType)
 end
 
 -- Set `Bloater` sounds.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.SetBloaterSounds = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.SetBloaterSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleC") then
 		zombie:setAge(-2)
 		zombie:getEmitter():stopAll()
@@ -578,9 +604,9 @@ ZomboidForge.TLOU_infected.ClothingPriority = {
 }
 
 -- Set clicker clothing by visually replacing one of its clothing based on the priority list of clothings to replace.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.SetClickerClothing = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.SetClickerClothing = function(zombie,_)
 	-- get zombie info
 	local trueID = ZomboidForge.pID(zombie)
 	ZomboidForge.NonPersistentZData[trueID] = ZomboidForge.NonPersistentZData[trueID] or {}
@@ -589,14 +615,6 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 	-- if already has hat fungi then skip
 	local hasHat_Fungi = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi
 	if hasHat_Fungi then return end
-
-	-- update lure counter
-	local clothingCounter = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.ClothingCounter or timeCheck
-	if clothingCounter and clothingCounter >= 0 then
-		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.ClothingCounter = clothingCounter - 1
-		return
-	end
-	ZomboidForge.NonPersistentZData[trueID].TLOU_infected.ClothingCounter = timeCheck
 
 	-- get clothing visuals from zombie
 	local visual = zombie:getItemVisuals()
@@ -639,16 +657,10 @@ ZomboidForge.SetClickerClothing = function(zombie,ZType)
 		zombie:resetModel()
 	end
 
-	-- update multiCheck counter
-	local multiCheck = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck or 0
-	if multiCheck >= 10 then
+	-- verify clicker has hat fungi
+	if hasHat_Fungi then
 		-- stop checking for this zombie
 		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi = hasHat_Fungi
-		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck = nil
-	else
-		-- increment multiCheck counter
-		multiCheck = multiCheck + 1
-		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.multiCheck = multiCheck
 	end
 end
 
@@ -657,36 +669,22 @@ end
 --#region Custom behavior: `HideIndoors`
 
 -- Main function to handle `Zombie` behavior to go hide inside the closest building or wander during night.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
-ZomboidForge.HideIndoors = function(zombie,ZType)
+---@param zombie 		IsoZombie
+---@param _		 		string   	--Zombie Type ID
+ZomboidForge.HideIndoors = function(zombie,_)
 	-- if zombie is already in building, completely skip
-	if zombie:getBuilding() then return end
-
-	-- ignore if zombie has target
-	if zombie:getTarget() then return end
-
-	-- get zombie pID and info
-	local trueID = ZomboidForge.pID(zombie)
-	ZomboidForge.NonPersistentZData[trueID].TLOU_infected = ZomboidForge.NonPersistentZData[trueID].TLOU_infected or {}
-
-	-- update lure counter
-	local lureCounter = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter
-	if lureCounter and lureCounter >= 0 then
-		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter = lureCounter - 1
-		return
-	elseif not lureCounter then
-		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter = timeCheck
+	-- elseif has target
+	-- elseif hasn't been at least N seconds since last update 
+	if zombie:getBuilding() or zombie:getTarget() or math.floor(zombie.TimeSinceSeenFlesh / 100)%(ZomboidForge.TLOU_infected.HideIndoorsUpdates) ~= 0 then
 		return
 	end
-	ZomboidForge.NonPersistentZData[trueID].TLOU_infected.LureCounter = timeCheck
 
 	-- lure zombie either to a building or make it wander if it's daytime
 	ZomboidForge.TLOU_infected.LureZombie(zombie)
 end
 
 -- Lure `Zombie` to the building during daytime or make it wander around during night time.
----@param zombie IsoZombie
+---@param zombie 		IsoZombie
 ZomboidForge.TLOU_infected.LureZombie = function(zombie)
 	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
     if TLOU_ModData.IsDay or not ZomboidForge.TLOU_infected.WanderAtNight then
@@ -743,8 +741,8 @@ ZomboidForge.TLOU_infected.ChunkCheck.SecondCheck = {
 -- Determines the closest square within a building.
 -- Checks in spiral around the original square `sourcesq` and stops when the closest building within
 -- a ring of `i` chunk size (up to `maxChunk` size) is found.
----@param sourcesq IsoGridSquare
----@return IsoGridSquare|nil closestSquare
+---@param sourcesq 		IsoGridSquare
+---@return IsoGridSquare|nil 	closestSquare
 ZomboidForge.TLOU_infected.GetClosestBuilding = function(sourcesq)
 	-- skip if no buildings available
 	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
@@ -805,13 +803,13 @@ ZomboidForge.TLOU_infected.GetClosestBuilding = function(sourcesq)
 end
 
 -- Check building distance from `sourcesq` position and returns closest square and distance from `sourcesq`.
----@param chunkID string
----@param closestDist double|nil
----@param closestSquare IsoGridSquare|nil
----@param x_sourcesq double
----@param y_sourcesq double
----@return double|nil closestDist
----@return IsoGridSquare|nil closestSquare
+---@param chunkID 				string
+---@param closestDist 			double|nil
+---@param closestSquare 		IsoGridSquare|nil
+---@param x_sourcesq 			double
+---@param y_sourcesq 			double
+---@return double|nil 			closestDist
+---@return IsoGridSquare|nil 	closestSquare
 ZomboidForge.TLOU_infected.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
 	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 	local squareCheck = nil
@@ -841,37 +839,33 @@ ZomboidForge.TLOU_infected.CheckBuildingDistance = function(chunkID,closestDist,
 	return closestDist, closestSquare
 end
 
+-- Determines if it's daytime based on the time given and the season.
+local season2daytime = {
+	Spring = function(hour) return hour >= 6 and hour <= 21 end,
+	Summer = function(hour) return hour >= 6 and hour <= 22 end,
+	Autumn = function(hour) return hour >= 6 and hour <= 21 end,
+	Winter = function(hour) return hour >= 8 and hour <= 17 end,
+}
+
+-- Used with `month2season` to access season based on month.
+local listOfSeasons = {
+	"Winter",
+	"Spring",
+	"Summer",
+	"Autumn",
+}
+-- Retrieve the season based on the month.
+---@param month		int
+---@return string
+local function month2season(month)
+	return listOfSeasons[ math.floor( (month+2)/3 ) % 4 + 1 ]
+end
+
 -- Checks if it's daytime by taking into account the seasons and updates the `IsDay` check.
 ZomboidForge.TLOU_infected.IsDay = function()
-	-- get gametime
-	local gametime = GameTime:getInstance();
-	local month = gametime:getMonth()
-	local currentHour = math.floor(gametime:getTimeOfDay())
-
-	-- check season
-	local season = nil
-	if month == 2 or month == 3 or month == 4 then
-		season = "Spring";
-	elseif month == 5 or month == 6 or month == 7 then
-		season = "Summer";
-	elseif month == 8 or month == 9 or month == 10 then
-		season = "Autumn";
-	elseif month == 11 or month == 12 or month == 1 then
-		season = "Winter";
-	end
-
-	-- check if it's day based on season and current time
-	local IsDay = false
-	if (season == "Spring" and currentHour >= 6 and currentHour <= 21) or
-    (season == "Summer" and currentHour >= 6 and currentHour <= 22) or
-    (season == "Autumn" and currentHour >= 6 and currentHour <= 21) or
-    (season == "Winter" and currentHour >= 8 and currentHour <= 17) then
-		IsDay = true
-	end
-
 	-- update IsDay check
 	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-	TLOU_ModData.IsDay = IsDay
+	TLOU_ModData.IsDay = season2daytime[ month2season(gametime:getMonth()) ]( math.floor(gametime:getTimeOfDay()) )
 end
 
 -- Adds detected buildings to the list of available buildings in a chunk.
@@ -907,8 +901,8 @@ end
 --#region Custom behavior: `DoorOneShot`
 
 -- Manage Bloater strength against structures by making them extra strong.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
+---@param zombie 		IsoZombie
+---@param ZType 		string   	     --Zombie Type ID
 ZomboidForge.StrongBloater = function(zombie,ZType)
 	-- run code if infected has thumping target
 
@@ -982,8 +976,8 @@ end
 
 -- Manage Clicker agro to change their animation when 
 -- they run after a player.
----@param zombie IsoZombie
----@param ZType integer     --Zombie Type ID
+---@param zombie 		IsoZombie
+---@param ZType 		string   	     --Zombie Type ID
 ZomboidForge.ClickerAgro = function(zombie,ZType)
 	local target = zombie:getTarget()
 	if target and not zombie:getVariableBoolean("ClickerAgro") then

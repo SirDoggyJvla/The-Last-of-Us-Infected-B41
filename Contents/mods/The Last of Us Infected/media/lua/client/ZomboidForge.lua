@@ -267,14 +267,17 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
 
     -- custom animation variable
     if ZombieTable.animationVariable then
-        zombie:addLineChatElement("animation variable = "..tostring(zombie:getVariableBoolean(ZombieTable.animationVariable)))
         if not zombie:getVariableBoolean(ZombieTable.animationVariable) then
-            zombie:addLineChatElement("updating animation")
             zombie:setVariable(ZombieTable.animationVariable,'true')
             if isClient() then
                 sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
             end
         end
+    end
+
+    -- run custom data if any
+    for i = 1,#ZombieTable.customData do
+        ZomboidForge[ZombieTable.customData[i]](zombie,ZType)
     end
 end
 
@@ -407,8 +410,8 @@ ZomboidForge.ZombieUpdate = function(zombie)
     end
 
     -- check if zombie IsInitialized
+    -- else initialize it
     if not nonPersistentZData.IsInitialized then
-        nonPersistentZData.IsInitialized = false
         ZomboidForge.ZombieInitiliaze(zombie)
         return
     end
@@ -612,7 +615,6 @@ ZomboidForge.OnTick = function(tick)
     local zombieIndex = tick - ZomboidForge.zeroTick
     if zombieList:size() > zombieIndex then
         local zombie = zombieList:get(zombieIndex)
-        zombie:addLineChatElement("updating")
         ZomboidForge.SetZombieData(zombie,nil)
     else
         ZomboidForge.zeroTick = tick + 1
@@ -654,12 +656,12 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 			local playerX = player:getX()
 			local playerY = player:getY()
 			local playerZ = player:getZ()
-			local mouseX, mouseY = ISCoordConversion.ToWorld(getMouseXScaled(), getMouseYScaled(), 0);
-			local targetMouseX = mouseX+1.5;
-			local targetMouseY = mouseY+1.5;
-			local direction = (math.atan2(targetMouseY-playerY, targetMouseX-playerX));
+			local mouseX, mouseY = ISCoordConversion.ToWorld(getMouseXScaled(), getMouseYScaled(), 0)
+			local targetMouseX = mouseX+1.5
+			local targetMouseY = mouseY+1.5
+			local direction = (math.atan2(targetMouseY-playerY, targetMouseX-playerX))
 
-			local feetDirection = player:getDir():toAngle();
+			local feetDirection = player:getDir():toAngle()
 			if feetDirection < 2 then
 				feetDirection = -(feetDirection+(math.pi*0.5))
 			else
@@ -672,27 +674,31 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 					direction = feetDirection + (math.pi/4)
 				end
 			end --Avoids an aiming angle pointing behind the person
-			local cell = getWorld():getCell();
-			local square = cell:getGridSquare(math.floor(targetMouseX), math.floor(targetMouseY), playerZ);
+			local cell = getWorld():getCell()
+			local square = cell:getGridSquare(math.floor(targetMouseX), math.floor(targetMouseY), playerZ)
 			if playerZ > 0 then
 				for i=math.floor(playerZ), 1, -1 do
-					square = cell:getGridSquare(math.floor(mouseX+1.5)+(i*3), math.floor(mouseY+1.5)+(i*3), i);
+					square = cell:getGridSquare(math.floor(mouseX+1.5)+(i*3), math.floor(mouseY+1.5)+(i*3), i)
 					if square and square:isSolidFloor() then
-						targetMouseX = mouseX+1.5+i;
-						targetMouseY = mouseY+1.5+i;
+						targetMouseX = mouseX+1.5+i
+						targetMouseY = mouseY+1.5+i
 						break
 					end
 				end
 			end
 			if square then
-				local movingObjects = square:getMovingObjects();
-				if (movingObjects ~= nil) then
+				local movingObjects = square:getMovingObjects()
+				if movingObjects then
 					for i=0, movingObjects:size()-1 do
 						local zombie = movingObjects:get(i)
 						if zombie and instanceof(zombie, "IsoZombie") and zombie:isAlive() then
                             local trueID = ZomboidForge.pID(zombie)
                             local ZFModData = ModData.getOrCreate("ZomboidForge")
                             local PersistentZData = ZFModData.PersistentZData[trueID]
+
+                            -- had to add this fail safe bcs it seems like some weird error was comming out of nowhere
+                            -- yet it should be safe, no reasons
+                            if not PersistentZData then return end
 
                             local ZType = PersistentZData.ZType
 							if ZomboidForge.ZTypes[ZType] and player:CanSee(zombie) then
@@ -735,10 +741,10 @@ ZomboidForge.UpdateNametag = function()
 				zombie:getModData().userName:setDefaultColors(ZombieTable.color[1]/255,ZombieTable.color[2]/255,ZombieTable.color[3]/255,interval/100)
 				zombie:getModData().userName:setOutlineColors(ZombieTable.outline[1]/255,ZombieTable.outline[2]/255,ZombieTable.outline[3]/255,interval/100)
 				zombie:getModData().userName:ReadString(UIFont.Small, getText(ZombieTable.name), -1)
-				local sx = IsoUtils.XToScreen(zombie:getX(), zombie:getY(), zombie:getZ(), 0);
-				local sy = IsoUtils.YToScreen(zombie:getX(), zombie:getY(), zombie:getZ(), 0);
-				sx = sx - IsoCamera.getOffX() - zombie:getOffsetX();
-				sy = sy - IsoCamera.getOffY() - zombie:getOffsetY();
+				local sx = IsoUtils.XToScreen(zombie:getX(), zombie:getY(), zombie:getZ(), 0)
+				local sy = IsoUtils.YToScreen(zombie:getX(), zombie:getY(), zombie:getZ(), 0)
+				sx = sx - IsoCamera.getOffX() - zombie:getOffsetX()
+				sy = sy - IsoCamera.getOffY() - zombie:getOffsetY()
 				if ZombieForgeOptions and ZombieForgeOptions.TextHeight then
 					sy = sy - 228 + 48*ZombieForgeOptions.TextHeight + 20*ZombieForgeOptions.HeightOffset
 				else
