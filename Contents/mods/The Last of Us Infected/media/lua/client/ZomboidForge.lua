@@ -84,6 +84,8 @@ ZomboidForge.OnGameStart = function()
             -- custom behavior
             onDeath = {},
             customBehavior = {},
+
+            customData = {},
         }
 	end
 end
@@ -696,7 +698,7 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
                             local ZFModData = ModData.getOrCreate("ZomboidForge")
                             local PersistentZData = ZFModData.PersistentZData[trueID]
 
-                            -- had to add this fail safe bcs it seems like some weird error was comming out of nowhere
+                            -- had to add this fail safe bcs it seems like some weird error was coming out of nowhere
                             -- yet it should be safe, no reasons
                             if not PersistentZData then return end
 

@@ -66,239 +66,227 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
     -- RUNNER
 	if SandboxVars.TLOUZombies.RunnerSpawn then
-		--table.insert(ZomboidForge.ZTypes,
-		ZomboidForge.ZTypes.TLOU_Runner =
-			{
-				-- base informations
-				name = "IGUI_TLOU_Runner",
-				chance = SandboxVars.TLOUZombies.RunnerChance,
-				outfit = {},
-				reanimatedPlayer = false,
-				skeleton = false,
-				hair = {},
-				hairColor = {},
-				beard = {},
-				beardColor = {},
+		ZomboidForge.ZTypes.TLOU_Runner = {
+			-- base informations
+			name = "IGUI_TLOU_Runner",
+			chance = SandboxVars.TLOUZombies.RunnerChance,
+			outfit = {},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = {},
+			hairColor = {},
+			beard = {},
+			beardColor = {},
 
-				-- stats
-				walktype = 1,
-				strength = 2,
-				toughness = 2,
-				cognition = 3,
-				memory = 2,
-				sight = SandboxVars.TLOUZombies.RunnerVision,
-				hearing = SandboxVars.TLOUZombies.RunnerHearing,
-				HP = 1,
+			-- stats
+			walktype = 1,
+			strength = 2,
+			toughness = 2,
+			cognition = 3,
+			memory = 2,
+			sight = SandboxVars.TLOUZombies.RunnerVision,
+			hearing = SandboxVars.TLOUZombies.RunnerHearing,
+			HP = 1,
 
-				noteeth = false,
-				transmission = false,
+			noteeth = false,
+			transmission = false,
 
-				-- custom variables
-				isRunner = true,
+			-- custom variables
+			isRunner = true,
 
-				-- UI
-				color = {122, 243, 0,},
-				outline = {0, 0, 0,},
+			-- UI
+			color = {122, 243, 0,},
+			outline = {0, 0, 0,},
 
-				-- attack functions
-				funcattack = {},
-				funconhit = {},
+			-- attack functions
+			funcattack = {},
+			funconhit = {},
 
-				-- custom behavior
-				onDeath = {},
-				customBehavior = {},
+			-- custom behavior
+			onDeath = {},
+			customBehavior = {},
 
-				customData = {
-					"SetRunnerSounds",
-				},
-			}
-		--)
+			customData = {
+				"SetRunnerSounds",
+			},
+		}
 	end
 
     -- STALKER
 	if SandboxVars.TLOUZombies.StalkerSpawn then
-		--table.insert(ZomboidForge.ZTypes,
-		ZomboidForge.ZTypes.TLOU_Stalker =
-			{
-				-- base informations
-				name = "IGUI_TLOU_Stalker",
-				chance = SandboxVars.TLOUZombies.StalkerChance,
-				outfit = {},
-				reanimatedPlayer = false,
-				skeleton = false,
-				hair = {},
-				hairColor = {},
-				beard = {
-					"",
-				},
-				beardColor = {},
+		ZomboidForge.ZTypes.TLOU_Stalker = {
+			-- base informations
+			name = "IGUI_TLOU_Stalker",
+			chance = SandboxVars.TLOUZombies.StalkerChance,
+			outfit = {},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = {},
+			hairColor = {},
+			beard = {
+				"",
+			},
+			beardColor = {},
 
-				-- stats
-				walktype = 1,
-				strength = 1,
-				toughness = 2,
-				cognition = 3,
-				memory = 3,
-				sight = SandboxVars.TLOUZombies.StalkerVision,
-				hearing = SandboxVars.TLOUZombies.StalkerHearing,
-				HP = 1,
+			-- stats
+			walktype = 1,
+			strength = 1,
+			toughness = 2,
+			cognition = 3,
+			memory = 3,
+			sight = SandboxVars.TLOUZombies.StalkerVision,
+			hearing = SandboxVars.TLOUZombies.StalkerHearing,
+			HP = 1,
 
-				noteeth = false,
-				transmission = false,
+			noteeth = false,
+			transmission = false,
 
-				-- custom variables
-				isStalker = true,
+			-- custom variables
+			isStalker = true,
 
-				-- UI
-				color = {230, 230, 0,},
-				outline = {0, 0, 0,},
+			-- UI
+			color = {230, 230, 0,},
+			outline = {0, 0, 0,},
 
-				-- attack functions
-				funcattack = {},
-				funconhit = {},
+			-- attack functions
+			funcattack = {},
+			funconhit = {},
 
-				-- custom behavior
-				onDeath = {},
-				customBehavior = {},
+			-- custom behavior
+			onDeath = {},
+			customBehavior = {},
 
-				customData = {
-					"SetStalkerSounds",
-					"RemoveBandages",
-				},
-			}
-		--)
+			customData = {
+				"SetStalkerSounds",
+				"RemoveBandages",
+			},
+		}
 	end
 
     -- CLICKER
 	if SandboxVars.TLOUZombies.ClickerSpawn then
-		ZomboidForge.ZTypes.TLOU_Clicker =
-		--table.insert(ZomboidForge.ZTypes,
-			{
-				-- base informations
-				name = "IGUI_TLOU_Clicker",
-				chance = SandboxVars.TLOUZombies.ClickerChance,
-				outfit = {},
-				reanimatedPlayer = false,
-				skeleton = false,
-				hair = {
-					male = {
-						"",
-					},
-					female = {
-						"",
-					},
-				},
-				hairColor = {
-					ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
-				},
-				beard = {
+		ZomboidForge.ZTypes.TLOU_Clicker = {
+			-- base informations
+			name = "IGUI_TLOU_Clicker",
+			chance = SandboxVars.TLOUZombies.ClickerChance,
+			outfit = {},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = {
+				male = {
 					"",
 				},
-				beardColor = {},
-				animationVariable = "isClicker",
-
-				-- stats
-				walktype = 2,
-				strength = 1,
-				toughness = 1,
-				cognition = 3,
-				memory = 2,
-				sight = 3,
-				hearing = SandboxVars.TLOUZombies.ClickerHearing,
-				HP = SandboxVars.TLOUZombies.ClickerHealth,
-
-				noteeth = false,
-				transmission = false,
-
-				-- custom variables
-				isClicker = true,
-
-				-- UI
-				color = {218, 109, 0,},
-				outline = {0, 0, 0,},
-
-				-- attack functions
-				funcattack = {
-					"ClickerAttack",
+				female = {
+					"",
 				},
-				funconhit = {
-					"ClickerHit",
-				},
+			},
+			hairColor = {
+				ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
+			},
+			beard = {
+				"",
+			},
+			beardColor = {},
+			animationVariable = "isClicker",
 
-				-- custom behavior
-				onDeath = {
-					"OnClickerDeath",
-				},
-				customBehavior = {
-					"ClickerAgro",
-				},
+			-- stats
+			walktype = 2,
+			strength = 1,
+			toughness = 1,
+			cognition = 3,
+			memory = 2,
+			sight = 3,
+			hearing = SandboxVars.TLOUZombies.ClickerHearing,
+			HP = SandboxVars.TLOUZombies.ClickerHealth,
 
-				customData = {
-					"SetClickerClothing",
-					"SetClickerSounds",
-					"RemoveBandages",
-				},
-			}
-		--)
+			noteeth = false,
+			transmission = false,
+
+			-- custom variables
+			isClicker = true,
+
+			-- UI
+			color = {218, 109, 0,},
+			outline = {0, 0, 0,},
+
+			-- attack functions
+			funcattack = {
+				"ClickerAttack",
+			},
+			funconhit = {
+				"ClickerHit",
+			},
+
+			-- custom behavior
+			onDeath = {
+				"OnClickerDeath",
+			},
+			customBehavior = {
+				"ClickerAgro",
+			},
+
+			customData = {
+				"SetClickerClothing",
+				"SetClickerSounds",
+				"RemoveBandages",
+			},
+		}
 	end
 
     -- BLOATER
 	if SandboxVars.TLOUZombies.BloaterSpawn then
-		--table.insert(ZomboidForge.ZTypes,
-		ZomboidForge.ZTypes.TLOU_Bloater =
-			{
-				-- base informations
-				name = "IGUI_TLOU_Bloater",
-				chance = SandboxVars.TLOUZombies.BloaterChance,
-				outfit = {
-					"Bloater",
-				},
-				reanimatedPlayer = false,
-				skeleton = false,
-				hair = {},
-				hairColor = {},
-				beard = {},
-				beardColor = {},
+		ZomboidForge.ZTypes.TLOU_Bloater = {
+			-- base informations
+			name = "IGUI_TLOU_Bloater",
+			chance = SandboxVars.TLOUZombies.BloaterChance,
+			outfit = {
+				"Bloater",
+			},
+			reanimatedPlayer = false,
+			skeleton = false,
+			hair = {},
+			hairColor = {},
+			beard = {},
+			beardColor = {},
 
-				-- stats
-				walktype = 2,
-				strength = 1,
-				toughness = 1,
-				cognition = 3,
-				memory = 2,
-				sight = 3,
-				hearing = SandboxVars.TLOUZombies.BloaterHearing,
-				HP = SandboxVars.TLOUZombies.BloaterHealth,
+			-- stats
+			walktype = 2,
+			strength = 1,
+			toughness = 1,
+			cognition = 3,
+			memory = 2,
+			sight = 3,
+			hearing = SandboxVars.TLOUZombies.BloaterHearing,
+			HP = SandboxVars.TLOUZombies.BloaterHealth,
 
-				noteeth = false,
-				transmission = false,
+			noteeth = false,
+			transmission = false,
 
-				-- custom variables
-				isBloater = true,
+			-- custom variables
+			isBloater = true,
 
-				-- UI
-				color = {205, 0, 0,},
-				outline = {0, 0, 0,},
+			-- UI
+			color = {205, 0, 0,},
+			outline = {0, 0, 0,},
 
-				-- attack functions
-				funcattack = {
-					"BloaterAttack",
-				},
-				funconhit = {
-					"BloaterHit",
-				},
-				customDamage = "BloaterDamage",
+			-- attack functions
+			funcattack = {
+				"BloaterAttack",
+			},
+			funconhit = {
+				"BloaterHit",
+			},
+			customDamage = "BloaterDamage",
 
-				-- custom behavior
-				onDeath = {},
-				customBehavior = {},
+			-- custom behavior
+			onDeath = {},
+			customBehavior = {},
 
-				customData = {
-					"SetBloaterSounds",
-					"RemoveBandages",
-				},
-			}
-		--)
+			customData = {
+				"SetBloaterSounds",
+				"RemoveBandages",
+			},
+		}
 	end
 
 	-- if infected should hide indoors in daytime
@@ -612,6 +600,8 @@ ZomboidForge.SetClickerClothing = function(zombie,_)
 	ZomboidForge.NonPersistentZData[trueID] = ZomboidForge.NonPersistentZData[trueID] or {}
 	ZomboidForge.NonPersistentZData[trueID].TLOU_infected = ZomboidForge.NonPersistentZData[trueID].TLOU_infected or {}
 
+	local TLOU_infected_data = ZomboidForge.NonPersistentZData[trueID].TLOU_infected
+
 	-- if already has hat fungi then skip
 	local hasHat_Fungi = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi
 	if hasHat_Fungi then return end
@@ -657,10 +647,21 @@ ZomboidForge.SetClickerClothing = function(zombie,_)
 		zombie:resetModel()
 	end
 
+	local multiCheck = TLOU_infected_data.multiCheck
+	if not multiCheck then
+		TLOU_infected_data.multiCheck = 0
+		multiCheck = 0
+	end
+
 	-- verify clicker has hat fungi
-	if hasHat_Fungi then
+	-- if yes and multiCheck is done then complete the check
+	-- else add a point to multiCheck
+	if hasHat_Fungi and multiCheck > 10 then
 		-- stop checking for this zombie
-		ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi = hasHat_Fungi
+		TLOU_infected_data.hasHat_Fungi = hasHat_Fungi
+		TLOU_infected_data.multiCheck = nil
+	elseif hasHat_Fungi then
+		TLOU_infected_data.multiCheck = multiCheck + 1
 	end
 end
 

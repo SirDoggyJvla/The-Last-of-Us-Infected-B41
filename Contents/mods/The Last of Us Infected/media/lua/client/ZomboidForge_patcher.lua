@@ -82,6 +82,7 @@ function ISSpawnHordeUI:onRemoveZombies()
 				for i=sq:getMovingObjects():size()-1,0,-1 do
 					local testZed = sq:getMovingObjects():get(i);
 					if instanceof(testZed, "IsoZombie") then
+                        ---@cast testZed IsoZombie
                         -- remove all emitters
                         testZed:getEmitter():stopAll()
 
