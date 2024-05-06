@@ -76,39 +76,6 @@ ZomboidForge.SetZType = function(zombie,ZType,PersistentZData)
     PersistentZData.ZType = ZType
 end
 
-local ask4data = {}
---- Initialize a zombie. `fullResetZ` will completely wipe the zombie data while
--- `rollZType` rolls a new ZType.
----@param zombie        IsoZombie
----@param fullResetZ    boolean
----@param rollZType     boolean
-ZomboidForge.ZombieInitiliaze = function(zombie,fullResetZ,rollZType)
-    -- get zombie data
-    local trueID = ZomboidForge.pID(zombie)
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
-
-    -- fully reset the stats of the zombie
-    if fullResetZ then
-        ZFModData.PersistentZData[trueID] = {}
-        ZomboidForge.NonPersistentZData[trueID] = {}
-        PersistentZData = {}
-    end
-
-    -- attribute zombie type if not set by weighted random
-    if rollZType then
-        local ZType = PersistentZData.ZType
-        if not ZType or not ZomboidForge.ZTypes[ZType] then
-            ZomboidForge.RollZType(zombie)
-        end
-    end
-
-    -- set zombie age
-    if zombie:getAge() ~= -1 then
-		zombie:setAge(-1)
-	end
-end
-
 --- Used to set the various data of a zombie, skipping the unneeded parts or already done. 
 --
 -- Order of data set:
@@ -143,7 +110,7 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     local ZombieTable = ZomboidForge.ZTypes[ZType]
     -- update zombie stats
     if not nonPersistentZData.GlobalCheck then
-        ZomboidForge.CheckZombieStats(zombie,ZType)
+        ZomboidForge.UpdateZombieStats(zombie,ZType)
     end
 
     -- set zombie clothing
@@ -272,7 +239,7 @@ end
 -- Once every stats went through the 10 checks and are actually correct then
 ---@param zombie        IsoZombie
 ---@param ZType         integer     --Zombie Type ID
-ZomboidForge.CheckZombieStats = function(zombie,ZType)
+ZomboidForge.UpdateZombieStats = function(zombie,ZType)
     -- get zombie info
     local trueID = ZomboidForge.pID(zombie)
     local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
@@ -342,146 +309,6 @@ ZomboidForge.CheckZombieStats = function(zombie,ZType)
     end
 end
 
---- Main function:
--- 
--- Handles everything about the Zombies.
--- Steps of Zombie update:
---
---      `Initialize zombie type`
---      `Update zombie data and stats`
---      `Run custom behavior`
---      `Run zombie attack function`
----@param zombie        IsoZombie
-ZomboidForge.ZombieUpdate = function(zombie)
-    -- get zombie data
-    local trueID = ZomboidForge.pID(zombie)
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
-
-    -- check if zombie is initialized
-    if not PersistentZData or not PersistentZData.ZType then
-        ZomboidForge.ZombieInitiliaze(zombie,true,true)
-        return
-    end
-
-    local ZType = PersistentZData.ZType
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-    if not ZombieTable then return end
-
-    -- run custom behavior functions for this zombie
-    for i = 1,#ZombieTable.customBehavior do
-        ZomboidForge[ZombieTable.customBehavior[i]](zombie,ZType)
-    end
-
-    -- run zombie attack functions
-    if zombie:isAttacking() then
-        ZomboidForge.ZombieAttack(zombie,ZType)
-    end
-end
-
---- `Zombie` attacking `Player`. 
--- 
--- Trigger `funcattack` of `Zombie` depending on `ZType`.
----@param zombie        IsoZombie
----@param ZType         integer     --Zombie Type ID
-ZomboidForge.ZombieAttack = function(zombie,ZType)
-    local target = zombie:getTarget()
-    if target and target:isCharacter() then
-        local ZombieTable = ZomboidForge.ZTypes[ZType]
-        if instanceof(target, "IsoPlayer") then
-            ---@cast target IsoPlayer
-            ZomboidForge.ShowZombieName(target, zombie)
-        end
-        if ZombieTable.funcattack then
-            for i=1,#ZombieTable.funcattack do
-                ZomboidForge[ZombieTable.funcattack[i]](target,zombie,ZType)
-            end
-        end
-    end
-end
-
---- `Player` attacking `Zombie`. 
--- 
--- Trigger `funconhit` of `Zombie` depending on `ZType`.
---
--- Handles the custom HP of zombies and apply custom damage depending on the customDamage function.
----@param attacker      IsoPlayer
----@param victim        IsoZombie
-ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
-    if victim:isZombie() then
-        local trueID = ZomboidForge.pID(victim)
-        local ZFModData = ModData.getOrCreate("ZomboidForge")
-        local PersistentZData = ZFModData.PersistentZData[trueID]
-        if not PersistentZData then return end
-
-        local ZType = PersistentZData.ZType
-        local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-        if ZType then
-            if ZombieTable and ZombieTable.funconhit then
-                for i=1,#ZombieTable.funconhit do
-                    ZomboidForge[ZombieTable.funconhit[i]](attacker, victim, handWeapon, damage)
-                end
-            end
-            ZomboidForge.ShowZombieName(attacker, victim)
-        end
-
-        -- skip if no HP stat or HP is 1
-        if ZombieTable.HP and ZombieTable.HP ~= 1 and handWeapon:getFullType() ~= "Base.BareHands" then
-            -- get or set HP amount
-            local HP = PersistentZData.HP or ZombieTable.HP
-
-            -- get damage if exists
-            if ZombieTable.customDamage then
-                damage = ZomboidForge[ZombieTable.customDamage](attacker, victim, handWeapon, damage)
-            end
-            HP = HP - damage
-
-            -- set zombie health or kill zombie
-            if (HP <= 0) then
-                victim:setOnlyJawStab(false)
-                victim:Kill(attacker)
-            else
-                -- Makes sure the Zombie doesn't get oneshoted by whatever bullshit weapon
-                -- someone might use.
-                -- Updates the HP counter of PersistentZData
-                victim:setHealth(1000)
-                PersistentZData.HP = HP
-            end
-        end
-    end
-end
-
---- OnDeath functions
----@param zombie        IsoZombie
-ZomboidForge.OnDeath = function(zombie)
-    local trueID = ZomboidForge.pID(zombie)
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
-    if not PersistentZData then return end
-
-    local ZType = PersistentZData.ZType
-    -- initialize zombie type
-    -- only a security for mods that insta-kill zombies on spawn
-    if not ZType then
-        ZomboidForge.ZombieInitiliaze(zombie,true,true)
-    end
-
-    local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-    -- run custom behavior functions for this zombie
-    for i = 1,#ZombieTable.onDeath do
-        ZomboidForge[ZombieTable.onDeath[i]](zombie,ZType)
-    end
-    -- reset emitters
-    zombie:getEmitter():stopAll()
-
-    -- delete zombie data
-    ZFModData.PersistentZData[trueID] = nil
-    ZomboidForge.NonPersistentZData[trueID] = nil
-end
-
 --#region Tools
 
 -- Based on Chuck's and I work. Outputs the `trueID` of a `Zombie`.
@@ -515,35 +342,6 @@ ZomboidForge.pID = function(zombie)
 
     ZomboidForge.TrueID[pID] = trueID
     return trueID
-end
-
-
-local zombieList
-ZomboidForge.zeroTick = 0
--- Global counter that is used by the framework to delay updates on specific stuff like stats but can be used
--- by other addons to delay update some stuff.
---
--- Added to `OnTick`
---
--- The part updating one zombie per tick was made by Albion.
----@param tick          int
-ZomboidForge.OnTick = function(tick)
-    -- Update counter
-    --ZomboidForge.counterUpdater()
-
-    -- initialize zombie list
-    if not zombieList then
-        zombieList = getPlayer():getCell():getZombieList()
-    end
-
-    -- Update zombie stats
-    local zombieIndex = tick - ZomboidForge.zeroTick
-    if zombieList:size() > zombieIndex then
-        local zombie = zombieList:get(zombieIndex)
-        ZomboidForge.SetZombieData(zombie,nil)
-    else
-        ZomboidForge.zeroTick = tick + 1
-    end
 end
 
 -- Global counter that is used by the framework to delay updates on specific stuff like stats but can be used
