@@ -70,4 +70,17 @@ ZomboidForge_server.Commands.ZF_ModData.ModData_Server2Clients = function(player
 	sendClientCommand('ZF_ModData', 'ModData_Server2Client', args)
 end
 
+-- Update data received from client to store in server's mod data
+-- and send the data to every other clients to store in their own mod data.
+---@param player	IsoPlayer	--player unused
+---@param args		table
+ZomboidForge_server.Commands.ZF_ModData.ModData_Ask4ZombieData = function(player, args)
+	local ModData = ModData.getOrCreate("ZomboidForge")
+
+	if not args or not args.trueID then return end
+
+	args.playerID = player:getOnlineID()
+	args.data = ModData.PersistentZData[args.trueID] or "None"
+end
+
 --#endregion
