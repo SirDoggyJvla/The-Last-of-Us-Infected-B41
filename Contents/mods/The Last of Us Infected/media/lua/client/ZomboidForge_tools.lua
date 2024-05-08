@@ -91,15 +91,21 @@ end
 --          `Zombie animation variable`
 --
 ---@param zombie        IsoZombie
----@param ZType         integer|nil [opt] Zombie Type ID
+---@param ZType         string|nil [opt] Zombie Type ID
 ZomboidForge.SetZombieData = function(zombie,ZType)
     local trueID = ZomboidForge.pID(zombie)
+    -- zombie did not get initialized by the game yet so don't touch that zombie
+    if trueID == 0 then return end
+
     local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
 
     -- if no ZType given, access it
     if not ZType then
         local PersistentZData = ModData.getOrCreate("ZomboidForge").PersistentZData[trueID]
-        if not PersistentZData then return end
+        if not PersistentZData or not ZomboidForge.NonPersistentZData[trueID] or not PersistentZData.ZType then
+            ZomboidForge.ZombieInitiliaze(zombie,true,true)
+            return
+        end
         ZType = PersistentZData.ZType
     end
 
@@ -188,11 +194,12 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
             zombie:setHealth(1000)
         end
     end
-
+    
     -- custom animation variable
-    if ZombieTable.animationVariable then
-        if not zombie:getVariableBoolean(ZombieTable.animationVariable) then
-            zombie:setVariable(ZombieTable.animationVariable,'true')
+    local animVariable = ZombieTable.animationVariable
+    if animVariable then
+        if not zombie:getVariableBoolean(animVariable) then
+            zombie:setVariable(animVariable,'true')
             if isClient() then
                 sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
             end
@@ -238,7 +245,7 @@ end
 --
 -- Once every stats went through the 10 checks and are actually correct then
 ---@param zombie        IsoZombie
----@param ZType         integer     --Zombie Type ID
+---@param ZType         string      --Zombie Type ID
 ZomboidForge.UpdateZombieStats = function(zombie,ZType)
     -- get zombie info
     local trueID = ZomboidForge.pID(zombie)
@@ -280,19 +287,16 @@ ZomboidForge.UpdateZombieStats = function(zombie,ZType)
             if not (stat == value) and ZombieTable[k] then
                 local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
                 getSandboxOptions():set(sandboxOption,ZombieTable[k])
-                zombie:makeInactive(true)
-                zombie:makeInactive(false)
             end
 
         -- unverifiable stats
         elseif not classField then
             local sandboxOption = ZomboidForge.Stats[k].setSandboxOption
             getSandboxOptions():set(sandboxOption,ZombieTable[k])
-            zombie:makeInactive(true)
-            zombie:makeInactive(false)
         end
     end
-
+    zombie:makeInactive(true)
+    zombie:makeInactive(false)
     -- update multiCheck counter for each stats
     local multiCheck = nonPersistentZData.multiCheck
     if not multiCheck then
@@ -340,7 +344,7 @@ ZomboidForge.pID = function(zombie)
     bits[16] = "1"
     ZomboidForge.HatFallen[Long.parseUnsignedLong(string.reverse(table.concat(bits, "")), 2)] = trueID
 
-    ZomboidForge.TrueID[pID] = trueID
+    --ZomboidForge.TrueID[pID] = trueID
     return trueID
 end
 
