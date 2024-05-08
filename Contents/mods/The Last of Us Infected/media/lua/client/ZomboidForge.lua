@@ -18,7 +18,6 @@ local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
 local print = print -- print function
 local tostring = tostring --tostring function
-local Long = Long --Long for pID
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
@@ -97,6 +96,9 @@ end
 ZomboidForge.ZombieInitiliaze = function(zombie,fullResetZ,rollZType)
     -- get zombie data
     local trueID = ZomboidForge.pID(zombie)
+    -- zombie did not get initialized by the game yet so don't touch that zombie
+    if trueID == 0 then return end
+
     local ZFModData = ModData.getOrCreate("ZomboidForge")
     local PersistentZData = ZFModData.PersistentZData[trueID]
 
@@ -137,8 +139,8 @@ ZomboidForge.ZombieUpdate = function(zombie)
     local ZFModData = ModData.getOrCreate("ZomboidForge")
     local PersistentZData = ZFModData.PersistentZData[trueID]
 
-    -- check if zombie is initialized
-    if not PersistentZData or not PersistentZData.ZType then
+    -- initialize zombie if needed
+    if not PersistentZData or not ZomboidForge.NonPersistentZData[trueID] or not PersistentZData.ZType then
         ZomboidForge.ZombieInitiliaze(zombie,true,true)
         return
     end
@@ -171,13 +173,14 @@ local zeroTick = 0
 -- Added to `OnTick`.
 ---@param tick          int
 ZomboidForge.OnTick = function(tick)
-    -- initialize zombie list
+    -- initialize zombieList
     if not zombieList then
         zombieList = getPlayer():getCell():getZombieList()
     end
 
     -- Update zombie stats
     local zombieIndex = tick - zeroTick
+
     if zombieList:size() > zombieIndex then
         local zombie = zombieList:get(zombieIndex)
         ZomboidForge.SetZombieData(zombie,nil)
