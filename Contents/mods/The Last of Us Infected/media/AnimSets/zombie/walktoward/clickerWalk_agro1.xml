@@ -6,18 +6,18 @@
 	<m_Conditions />
 
 	<m_Conditions>
-		<m_Name>bMoving</m_Name>
-		<m_Type>BOOL</m_Type>
-		<m_BoolValue>true</m_BoolValue>
-	</m_Conditions>
-
-	<m_Conditions>
 		<m_Name>isClicker</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>
 	<m_Conditions>
 		<m_Name>ClickerAgro</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+
+	<m_Conditions>
+		<m_Name>bMoving</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>

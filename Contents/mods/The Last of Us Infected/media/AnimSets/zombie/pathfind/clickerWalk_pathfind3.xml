@@ -5,20 +5,6 @@
 	<m_SpeedScale>2</m_SpeedScale>
 	<m_Conditions />
 
-	
-	<m_Conditions>
-		<m_Name>zombieWalkType</m_Name>
-		<m_Type>STRING</m_Type>
-		<m_StringValue>3</m_StringValue>
-	</m_Conditions>
-	
-
-	<m_Conditions>
-		<m_Name>bMoving</m_Name>
-		<m_Type>BOOL</m_Type>
-		<m_BoolValue>true</m_BoolValue>
-	</m_Conditions>
-	
 	<m_Conditions>
 		<m_Name>isClicker</m_Name>
 		<m_Type>BOOL</m_Type>
@@ -28,6 +14,17 @@
 		<m_Name>ClickerAgro</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>false</m_BoolValue>
+	</m_Conditions>
+
+	<m_Conditions>
+		<m_Name>zombieWalkType</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_StringValue>3</m_StringValue>
+	</m_Conditions>
+	<m_Conditions>
+		<m_Name>bMoving</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>
 
 	<m_Events>
