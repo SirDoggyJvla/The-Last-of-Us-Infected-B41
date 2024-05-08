@@ -39,10 +39,17 @@ ZomboidForge.Patcher.AdminContextMenu.OnRemoveAllZombiesClient = AdminContextMen
 ZomboidForge.Patcher.RemoveAllEmitters = function()
     local zombies = getCell():getObjectList()
     for i=zombies:size()-1,0,-1 do
-         local zombie = zombies:get(i)
-         if instanceof(zombie, "IsoZombie") then
-              zombie:getEmitter():stopAll()
-         end
+        local zombie = zombies:get(i)
+        if instanceof(zombie, "IsoZombie") then
+        zombie:getEmitter():stopAll()
+        if isClient() then
+            sendClientCommand('ZombieHandler','RemoveEmitters',{zombie = zombie:getOnlineID()})
+        end
+
+        -- delete zombie data
+        local trueID = ZomboidForge.pID(zombie)
+        ZomboidForge.DeleteZombieData(trueID)
+        end
     end
 end
 
@@ -86,22 +93,9 @@ function ISSpawnHordeUI:onRemoveZombies()
                         -- remove all emitters
                         testZed:getEmitter():stopAll()
 
-                        -- get zombie data
-                        local trueID = ZomboidForge.pID(testZed)
-                        local ZFModData = ModData.getOrCreate("ZomboidForge")
-
                         -- delete zombie data
-                        ZFModData.PersistentZData[trueID] = nil
-                        ZomboidForge.NonPersistentZData[trueID] = nil
-
-                        ZomboidForge.ModData_Client2Server(
-                            {
-                                modData = "ZomboidForge",
-                                category = "PersistentZData",
-                                key = trueID,
-                                data = nil,
-                            }
-                        )
+                        local trueID = ZomboidForge.pID(testZed)
+                        ZomboidForge.DeleteZombieData(trueID)
 					end
 				end
 			end

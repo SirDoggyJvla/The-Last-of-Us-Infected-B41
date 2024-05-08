@@ -31,7 +31,7 @@ ZomboidForge.OnLoad = function()
     end
 
     -- reset non persistent data
-    ZomboidForge.NonPersistentZData = {}
+    ZomboidForge.nonPersistentZData = {}
 
     -- calculate total chance
     ZomboidForge.TotalChance = 0
@@ -94,26 +94,24 @@ end
 ---@param fullResetZ    boolean
 ---@param rollZType     boolean
 ZomboidForge.ZombieInitiliaze = function(zombie,fullResetZ,rollZType)
-    -- get zombie data
+    -- get zombie trueID
     local trueID = ZomboidForge.pID(zombie)
     -- zombie did not get initialized by the game yet so don't touch that zombie
     if trueID == 0 then return end
 
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
-
     -- fully reset the stats of the zombie
     if fullResetZ then
-        ZFModData.PersistentZData[trueID] = {}
-        ZomboidForge.NonPersistentZData[trueID] = {}
-        PersistentZData = {}
+        ZomboidForge.ResetZombieData(trueID)
     end
+
+    -- get zombie data
+    local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
 
     -- attribute zombie type if not set by weighted random
     if rollZType then
-        local ZType = PersistentZData.ZType
+        local ZType = nonPersistentZData.ZType
         if not ZType or not ZomboidForge.ZTypes[ZType] then
-            ZomboidForge.RollZType(zombie)
+            nonPersistentZData.ZType = ZomboidForge.RollZType(trueID)
         end
     end
 
@@ -136,19 +134,19 @@ end
 ZomboidForge.ZombieUpdate = function(zombie)
     -- get zombie data
     local trueID = ZomboidForge.pID(zombie)
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
+    -- zombie did not get initialized by the game yet so don't touch that zombie
+    if trueID == 0 then return end
 
+    local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
+
+    local ZType = nonPersistentZData.ZType
     -- initialize zombie if needed
-    if not PersistentZData or not ZomboidForge.NonPersistentZData[trueID] or not PersistentZData.ZType then
+    if not ZType then
         ZomboidForge.ZombieInitiliaze(zombie,true,true)
         return
     end
 
-    local ZType = PersistentZData.ZType
     local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-    if not ZombieTable then return end
 
     -- run custom behavior functions for this zombie
     for i = 1,#ZombieTable.customBehavior do
@@ -157,7 +155,7 @@ ZomboidForge.ZombieUpdate = function(zombie)
 
     -- run zombie attack functions
     if zombie:isAttacking() then
-        ZomboidForge.ZombieAttack(zombie,ZType)
+        ZomboidForge.ZombieAgro(zombie,ZType)
     end
 end
 
@@ -180,21 +178,25 @@ ZomboidForge.OnTick = function(tick)
 
     -- Update zombie stats
     local zombieIndex = tick - zeroTick
-
     if zombieList:size() > zombieIndex then
         local zombie = zombieList:get(zombieIndex)
         ZomboidForge.SetZombieData(zombie,nil)
     else
         zeroTick = tick + 1
     end
+
+    -- if players are allowed to use nametags
+    if SandboxVars.ZomboidForge.Nametags then
+        ZomboidForge.UpdateNametag()
+    end
 end
 
---- `Zombie` attacking `Player`. 
+--- `Zombie` has agro on an `IsoGameCharacter`. 
 -- 
--- Trigger `funcattack` of `Zombie` depending on `ZType`.
+-- Trigger `zombieAgro` of `Zombie` depending on `ZType`.
 ---@param zombie        IsoZombie
----@param ZType         integer     --Zombie Type ID
-ZomboidForge.ZombieAttack = function(zombie,ZType)
+---@param ZType         string
+ZomboidForge.ZombieAgro = function(zombie,ZType)
     local target = zombie:getTarget()
     if target and target:isCharacter() then
         local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -202,9 +204,9 @@ ZomboidForge.ZombieAttack = function(zombie,ZType)
             ---@cast target IsoPlayer
             ZomboidForge.ShowZombieName(target, zombie)
         end
-        if ZombieTable.funcattack then
-            for i=1,#ZombieTable.funcattack do
-                ZomboidForge[ZombieTable.funcattack[i]](target,zombie,ZType)
+        if ZombieTable.zombieAgro then
+            for i=1,#ZombieTable.zombieAgro do
+                ZomboidForge[ZombieTable.zombieAgro[i]](target,zombie,ZType)
             end
         end
     end
@@ -216,47 +218,63 @@ end
 --
 -- Handles the custom HP of zombies and apply custom damage depending on the customDamage function.
 ---@param attacker      IsoPlayer
----@param victim        IsoZombie
-ZomboidForge.OnHit = function(attacker, victim, handWeapon, damage)
-    if victim:isZombie() then
-        local trueID = ZomboidForge.pID(victim)
-        local ZFModData = ModData.getOrCreate("ZomboidForge")
-        local PersistentZData = ZFModData.PersistentZData[trueID]
-        if not PersistentZData then return end
+---@param zombie        IsoZombie
+ZomboidForge.OnHit = function(attacker, zombie, handWeapon, damage)
+    if zombie:isZombie() then
+        local trueID = ZomboidForge.pID(zombie)
+        local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
 
-        local ZType = PersistentZData.ZType
+        local ZType = nonPersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
 
         if ZType then
-            if ZombieTable and ZombieTable.funconhit then
-                for i=1,#ZombieTable.funconhit do
-                    ZomboidForge[ZombieTable.funconhit[i]](attacker, victim, handWeapon, damage)
+            if ZombieTable and ZombieTable.zombieOnHit then
+                for i=1,#ZombieTable.zombieOnHit do
+                    ZomboidForge[ZombieTable.zombieOnHit[i]](attacker, zombie, handWeapon, damage)
                 end
             end
-            ZomboidForge.ShowZombieName(attacker, victim)
+            ZomboidForge.ShowZombieName(attacker, zombie)
         end
 
-        -- skip if no HP stat or HP is 1
-        if ZombieTable.HP and ZombieTable.HP ~= 1 and handWeapon:getFullType() ~= "Base.BareHands" then
-            -- get or set HP amount
-            local HP = PersistentZData.HP or ZombieTable.HP
+        -- only calculates damage if it's the player hitting the zombie
+        if attacker == getPlayer() then
+            -- skip if no HP stat or HP is 1
+            local HP = ZombieTable.HP
+            if HP and HP ~= 1 and handWeapon:getFullType() ~= "Base.BareHands" then
+                -- get or set HP amount
 
-            -- get damage if exists
-            if ZombieTable.customDamage then
-                damage = ZomboidForge[ZombieTable.customDamage](attacker, victim, handWeapon, damage)
-            end
-            HP = HP - damage
+                -- get damage if exists
+                if ZombieTable.customDamage then
+                    damage = ZomboidForge[ZombieTable.customDamage](attacker, zombie, handWeapon, damage)
+                end
 
-            -- set zombie health or kill zombie
-            if (HP <= 0) then
-                victim:setOnlyJawStab(false)
-                victim:Kill(attacker)
-            else
-                -- Makes sure the Zombie doesn't get oneshoted by whatever bullshit weapon
-                -- someone might use.
-                -- Updates the HP counter of PersistentZData
-                victim:setHealth(1000)
-                PersistentZData.HP = HP
+                -- set zombie health or kill zombie
+                if isClient() then
+                    local args = {
+                        damage = damage,
+                        trueID = trueID,
+                        zombie = zombie:getOnlineID(),
+                        defaultHP = HP,
+                    }
+
+                    sendClientCommand('ZombieHandler', 'DamageZombie', args)
+                else
+                    -- get zombie persistent data
+                    local PersistentZData = ZomboidForge.GetPersistentZData(trueID)
+
+                    HP = PersistentZData.HP or HP
+                    HP = HP - damage
+
+                    if HP <= 0 then
+                        zombie:Kill(attacker)
+                    else
+                        -- Makes sure the Zombie doesn't get oneshoted by whatever bullshit weapon
+                        -- someone might use.
+                        -- Updates the HP counter of PersistentZData
+                        zombie:setHealth(1000)
+                        PersistentZData.HP = HP
+                    end
+                end
             end
         end
     end
@@ -266,11 +284,9 @@ end
 ---@param zombie        IsoZombie
 ZomboidForge.OnDeath = function(zombie)
     local trueID = ZomboidForge.pID(zombie)
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
-    if not PersistentZData then return end
+    local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
 
-    local ZType = PersistentZData.ZType
+    local ZType = nonPersistentZData.ZType
     -- initialize zombie type
     -- only a security for mods that insta-kill zombies on spawn
     if not ZType then
@@ -280,13 +296,12 @@ ZomboidForge.OnDeath = function(zombie)
     local ZombieTable = ZomboidForge.ZTypes[ZType]
 
     -- run custom behavior functions for this zombie
-    for i = 1,#ZombieTable.onDeath do
-        ZomboidForge[ZombieTable.onDeath[i]](zombie,ZType)
+    for i = 1,#ZombieTable.zombieDeath do
+        ZomboidForge[ZombieTable.zombieDeath[i]](zombie,ZType)
     end
     -- reset emitters
     zombie:getEmitter():stopAll()
 
     -- delete zombie data
-    ZFModData.PersistentZData[trueID] = nil
-    ZomboidForge.NonPersistentZData[trueID] = nil
+    ZomboidForge.DeleteZombieData(trueID)
 end

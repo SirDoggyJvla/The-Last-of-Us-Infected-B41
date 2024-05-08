@@ -22,8 +22,7 @@ local ZomboidForge = {
 
     -- command functions
     Commands = {
-        AnimationHandler =      {},
-        ZF_ModData =            {},
+        ZombieHandler =         {},
     },
 
     -- Counter of the ZomboidForge framework. Updates every OnTick

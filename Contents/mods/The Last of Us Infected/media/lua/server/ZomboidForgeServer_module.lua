@@ -24,7 +24,6 @@ local ZomboidForge_server = {}
 
 -- initialize command module
 ZomboidForge_server.Commands = {}
-ZomboidForge_server.Commands.AnimationHandler = {}
-ZomboidForge_server.Commands.ZF_ModData = {}
+ZomboidForge_server.Commands.ZombieHandler = {}
 
 return ZomboidForge_server

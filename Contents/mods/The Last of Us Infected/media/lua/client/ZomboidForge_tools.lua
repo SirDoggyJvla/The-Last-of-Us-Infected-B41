@@ -35,45 +35,36 @@ function ZomboidForge.seededRand(trueID)
 end
 
 --- Rolls the `ZType` of a zombie.
----@param zombie        IsoZombie
-ZomboidForge.RollZType = function(zombie)
-    local trueID = ZomboidForge.pID(zombie)
-    local ZFModData = ModData.getOrCreate("ZomboidForge")
-    local PersistentZData = ZFModData.PersistentZData[trueID]
-
-    -- chose a random number based on max total weight
+---@param trueID        int
+ZomboidForge.RollZType = function(trueID)
+    -- chose a seeded random number based on max total weight
     local rand = ZomboidForge.seededRand(trueID)
 
     -- test one by one each types and attribute if pass
-    for testingZType,ZombieTable in pairs(ZomboidForge.ZTypes) do
+    for ZType,ZombieTable in pairs(ZomboidForge.ZTypes) do
         rand = rand - ZombieTable.chance
         if rand <= 0 then
             -- attribute a ZType to the zombie
-            PersistentZData.ZType = testingZType
-            break
+            return ZType
         end
     end
 end
 
---- Sets the `ZType` of a specified `zombie`.
----@param zombie            IsoZombie
+-- Get the ZType of a zombie.
+---@param trueID            int
+ZomboidForge.GetZType = function(trueID)
+
+end
+
+-- Sets the `ZType` of a specified `zombie`.
+---@param trueID            int
 ---@param ZType             string
----@param PersistentZData   table|nil
-ZomboidForge.SetZType = function(zombie,ZType,PersistentZData)
-    local trueID = ZomboidForge.pID(zombie)
-
+ZomboidForge.SetZType = function(trueID,ZType)
     -- get PersistentZData if not given
-    if not PersistentZData then
-        local ZFModData = ModData.getOrCreate("ZomboidForge")
-        PersistentZData = ZFModData.PersistentZData[trueID]
-    end
+    local NonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
 
-    -- check if zombie is initialized
-    if not PersistentZData then
-        ZomboidForge.ZombieInitiliaze(zombie,true,false)
-    end
-
-    PersistentZData.ZType = ZType
+    -- set ZType
+    NonPersistentZData.ZType = ZType
 end
 
 --- Used to set the various data of a zombie, skipping the unneeded parts or already done. 
@@ -97,20 +88,20 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
     -- zombie did not get initialized by the game yet so don't touch that zombie
     if trueID == 0 then return end
 
-    local nonPersistentZData = ZomboidForge.NonPersistentZData[trueID]
+    local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
 
     -- if no ZType given, access it
     if not ZType then
-        local PersistentZData = ModData.getOrCreate("ZomboidForge").PersistentZData[trueID]
-        if not PersistentZData or not ZomboidForge.NonPersistentZData[trueID] or not PersistentZData.ZType then
+
+        if not nonPersistentZData.ZType then
             ZomboidForge.ZombieInitiliaze(zombie,true,true)
             return
         end
-        ZType = PersistentZData.ZType
+        ZType = nonPersistentZData.ZType
     end
 
     -- if still no ZType then skip again
-    if not ZType or not nonPersistentZData then return end
+    if not ZType then return end
 
     -- get ZType data
     local ZombieTable = ZomboidForge.ZTypes[ZType]
@@ -201,7 +192,7 @@ ZomboidForge.SetZombieData = function(zombie,ZType)
         if not zombie:getVariableBoolean(animVariable) then
             zombie:setVariable(animVariable,'true')
             if isClient() then
-                sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
+                sendClientCommand('ZombieHandler', 'SetAnimationVariable', {animationVariable = ZombieTable.animationVariable, zombie = zombie:getOnlineID()})
             end
         end
     end
@@ -315,6 +306,60 @@ end
 
 --#region Tools
 
+-- Gives the persistent data of an `IsoZombie` based on its given `trueID`.
+---@param trueID        int
+---@return table
+ZomboidForge.GetPersistentZData = function(trueID)
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+    if not ZFModData.PersistentZData then
+        ZFModData.PersistentZData = {}
+    end
+    if not ZFModData.PersistentZData[trueID] then
+        ZFModData.PersistentZData[trueID] = {}
+    end
+
+    return ZFModData.PersistentZData[trueID]
+end
+
+-- Gives the non persistent data of an `IsoZombie` based on its given `trueID`.
+---@param trueID        int
+---@return table
+ZomboidForge.GetNonPersistentZData = function(trueID)
+    if not ZomboidForge.NonPersistentZData[trueID] then
+        ZomboidForge.NonPersistentZData[trueID] = {}
+    end
+
+    return ZomboidForge.NonPersistentZData[trueID]
+end
+
+-- Reset all data of an `IsoZombie` based on its given `trueID`.
+---@param trueID        int
+ZomboidForge.ResetZombieData = function(trueID)
+    -- reset non persistent zombie data
+    ZomboidForge.NonPersistentZData[trueID] = {}
+
+    -- reset persistent zombie data
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+    local PersistentZData = ZFModData.PersistentZData
+    if PersistentZData and PersistentZData[trueID] then
+        PersistentZData[trueID] = {}
+    end
+end
+
+-- Delete all data of an `IsoZombie` based on its given `trueID`.
+---@param trueID        int
+ZomboidForge.DeleteZombieData = function(trueID)
+    -- delete non persistent zombie data
+    ZomboidForge.NonPersistentZData[trueID] = nil
+
+    -- delete persistent zombie data
+    local ZFModData = ModData.getOrCreate("ZomboidForge")
+    local PersistentZData = ZFModData.PersistentZData
+    if PersistentZData and PersistentZData[trueID] then
+        PersistentZData[trueID] = nil
+    end
+end
+
 -- Based on Chuck's and I work. Outputs the `trueID` of a `Zombie`.
 -- Thx to the help of Shurutsue, Albion and probably others.
 --
@@ -378,7 +423,7 @@ end
 -- If `Zombie` found then update `ShowZombieName`.
 ---@param player        IsoPlayer
 ZomboidForge.GetZombieOnPlayerMouse = function(player)
-	if (ZombieForgeOptions and ZombieForgeOptions.NameTag)or(ZombieForgeOptions==nil) then
+	if ZombieForgeOptions and ZombieForgeOptions.NameTag or not ZombieForgeOptions then
 		if player:isLocalPlayer() and player:isAiming() then
 			local playerX = player:getX()
 			local playerY = player:getY()
@@ -419,15 +464,11 @@ ZomboidForge.GetZombieOnPlayerMouse = function(player)
 					for i=0, movingObjects:size()-1 do
 						local zombie = movingObjects:get(i)
 						if zombie and instanceof(zombie, "IsoZombie") and zombie:isAlive() then
+                            -- get zombie data
                             local trueID = ZomboidForge.pID(zombie)
-                            local ZFModData = ModData.getOrCreate("ZomboidForge")
-                            local PersistentZData = ZFModData.PersistentZData[trueID]
+                            local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
+                            local ZType = nonPersistentZData.ZType
 
-                            -- had to add this fail safe bcs it seems like some weird error was coming out of nowhere
-                            -- yet it should be safe, no reasons
-                            if not PersistentZData then return end
-
-                            local ZType = PersistentZData.ZType
 							if ZomboidForge.ZTypes[ZType] and player:CanSee(zombie) then
 								ZomboidForge.ShowNametag[trueID] = {zombie,100}
 							end
@@ -444,22 +485,22 @@ end
 -- Could probably be improved upon since currently the behavior is possibly not perfect in multiplayer.
 -- Specifically with `ShowZombieName`.
 --
--- From CDDA Zombies
+-- From CDDA Zombies.
 ZomboidForge.UpdateNametag = function()
 	for trueID,ZData in pairs(ZomboidForge.ShowNametag) do
 		local zombie = ZData[1]
 		local interval = ZData[2]
 
-        --local trueID = ZomboidForge.pID(zombie)
-        local ZFModData = ModData.getOrCreate("ZomboidForge")
-        local PersistentZData = ZFModData.PersistentZData[trueID]
+        -- get zombie data
+        local nonPersistentZData = ZomboidForge.GetNonPersistentZData(trueID)
 
-        if not PersistentZData then
+        if not nonPersistentZData then
             ZomboidForge.ShowNametag[trueID] = nil
             return
         end
 
-        local ZType = PersistentZData.ZType
+        -- get zombie data
+        local ZType = nonPersistentZData.ZType
         local ZombieTable = ZomboidForge.ZTypes[ZType]
 		if interval>0 and ZombieTable then
 			local player = getPlayer()

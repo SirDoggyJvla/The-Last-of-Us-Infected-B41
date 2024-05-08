@@ -26,61 +26,52 @@ local ZomboidForge_server = require "ZomboidForgeServer_module"
 -- ZomboidForge.Commands.module.command
 
 -- Updates animation variables of zombies for every single clients.
-ZomboidForge_server.Commands.AnimationHandler.SetAnimationVariable = function(player, args)
-	sendServerCommand('AnimationHandler', 'SetAnimationVariable', {id = player:getOnlineID(), animationVariable = args.animationVariable, zombie =  args.zombie, state = args.state})
+ZomboidForge_server.Commands.ZombieHandler.SetAnimationVariable = function(player, args)
+	sendServerCommand('ZombieHandler', 'SetAnimationVariable', {id = player:getOnlineID(), animationVariable = args.animationVariable, zombie =  args.zombie, state = args.state})
 end
 
--- Update data received from client to store in server's mod data
--- and send the data to every other clients to store in their own mod data.
----@param player	IsoPlayer	--player unused
----@param args		table
-ZomboidForge_server.Commands.ZF_ModData.ModData_Client2Server = function(player, args)
-	local ModData = ModData.getOrCreate(args.modData)
+-- Updates animation variables of zombies for every single clients.
+ZomboidForge_server.Commands.ZombieHandler.RemoveEmitters = function(player, args)
+	sendServerCommand('ZombieHandler', 'RemoveEmitters', {id = player:getOnlineID(),zombie = args.zombie})
+end
 
-	-- Initialize mod data tables if not already
-	if not ModData[args.category] then
-		ModData[args.category] = {}
-		ModData[args.category][args.key] = {}
-	elseif not ModData[args.category][args.key] then
-		ModData[args.category][args.key] = {}
+ZomboidForge_server.Commands.ZombieHandler.DamageZombie = function(player,args)
+	-- get zombie data
+	local ZFModData = ModData.getOrCreate("ZomboidForge")
+	if not ZFModData.PersistentZData then
+		ZFModData.PersistentZData = {}
+	end
+	local PersistentZData = ZFModData.PersistentZData[args.trueID]
+	if not PersistentZData then
+		PersistentZData = {}
 	end
 
-	-- Add data to mod data
-	-- If data = table then add every entries else add just the data to the key
-	if type(args.data) == "table" then
-		for k,v in pairs(args.data) do
-			ModData[args.category][args.key][k] = v
-		end
+	-- get zombie HP
+	local HP = PersistentZData.HP or args.defaultHP
+
+	-- apply damage
+	HP = HP - args.damage
+
+	-- determine if zombie gets killed
+	local kill = HP <= 0
+
+	-- ask clients to handle the zombie HP/killing
+	args = {
+		attacker = player:getOnlineID(),
+		zombie = args.zombie,
+		kill = kill,
+		HP = 1000,
+	}
+	sendServerCommand('ZombieHandler', 'SetZombieHP', args)
+
+	-- delete persistent data about this zombie if it gets killed
+	-- else update HP counter
+	if kill then
+		PersistentZData = nil
 	else
-		ModData[args.category][args.key] = args.data
+		-- update the HP counter of PersistentZData
+		PersistentZData.HP = HP
 	end
-
-	-- Tell every other clients to update their mod data
-	ZomboidForge_server.Commands.ZF_ModData.ModData_Server2Clients(player,args)
-end
-
--- Send data from server to every clients to store in their mod data.
----@param player	IsoPlayer	--player unused
----@param args		table
-ZomboidForge_server.Commands.ZF_ModData.ModData_Server2Clients = function(player,args)
-	-- Used for players to ignore updating their mod data if they are the source of this update
-	args.playerID = player:getOnlineID()
-
-	-- Call clients to update their mod data with the data received by server
-	sendClientCommand('ZF_ModData', 'ModData_Server2Client', args)
-end
-
--- Update data received from client to store in server's mod data
--- and send the data to every other clients to store in their own mod data.
----@param player	IsoPlayer	--player unused
----@param args		table
-ZomboidForge_server.Commands.ZF_ModData.ModData_Ask4ZombieData = function(player, args)
-	local ModData = ModData.getOrCreate("ZomboidForge")
-
-	if not args or not args.trueID then return end
-
-	args.playerID = player:getOnlineID()
-	args.data = ModData.PersistentZData[args.trueID] or "None"
 end
 
 --#endregion

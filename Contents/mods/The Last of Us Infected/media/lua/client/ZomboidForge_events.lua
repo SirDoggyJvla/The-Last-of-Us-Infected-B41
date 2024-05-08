@@ -16,14 +16,6 @@ require "ZomboidForge"
 require "ZomboidForge_tools"
 local ZomboidForge = require "ZomboidForge_module"
 
---- Events added OnLoad
-Events.OnLoad.Add(function()
-    -- Adds the nametag update event if activated in sandbox settings
-    if SandboxVars.ZomboidForge.Nametags then
-        Events.OnTick.Add(ZomboidForge.UpdateNametag)
-    end
-end)
-
 --- On start Events
 Events.OnLoad.Add(ZomboidForge.OnLoad)
 Events.OnGameStart.Add(ZomboidForge.OnGameStart)

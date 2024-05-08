@@ -99,11 +99,11 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			outline = {0, 0, 0,},
 
 			-- attack functions
-			funcattack = {},
-			funconhit = {},
+			zombieAgro = {},
+			zombieOnHit = {},
 
 			-- custom behavior
-			onDeath = {},
+			zombieDeath = {},
 			customBehavior = {},
 
 			customData = {
@@ -149,11 +149,11 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			outline = {0, 0, 0,},
 
 			-- attack functions
-			funcattack = {},
-			funconhit = {},
+			zombieAgro = {},
+			zombieOnHit = {},
 
 			-- custom behavior
-			onDeath = {},
+			zombieDeath = {},
 			customBehavior = {},
 
 			customData = {
@@ -210,15 +210,15 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			outline = {0, 0, 0,},
 
 			-- attack functions
-			funcattack = {
+			zombieAgro = {
 				"ClickerAttack",
 			},
-			funconhit = {
+			zombieOnHit = {
 				"ClickerHit",
 			},
 
 			-- custom behavior
-			onDeath = {
+			zombieDeath = {
 				"OnClickerDeath",
 			},
 			customBehavior = {
@@ -270,16 +270,16 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			outline = {0, 0, 0,},
 
 			-- attack functions
-			funcattack = {
+			zombieAgro = {
 				"BloaterAttack",
 			},
-			funconhit = {
+			zombieOnHit = {
 				"BloaterHit",
 			},
 			customDamage = "BloaterDamage",
 
 			-- custom behavior
-			onDeath = {},
+			zombieDeath = {},
 			customBehavior = {},
 
 			customData = {
@@ -313,19 +313,19 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_Overhaul.CordycepsSpawn then
-		table.insert(ZomboidForge.ZTypes.TLOU_Runner.onDeath,
+		table.insert(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,
 			"OnInfectedDeath_cordyceps"
 		)
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.onDeath,
+		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,
 			"OnInfectedDeath_cordyceps"
 		)
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.onDeath,
+		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,
 			"OnInfectedDeath_cordyceps"
 		)
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.onDeath,
+		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,
 			"OnInfectedDeath_cordyceps"
 		)
 	end
