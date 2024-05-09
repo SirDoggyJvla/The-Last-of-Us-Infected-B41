@@ -1,56 +1,99 @@
 Sandbox_EN = {
-	Sandbox_TLOU_Zombies = "The Last of Us Infected",
+	/* Page names */
+	Sandbox_TLOU_infected = "The Last of Us Infected",
+	Sandbox_TLOU_infected_stats = "The Last of Us Infected [Infected Stats]",
+	Sandbox_TLOU_infected_customBehavior = "The Last of Us Infected [Custom behavior]",
+	Sandbox_TLOU_infected_other = "The Last of Us Infected [Other]",
 
+
+	/* Zomboid Forge zombie spawns */
+	Sandbox_TLOU_RunnerSpawn = "Spawn Runners",
+	Sandbox_TLOU_RunnerSpawn_tooltip = "Runners are dangerous and fast humans recently infected by the Cordyceps fungus. They can quickly overwhelm you with their sheer speed and numbers. You may hear them talking and struggling from within, with the soul of the host likely still present but unable to control their body.",
+	Sandbox_TLOU_RunnerSpawnWeight = "Runners spawn weight",
+
+	Sandbox_TLOU_StalkerSpawn = "Spawn Stalkers",
+	Sandbox_TLOU_StalkerSpawn_tooltip = "Stalkers evolve from Runners with the Cordycep fully taking over the host's body. They are quicker and stronger than simple Runners, often ambushing you by hiding inside buildings. The human inside likely lost the battle against the fungi, and its cries of struggle are slowly being replaced by a distinctive clicking noise.",
+	Sandbox_TLOU_StalkerSpawnWeight = "Stalkers spawn weight",
+
+	Sandbox_TLOU_ClickerSpawn = "Spawn Clickers",
+	Sandbox_TLOU_ClickerSpawn_tooltip = "Clickers evolve from Stalkers into an even more dangerous state. Their inhuman strength makes them extremely perilous to approach; anyone too close could find themselves dead in mere seconds. The cries of struggle have long been replaced with a clicking noise, used to replace their lost eyes due to the Cordyceps eating through them. Fortunately, this alteration makes them slower than simple Runners and Stalkers. However, they will move in unpredictable ways their arms, catching you whenever they get close enough to you.",
+	Sandbox_TLOU_ClickerSpawnWeight = "Clickers spawn weight",
+
+	Sandbox_TLOU_BloaterSpawn = "Spawn Bloaters",
+	Sandbox_TLOU_BloaterSpawn_tooltip = "Bloaters are seen as legends by many due to their rarity among infected types. If a Clicker manages to survive over the years, sustaining its body and the Cordycep within, it evolves into a colossus with thick skin protected by Cordyceps patches. No one wants to contemplate what would happen to a person if they were caught by this creature, so approaching it is out of the question.",
+	Sandbox_TLOU_BloaterSpawnWeight = "Bloaters spawn weight",
+
+
+	/* Infected Stats */
+	Sandbox_TLOU_RunnerStrength = "Runner Strength",
+	Sandbox_TLOU_RunnerToughness = "Runner Toughness",
 	Sandbox_TLOU_RunnerVision = "Runner Sight",
 	Sandbox_TLOU_RunnerHearing = "Runner Hearing",
+	Sandbox_TLOU_RunnerHP = "Runner health multiplier",
+
 	Sandbox_TLOU_StalkerVision = "Stalker Sight",
 	Sandbox_TLOU_StalkerHearing = "Stalker Hearing",
+	Sandbox_TLOU_StalkerHP = "Stalker health multiplier",
+
 	Sandbox_TLOU_ClickerHearing = "Clicker Hearing",
+	Sandbox_TLOU_ClickerHP = "Clicker health multiplier",
+
 	Sandbox_TLOU_BloaterHearing = "Bloater Hearing",
+	Sandbox_TLOU_BloaterHP = "Bloater health multiplier",
 
-	Sandbox_TLOU_HearingEnum_option1 = "Eagle",
-	Sandbox_TLOU_HearingEnum_option2 = "Normal",
-	Sandbox_TLOU_HearingEnum_option3 = "Poor",
 
-	Sandbox_TLOU_EyesightEnum_option1 = "Pinpoint",
-	Sandbox_TLOU_EyesightEnum_option2 = "Normal",
-	Sandbox_TLOU_EyesightEnum_option3 = "Poor",
-
-	Sandbox_TLOU_Normal = "Normal Zombie Spawn Rate",
-	Sandbox_TLOU_Normal_tooltip = "Spawn chance for regular Project Zomboid zombies."
-
-	Sandbox_TLOU_Runner = "Runner Spawn Rate",
-	Sandbox_TLOU_Runner_tooltip = "Spawn chance for runners. Runners are your typical run-of-the-mill sprinters. Normal health and strength."
-
-	Sandbox_TLOU_Stalker = "Stalker Spawn Rate",
-	Sandbox_TLOU_Stalker_tooltip = "Maximum spawn chance for stalkers. Stalkers are like runners, but with high strength and worse vision. They will hide inside buildings (by default)."
-
-	Sandbox_TLOU_Clicker = "Clicker Spawn Rate",
-	Sandbox_TLOU_Clicker_tooltip = "Maximum spawn chance for clickers. Clickers are slow with poor eyesight, but are very strong and durable. Letting one grab you means instant death (by default). They cannot be pushed/punched (by default). Long melee weapons and/or firearms recommended."
-
-	Sandbox_TLOU_Bloater = "Bloater Spawn Rate",
-	Sandbox_TLOU_Bloater_tooltip = "Maximum spawn chance for bloaters. Bloaters have extremely high strength and HP. Immune to staggering. Melee is useless. Guns, molotovs, or explosives are your only option. They will grab and one shot you if you get within arms reach."
-
-	Sandbox_TLOU_StalkersHide = "Stalkers hide (experimental)",
-	Sandbox_TLOU_StalkersHide_tooltip = "When checked, stalkers will hide inside buildings. It's a work in progress!"
-
-	Sandbox_TLOU_OneShotClickers = "One shotting clickers",
-	Sandbox_TLOU_OneShotClickers_tooltip = "When checked, clickers will kill you with just one hit."
-
+	/* Dangerous Clickers */
 	Sandbox_TLOU_NoPushClickers = "No pushing/stomping clickers",
-	Sandbox_TLOU_NoPushClickers_tooltip = "When checked, you will be unable to push or head stomp clickers."
+	Sandbox_TLOU_NoPushClickers_tooltip = "Makes players unable to push or head stomp clickers.",
 
 	Sandbox_TLOU_GrabbyClickers = "Grabby clickers",
-	Sandbox_TLOU_GrabbyClickers_tooltip = "When checked, you will be locked in place when a clicker attempts an attack. You can save yourself with knives, scissors, etc."
+	Sandbox_TLOU_GrabbyClickers_tooltip = "Clickers can grab you, making you unable to move. You can save yourself with short blades if you time it well. By default is deactivated due to how unfair it can be but if you want an even harder challenge, go for it.",
 
-	Sandbox_TLOU_ClickerHP = "Clicker health multiplier",
-	Sandbox_TLOU_ClickerHP_tooltip = "Multiplies the health of clickers."
+	Sandbox_TLOU_OneShotClickers = "One shotting clickers",
+	Sandbox_TLOU_OneShotClickers_tooltip = "Clickers will one shot you, this trait is definitely the most punishing one.",
 
-	Sandbox_TLOU_BloaterHP = "Bloater health multiplier",
-	Sandbox_TLOU_BloaterHP_tooltip = "Multiplies the health of bloaters. Old value was 50, which took around 12 shotgun blasts to kill."
 
-	Sandbox_TLOU_CordycepsSpawn = "Allow cordyceps item in killed infected inventory ?"
-	Sandbox_TLOU_CordycepsSpawn_tooltip = "Cordyceps items that usually spawn in corpses in Spore Zones added by Braven will be able to spawn in killed infected. Only works if Cordyceps Spore Zone by Braven is installed."
+	/* Strong Bloaters */
+	Sandbox_TLOU_StrongBloater = "Strong Bloaters",
+	Sandbox_TLOU_StrongBloater_tooltip = "Bloaters are so bulky that they can destroy structures very quickly. (only affects barricades, doors, windows or player built structures)",
+
+
+	/* Extra fire damage */
+	Sandbox_TLOU_ExtraFireDamage_Clicker = "Clickers are flammable",
+	Sandbox_TLOU_ExtraFireDamage_Clicker_tooltip = "Clickers will have their armor weakened when set on fire.",
+
+	Sandbox_TLOU_ExtraFireDamage_Bloater = "Bloaters are flammable",
+	Sandbox_TLOU_ExtraFireDamage_Bloater_tooltip = "Bloaters will have their armor weakened when set on fire.",
+
+	Sandbox_TLOU_ExtraFireDamage = "Extra Fire Damage Multiplier",
+	Sandbox_TLOU_ExtraFireDamage_tooltip = "Defines the multiplier applied to the damage dealt to flammable infected. The base damage to flammable infected is capped at 3, times this multiplier when on fire. <BR> By default, Bloaters take ~20 shotgun shells to kill with the default health setting. Fire reduces this to ~7 shells.",
+
+
+	/* Hide Indoors */
+	Sandbox_TLOU_HideIndoors = "Hide Indoors",
+	Sandbox_TLOU_HideIndoors_tooltip = "All the infected besides Runners have a tendency to hide from the sun within the dark corners of buildings. This makes exploration of a building particularly dangerous while the streets are safer. Make sure to pay attention to your surrondings when exploring.",
+
+	Sandbox_TLOU_OnlyUnexplored = "Only Unexplored",
+	Sandbox_TLOU_OnlyUnexplored_tooltip = "Infected will go hide only in unexplored areas. If unchecked then expect some guests in your house. If you've explored every buildings in an area, this could also mean you would find all the Infected types in the street which isn't ideal, especially with respawn on.",
+
+	Sandbox_TLOU_WanderAtNight = "Wander at night",
+	Sandbox_TLOU_WanderAtNight_tooltip = "In the same way that they hide from the sun, infected other than Runners will come roam out when night falls. This doesn't do anything if Hide Indoors is not activated.",
+
+	Sandbox_TLOU_MaxDistanceToCheck = "Max distance to check buildings [tiles]",
+	Sandbox_TLOU_MaxDistanceToCheck_tooltip = "Defines the max distance an Infected will check for buildings. The higher the value, the harder the performance impact might be (unsure how hard it hits performances).",
+
+	Sandbox_TLOU_HideIndoorsUpdates = "Hide Indoors Updates [in-game minutes]",
+	Sandbox_TLOU_HideIndoorsUpdates_tooltip = "Defines how often Infected will check buildings to move towards or roam outside at night. This number shouldn't be kept too low but if you set it too high the Infected might not have time to go in buildings or roam outside at night. On the other hand, you can set it to higher values so they have time to roam around the map. (such as map sounds like alarms or gun shots)",
+
+
+	/* Vaulting Infected */
+	Sandbox_TLOU_VaultingInfected = "Vaulting Runners and Stalkers",
+	Sandbox_TLOU_VaultingInfected_tooltip = "Runners and Stalkers will be able to vault fences, making them more dangerous and less vulnerable to fence abuses. Lore accurate infected are also able to vault.",
+
+
+	/* Mod compatibility: Cordyceps Spore Zones */
+	Sandbox_TLOU_CordycepsSpawn = "Allow cordyceps to be harvested"
+	Sandbox_TLOU_CordycepsSpawn_tooltip = "Cordyceps items that usually spawn in corpses in the Cordyceps Spore Zones added by Braven will be able to spawn in killed infected. Only works if Cordyceps Spore Zone by Braven is installed."
 
 	Sandbox_TLOU_CordycepsSpawnRate_Runner = "Cordyceps drop chance for Runners [in %]"
 	Sandbox_TLOU_CordycepsSpawnRate_Runner_tooltip = "If cordyceps items are allowed to spawn, chose the droprate of it in percentage for Runners."
@@ -63,10 +106,4 @@ Sandbox_EN = {
 
 	Sandbox_TLOU_CordycepsSpawnRate_Bloater = "Cordyceps drop chance for Bloaters [in %]"
 	Sandbox_TLOU_CordycepsSpawnRate_Bloater_tooltip = "If cordyceps items are allowed to spawn, chose the droprate of it in percentage for Bloaters."
-
-
-
-	Sandbox_ZomboidForge = "Zomboid Forge",
-	Sandbox_ZomboidForge_nametags = "Allow zombie nametags"
-	Sandbox_ZomboidForge_nametags_tooltip = "Toggling this ON will allow players to have the nametags of the various zombies. If toggled OFF, no one can see the nametags."
 }

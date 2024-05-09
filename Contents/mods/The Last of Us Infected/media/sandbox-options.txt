@@ -1,316 +1,389 @@
 VERSION = 1,
 
-option TLOUZombies.RunnerSpawn
+/*---------------------------------------------------------------------
+-- Zomboid Forge spawn rates
+---------------------------------------------------------------------*/
+option TLOU_infected.RunnerSpawn
 {
 	type = boolean,
 	default = true,
 	page = ZomboidForge,
-	translation = ZomboidForge_runnerSpawn,
+	translation = TLOU_RunnerSpawn,
 }
 
-option TLOUZombies.RunnerChance
+option TLOU_infected.RunnerSpawnWeight
 {
 	type = integer,
 	min = 0,
 	max = 1000,
 	default = 580,
 	page = ZomboidForge,
-	translation = TLOU_Runner,
+	translation = TLOU_RunnerSpawnWeight,
 }
 
-option TLOUZombies.StalkerSpawn
+option TLOU_infected.StalkerSpawn
 {
 	type = boolean,
 	default = true,
 	page = ZomboidForge,
-	translation = ZomboidForge_stalkerSpawn,
+	translation = TLOU_StalkerSpawn,
 }
 
-option TLOUZombies.StalkerChance
+option TLOU_infected.StalkerSpawnWeight
 {
 	type = integer,
 	min = 0,
 	max = 1000,
 	default = 90,
 	page = ZomboidForge,
-	translation = TLOU_Stalker,
+	translation = TLOU_StalkerSpawnWeight,
 }
 
-option TLOUZombies.ClickerSpawn
+option TLOU_infected.ClickerSpawn
 {
 	type = boolean,
 	default = true,
 	page = ZomboidForge,
-	translation = ZomboidForge_clickerSpawn,
+	translation = TLOU_ClickerSpawn,
 }
 
-option TLOUZombies.ClickerChance
+option TLOU_infected.ClickerSpawnWeight
 {
 	type = integer,
 	min = 0,
 	max = 1000,
 	default = 320,
 	page = ZomboidForge,
-	translation = TLOU_Clicker,
+	translation = TLOU_ClickerSpawnWeight,
 }
 
-option TLOUZombies.BloaterSpawn
+option TLOU_infected.BloaterSpawn
 {
 	type = boolean,
 	default = true,
 	page = ZomboidForge,
-	translation = ZomboidForge_bloaterSpawn,
+	translation = TLOU_BloaterSpawn,
 }
 
-option TLOUZombies.BloaterChance
+option TLOU_infected.BloaterSpawnWeight
 {
 	type = integer,
 	min = 0,
 	max = 1000,
 	default = 10,
 	page = ZomboidForge,
-	translation = TLOU_Bloater,
+	translation = TLOU_BloaterSpawnWeight,
 }
 
-option TLOUZombies.RunnerVision
+
+
+/*---------------------------------------------------------------------
+-- Infected stats: Runner
+---------------------------------------------------------------------*/
+option TLOU_infected.RunnerStrength
+{
+	type = enum,
+	numValues = 3,
+	default = 3,
+	page = TLOU_infected_stats,
+	translation = TLOU_RunnerStrength,
+	valueTranslation = ZF_StrengthEnum,
+}
+
+option TLOU_infected.RunnerToughness
+{
+	type = enum,
+	numValues = 3,
+	default = 3,
+	page = TLOU_infected_stats,
+	translation = TLOU_RunnerToughness,
+	valueTranslation = ZF_ToughnessEnum,
+}
+
+option TLOU_infected.RunnerVision
 {
 	type = enum,
 	numValues = 3,
 	default = 2,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_RunnerVision,
-	valueTranslation = TLOU_EyesightEnum,
+	valueTranslation = ZF_EyesightEnum,
 }
 
-option TLOUZombies.RunnerHearing
+option TLOU_infected.RunnerHearing
 {
 	type = enum,
 	numValues = 3,
 	default = 2,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_RunnerHearing,
-	valueTranslation = TLOU_HearingEnum,
+	valueTranslation = ZF_HearingEnum,
 }
 
-option TLOUZombies.StalkerVision
+option TLOU_infected.RunnerHealth
+{
+	type = integer,
+	min = 1,
+	max = 1000,
+	default = 1,
+	page = TLOU_infected_stats,
+	translation = TLOU_RunnerHP,
+}
+
+
+
+/*---------------------------------------------------------------------
+-- Infected stats: Stalker
+---------------------------------------------------------------------*/
+option TLOU_infected.StalkerVision
 {
 	type = enum,
 	numValues = 3,
 	default = 2,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_StalkerVision,
-	valueTranslation = TLOU_EyesightEnum,
+	valueTranslation = ZF_EyesightEnum,
 }
 
-option TLOUZombies.StalkerHearing
+option TLOU_infected.StalkerHearing
 {
 	type = enum,
 	numValues = 3,
 	default = 2,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_StalkerHearing,
-	valueTranslation = TLOU_HearingEnum,
+	valueTranslation = ZF_HearingEnum,
 }
 
-option TLOUZombies.ClickerHearing
+option TLOU_infected.StalkerHealth
+{
+	type = integer,
+	min = 1,
+	max = 1000,
+	default = 1,
+	page = TLOU_infected_stats,
+	translation = TLOU_StalkerHP,
+}
+
+
+
+/*---------------------------------------------------------------------
+-- Infected stats: Clicker
+---------------------------------------------------------------------*/
+option TLOU_infected.ClickerHearing
 {
 	type = enum,
 	numValues = 3,
 	default = 1,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_ClickerHearing,
-	valueTranslation = TLOU_HearingEnum,
+	valueTranslation = ZF_HearingEnum,
 }
 
-option TLOUZombies.BloaterHearing
-{
-	type = enum,
-	numValues = 3,
-	default = 1,
-	page = TLOU_Zombies,
-	translation = TLOU_BloaterHearing,
-	valueTranslation = TLOU_HearingEnum,
-}
-
-option TLOUZombies.HideIndoors
-{
-	type = boolean,
-	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_HideIndoors,
-}
-
-option TLOUZombies.NoPushClickers
-{
-	type = boolean,
-	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_NoPushClickers,
-}
-
-option TLOUZombies.GrabbyClickers
-{
-	type = boolean,
-	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_GrabbyClickers,
-}
-
-option TLOUZombies.OneShotClickers
-{
-	type = boolean,
-	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_OneShotClickers,
-}
-
-option TLOUZombies.StrongBloater
-{
-	type = boolean,
-	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_StrongBloater,
-}
-
-option TLOUZombies.ClickerHealth
+option TLOU_infected.ClickerHealth
 {
 	type = integer,
 	min = 1,
 	max = 1000,
 	default = 5,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_ClickerHP,
 }
 
-option TLOUZombies.BloaterHealth
+
+
+/*---------------------------------------------------------------------
+-- Infected stats: Bloater
+---------------------------------------------------------------------*/
+option TLOU_infected.BloaterHearing
+{
+	type = enum,
+	numValues = 3,
+	default = 1,
+	page = TLOU_infected_stats,
+	translation = TLOU_BloaterHearing,
+	valueTranslation = ZF_HearingEnum,
+}
+
+option TLOU_infected.BloaterHealth
 {
 	type = integer,
 	default = 50,
 	min = 1,
 	max = 1000,
-	page = TLOU_Zombies,
+	page = TLOU_infected_stats,
 	translation = TLOU_BloaterHP,
 }
 
-option TLOUZombies.CordycepsSpawn
+
+
+/*---------------------------------------------------------------------
+-- Infected custom behavior
+---------------------------------------------------------------------*/
+/* Dangerous Clickers */
+option TLOU_infected.NoPushClickers
 {
 	type = boolean,
 	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_CordycepsSpawn,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_NoPushClickers,
 }
 
-option TLOUZombies.CordycepsSpawnRate_Runner
+option TLOU_infected.GrabbyClickers
 {
-	type = integer, 
-	min = 0, 
-	max = 100, 
-	default = 50,
-	page = TLOU_Zombies,
-	translation = TLOU_CordycepsSpawnRate_Runner,
+	type = boolean,
+	default = false,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_GrabbyClickers,
 }
 
-option TLOUZombies.CordycepsSpawnRate_Stalker
-{
-	type = integer, 
-	min = 0, 
-	max = 100, 
-	default = 100,
-	page = TLOU_Zombies,
-	translation = TLOU_CordycepsSpawnRate_Stalker,
-}
-
-option TLOUZombies.CordycepsSpawnRate_Clicker
-{
-	type = integer, 
-	min = 0, 
-	max = 100, 
-	default = 100,
-	page = TLOU_Zombies,
-	translation = TLOU_CordycepsSpawnRate_Clicker,
-}
-
-option TLOUZombies.CordycepsSpawnRate_Bloater
-{
-	type = integer, 
-	min = 0, 
-	max = 100, 
-	default = 100,
-	page = TLOU_Zombies,
-	translation = TLOU_CordycepsSpawnRate_Bloater,
-}
-
-option TLOUZombies.OnlyUnexplored
+option TLOU_infected.OneShotClickers
 {
 	type = boolean,
 	default = true,
-	page = TLOU_Zombies,
-	translation = TLOU_IgnoreUnexplored,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_OneShotClickers,
 }
 
-option TLOUZombies.WanderAtNight
+/* Strong Bloaters */
+option TLOU_infected.StrongBloater
 {
 	type = boolean,
 	default = true,
-	page = TLOU_Zombies,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_StrongBloater,
+}
+
+/* Extra fire damage */
+option TLOU_infected.ExtraFireDamage_Clicker
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_ExtraFireDamage_Clicker,
+}
+
+option TLOU_infected.ExtraFireDamage_Bloater
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_ExtraFireDamage_Bloater,
+}
+
+option TLOU_infected.ExtraFireDamage
+{
+	type = integer, 
+	min = 2, 
+	max = 10, 
+	default = 3,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_ExtraFireDamage,
+}
+
+/* Hide Indoors */
+option TLOU_infected.HideIndoors
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_HideIndoors,
+}
+
+option TLOU_infected.OnlyUnexplored
+{
+	type = boolean,
+	default = false,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_OnlyUnexplored,
+}
+
+option TLOU_infected.WanderAtNight
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
 	translation = TLOU_WanderAtNight,
 }
 
-option TLOUZombies.MaxDistanceToCheck
+option TLOU_infected.MaxDistanceToCheck
 {
 	type = integer, 
-	min = 0, 
+	min = 10, 
 	max = 100, 
 	default = 50,
-	page = TLOU_Zombies,
+	page = TLOU_infected_customBehavior,
 	translation = TLOU_MaxDistanceToCheck,
 }
 
-option TLOUZombies.HideIndoorsUpdates
+option TLOU_infected.HideIndoorsUpdates
 {
 	type = integer,
 	min = 15,
 	max = 720,
 	default = 30,
-	page = TLOU_Zombies,
-	translation = ZomboidForge_hideIndoorsUpdates,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_HideIndoorsUpdates,
 }
 
-
-option ZomboidForge.tickUpdater
-{
-	type = integer,
-	min = 0,
-	max = 2000,
-	default = 500,
-	page = ZomboidForge,
-	translation = ZomboidForge_tickUpdater,
-}
-
-option ZomboidForge.Nametags
+/* Vaulting Infected */
+option TLOU_infected.VaultingInfected
 {
 	type = boolean,
 	default = true,
-	page = ZomboidForge,
-	translation = ZomboidForge_nametags,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_VaultingInfected,
 }
 
 
 
-option ZomboidForge.ZomboidSpawn
+/*---------------------------------------------------------------------
+-- Mod compatibility: Cordyceps Spore Zones
+---------------------------------------------------------------------*/
+option TLOU_infected.CordycepsSpawn
 {
 	type = boolean,
-	default = false,
-	page = ZomboidForge,
-	translation = ZomboidForge_zomboidSpawn,
+	default = true,
+	page = TLOU_infected_other,
+	translation = TLOU_CordycepsSpawn,
 }
 
-option ZomboidForge.ZomboidChance
+option TLOU_infected.CordycepsSpawnRate_Runner
 {
-	type = integer,
-	min = 0,
-	max = 1000,
-	default = 500,
-	page = ZomboidForge,
-	translation = ZomboidForge_zomboidChance,
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 50,
+	page = TLOU_infected_other,
+	translation = TLOU_CordycepsSpawnRate_Runner,
+}
+
+option TLOU_infected.CordycepsSpawnRate_Stalker
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 100,
+	page = TLOU_infected_other,
+	translation = TLOU_CordycepsSpawnRate_Stalker,
+}
+
+option TLOU_infected.CordycepsSpawnRate_Clicker
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 100,
+	page = TLOU_infected_other,
+	translation = TLOU_CordycepsSpawnRate_Clicker,
+}
+
+option TLOU_infected.CordycepsSpawnRate_Bloater
+{
+	type = integer, 
+	min = 0, 
+	max = 100, 
+	default = 100,
+	page = TLOU_infected_other,
+	translation = TLOU_CordycepsSpawnRate_Bloater,
 }

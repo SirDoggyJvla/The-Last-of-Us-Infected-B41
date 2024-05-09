@@ -32,15 +32,15 @@ ZomboidForge.TLOU_infected = {}
 -- Sandbox options imported localy for performance reasons
 -- used here for file reloads in-game
 ZomboidForge.TLOU_infected.lootchance = {
-	TLOU_Runner = SandboxVars.TLOUZombies.CordycepsSpawnRate_Runner,
-	TLOU_Stalker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Stalker,
-	TLOU_Clicker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Clicker,
-	TLOU_Bloater = SandboxVars.TLOUZombies.CordycepsSpawnRate_Bloater,
+	TLOU_Runner = SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
+	TLOU_Stalker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
+	TLOU_Clicker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
+	TLOU_Bloater = SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
 }
-ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOUZombies.HideIndoorsUpdates * 1.2)
-ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOUZombies.OnlyUnexplored
-ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOUZombies.WanderAtNight
-ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOUZombies.MaxDistanceToCheck
+ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
+ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOU_infected.OnlyUnexplored
+ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOU_infected.WanderAtNight
+ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOU_infected.MaxDistanceToCheck
 
 --- Create zombie types
 ZomboidForge.Initialize_TLOUInfected = function()
@@ -54,45 +54,33 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
 	-- Sandbox options imported localy for performance reasons
 	ZomboidForge.TLOU_infected.lootchance = {
-		TLOU_Runner = SandboxVars.TLOUZombies.CordycepsSpawnRate_Runner,
-		TLOU_Stalker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Stalker,
-		TLOU_Clicker = SandboxVars.TLOUZombies.CordycepsSpawnRate_Clicker,
-		TLOU_Bloater = SandboxVars.TLOUZombies.CordycepsSpawnRate_Bloater,
+		TLOU_Runner = SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
+		TLOU_Stalker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
+		TLOU_Clicker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
+		TLOU_Bloater = SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
 	}
-	ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOUZombies.HideIndoorsUpdates * 1.2)
-	ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOUZombies.OnlyUnexplored
-	ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOUZombies.WanderAtNight
-	ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOUZombies.MaxDistanceToCheck
+	ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
+	ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOU_infected.OnlyUnexplored
+	ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOU_infected.WanderAtNight
+	ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOU_infected.MaxDistanceToCheck
+	ZomboidForge.TLOU_infected.ExtraFireDamage = SandboxVars.TLOU_infected.ExtraFireDamage
 
     -- RUNNER
-	if SandboxVars.TLOUZombies.RunnerSpawn then
+	if SandboxVars.TLOU_infected.RunnerSpawn then
 		ZomboidForge.ZTypes.TLOU_Runner = {
 			-- base informations
 			name = "IGUI_TLOU_Runner",
-			chance = SandboxVars.TLOUZombies.RunnerChance,
-			outfit = {},
-			reanimatedPlayer = false,
-			skeleton = false,
-			hair = {},
-			hairColor = {},
-			beard = {},
-			beardColor = {},
+			chance = SandboxVars.TLOU_infected.RunnerSpawnWeight,
 
 			-- stats
 			walktype = 1,
-			strength = 2,
-			toughness = 2,
+			strength = SandboxVars.TLOU_infected.RunnerStrength,
+			toughness = SandboxVars.TLOU_infected.RunnerToughness,
 			cognition = 3,
 			memory = 2,
-			sight = SandboxVars.TLOUZombies.RunnerVision,
-			hearing = SandboxVars.TLOUZombies.RunnerHearing,
-			HP = 1,
-
-			noteeth = false,
-			transmission = false,
-
-			-- custom variables
-			isRunner = true,
+			sight = SandboxVars.TLOU_infected.RunnerVision,
+			hearing = SandboxVars.TLOU_infected.RunnerHearing,
+			HP = SandboxVars.TLOU_infected.RunnerHealth,
 
 			-- UI
 			color = {122, 243, 0,},
@@ -113,20 +101,14 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
     -- STALKER
-	if SandboxVars.TLOUZombies.StalkerSpawn then
+	if SandboxVars.TLOU_infected.StalkerSpawn then
 		ZomboidForge.ZTypes.TLOU_Stalker = {
 			-- base informations
 			name = "IGUI_TLOU_Stalker",
-			chance = SandboxVars.TLOUZombies.StalkerChance,
-			outfit = {},
-			reanimatedPlayer = false,
-			skeleton = false,
-			hair = {},
-			hairColor = {},
+			chance = SandboxVars.TLOU_infected.StalkerSpawnWeight,
 			beard = {
 				"",
 			},
-			beardColor = {},
 
 			-- stats
 			walktype = 1,
@@ -134,15 +116,9 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			toughness = 2,
 			cognition = 3,
 			memory = 3,
-			sight = SandboxVars.TLOUZombies.StalkerVision,
-			hearing = SandboxVars.TLOUZombies.StalkerHearing,
-			HP = 1,
-
-			noteeth = false,
-			transmission = false,
-
-			-- custom variables
-			isStalker = true,
+			sight = SandboxVars.TLOU_infected.StalkerVision,
+			hearing = SandboxVars.TLOU_infected.StalkerHearing,
+			HP = SandboxVars.TLOU_infected.StalkerHealth,
 
 			-- UI
 			color = {230, 230, 0,},
@@ -164,14 +140,11 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
     -- CLICKER
-	if SandboxVars.TLOUZombies.ClickerSpawn then
+	if SandboxVars.TLOU_infected.ClickerSpawn then
 		ZomboidForge.ZTypes.TLOU_Clicker = {
 			-- base informations
 			name = "IGUI_TLOU_Clicker",
-			chance = SandboxVars.TLOUZombies.ClickerChance,
-			outfit = {},
-			reanimatedPlayer = false,
-			skeleton = false,
+			chance = SandboxVars.TLOU_infected.ClickerSpawnWeight,
 			hair = {
 				male = {
 					"",
@@ -186,7 +159,6 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			beard = {
 				"",
 			},
-			beardColor = {},
 			animationVariable = "isClicker",
 
 			-- stats
@@ -196,14 +168,8 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			cognition = 3,
 			memory = 2,
 			sight = 3,
-			hearing = SandboxVars.TLOUZombies.ClickerHearing,
-			HP = SandboxVars.TLOUZombies.ClickerHealth,
-
-			noteeth = false,
-			transmission = false,
-
-			-- custom variables
-			isClicker = true,
+			hearing = SandboxVars.TLOU_infected.ClickerHearing,
+			HP = SandboxVars.TLOU_infected.ClickerHealth,
 
 			-- UI
 			color = {218, 109, 0,},
@@ -234,20 +200,15 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
     -- BLOATER
-	if SandboxVars.TLOUZombies.BloaterSpawn then
+	if SandboxVars.TLOU_infected.BloaterSpawn then
 		ZomboidForge.ZTypes.TLOU_Bloater = {
 			-- base informations
 			name = "IGUI_TLOU_Bloater",
-			chance = SandboxVars.TLOUZombies.BloaterChance,
+			chance = SandboxVars.TLOU_infected.BloaterSpawnWeight,
 			outfit = {
 				"Bloater",
 			},
-			reanimatedPlayer = false,
-			skeleton = false,
-			hair = {},
-			hairColor = {},
-			beard = {},
-			beardColor = {},
+			animationVariable = "isBloater",
 
 			-- stats
 			walktype = 2,
@@ -256,14 +217,8 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			cognition = 3,
 			memory = 2,
 			sight = 3,
-			hearing = SandboxVars.TLOUZombies.BloaterHearing,
-			HP = SandboxVars.TLOUZombies.BloaterHealth,
-
-			noteeth = false,
-			transmission = false,
-
-			-- custom variables
-			isBloater = true,
+			hearing = SandboxVars.TLOU_infected.BloaterHearing,
+			HP = SandboxVars.TLOU_infected.BloaterHealth,
 
 			-- UI
 			color = {205, 0, 0,},
@@ -276,7 +231,6 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			zombieOnHit = {
 				"BloaterHit",
 			},
-			customDamage = "BloaterDamage",
 
 			-- custom behavior
 			zombieDeath = {},
@@ -289,8 +243,15 @@ ZomboidForge.Initialize_TLOUInfected = function()
 		}
 	end
 
+	-- If runners and stalkers are able to vault
+	if SandboxVars. TLOU_infected.VaultingInfected then
+		ZomboidForge.ZTypes.TLOU_Runner.animationVariable = "isInfected"
+
+		ZomboidForge.ZTypes.TLOU_Stalker.animationVariable = "isInfected"
+	end
+
 	-- if infected should hide indoors in daytime
-	if SandboxVars.TLOUZombies.HideIndoors then
+	if SandboxVars.TLOU_infected.HideIndoors then
 		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
 			"HideIndoors"
 		)
@@ -305,10 +266,19 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
 	-- if Bloaters are allowed to deal more damage to structures
-	if SandboxVars.TLOUZombies.StrongBloater then
+	if SandboxVars.TLOU_infected.StrongBloater then
 		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
 			"StrongBloater"
 		)
+	end
+
+	-- if Clicker and Bloaters take extra damage from fire but the damage they take is capped
+	if SandboxVars. TLOU_infected.ExtraFireDamage_Clicker then
+		ZomboidForge.ZTypes.TLOU_Clicker.customDamage = "ExtraFireDamage"
+	end
+
+	if SandboxVars. TLOU_infected.ExtraFireDamage_Bloater then
+		ZomboidForge.ZTypes.TLOU_Bloater.customDamage = "ExtraFireDamage"
 	end
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
@@ -337,13 +307,13 @@ end
 function ZomboidForge.ClickerAttack(player,zombie)
 	if player and player:isAlive() then
 		--clicker grabs player
-		if SandboxVars.TLOUZombies.GrabbyClickers and not player:isGodMod() then
+		if SandboxVars.TLOU_infected.GrabbyClickers and not player:isGodMod() then
 			player:setSlowFactor(1)
 			player:setSlowTimer(1)
 		end
 
 		-- kill player if oneshot clickers
-		if SandboxVars.TLOUZombies.OneShotClickers then 
+		if SandboxVars.TLOU_infected.OneShotClickers then 
 			if player:hasHitReaction() and not player:isGodMod() then
 				--player:setDeathDragDown(true)
 				player:Kill(zombie)
@@ -370,7 +340,7 @@ end
 
 -- player attacked a clicker
 function ZomboidForge.ClickerHit(player, zombie, handWeapon, damage)
-	if SandboxVars.TLOUZombies.NoPushClickers then
+	if SandboxVars.TLOU_infected.NoPushClickers then
 		if handWeapon:getFullType() == "Base.BareHands" then
 			zombie:setOnlyJawStab(true)
 		else
@@ -392,7 +362,7 @@ function ZomboidForge.BloaterHit(player, zombie, handWeapon, damage)
 end
 
 -- set damage to bloater from player
-function ZomboidForge.BloaterDamage(player, zombie, handWeapon, damage)
+function ZomboidForge.ExtraFireDamage(player, zombie, handWeapon, damage)
 	-- maximum damage output
 	if damage >= 3 then
 		damage = 3
@@ -400,7 +370,7 @@ function ZomboidForge.BloaterDamage(player, zombie, handWeapon, damage)
 
 	-- if Zombie is on fire, deal more damage even past max damage output
 	if zombie:isOnFire() then
-		return damage * 3
+		return damage * ZomboidForge.TLOU_infected.ExtraFireDamage
 	end
 
 	return damage
@@ -595,22 +565,12 @@ ZomboidForge.TLOU_infected.ClothingPriority = {
 ---@param zombie 		IsoZombie
 ---@param _		 		string   	--Zombie Type ID
 ZomboidForge.SetClickerClothing = function(zombie,_)
-	-- get zombie info
-	local trueID = ZomboidForge.pID(zombie)
-	ZomboidForge.NonPersistentZData[trueID] = ZomboidForge.NonPersistentZData[trueID] or {}
-	ZomboidForge.NonPersistentZData[trueID].TLOU_infected = ZomboidForge.NonPersistentZData[trueID].TLOU_infected or {}
-
-	local TLOU_infected_data = ZomboidForge.NonPersistentZData[trueID].TLOU_infected
-
-	-- if already has hat fungi then skip
-	local hasHat_Fungi = ZomboidForge.NonPersistentZData[trueID].TLOU_infected.hasHat_Fungi
-	if hasHat_Fungi then return end
-
 	-- get clothing visuals from zombie
 	local visual = zombie:getItemVisuals()
 	if not visual then return end
 
 	-- scroll through every clothing and replace it
+	local hasHat_Fungi = false
 	if visual:size() > 0 then
 		local priority = 100
 		local itemReset = nil
@@ -645,23 +605,6 @@ ZomboidForge.SetClickerClothing = function(zombie,_)
 		visual:add(itemVisual)
 
 		zombie:resetModel()
-	end
-
-	local multiCheck = TLOU_infected_data.multiCheck
-	if not multiCheck then
-		TLOU_infected_data.multiCheck = 0
-		multiCheck = 0
-	end
-
-	-- verify clicker has hat fungi
-	-- if yes and multiCheck is done then complete the check
-	-- else add a point to multiCheck
-	if hasHat_Fungi and multiCheck > 10 then
-		-- stop checking for this zombie
-		TLOU_infected_data.hasHat_Fungi = hasHat_Fungi
-		TLOU_infected_data.multiCheck = nil
-	elseif hasHat_Fungi then
-		TLOU_infected_data.multiCheck = multiCheck + 1
 	end
 end
 
@@ -830,7 +773,7 @@ ZomboidForge.TLOU_infected.CheckBuildingDistance = function(chunkID,closestDist,
 			-- if OnlyUnexplored is false, then ignore the rest and pass
 			-- if OnlyUnexplored is true, check if whole building is explored, if true then don't pass, if false then pass
 			if distance < closestDist and
-			not (ZomboidForge.TLOU_infected.OnlyUnexplored and (not ZomboidForge.TLOU_infected.OnlyUnexplored or not building:isAllExplored()))
+			(not ZomboidForge.TLOU_infected.OnlyUnexplored or not building:isAllExplored())
 			then
 				closestDist = distance
 				closestSquare = squareCheck
