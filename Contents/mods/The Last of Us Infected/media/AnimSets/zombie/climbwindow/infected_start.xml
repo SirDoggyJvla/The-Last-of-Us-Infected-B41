@@ -7,7 +7,7 @@
 	<m_EarlyTransitionOut>true</m_EarlyTransitionOut>
 	<m_SpeedScale>1.28</m_SpeedScale>
 	<m_BlendTime>0.20</m_BlendTime>
-	
+
 	<m_Conditions>
 		<m_Name>isInfected</m_Name>
 		<m_Type>BOOL</m_Type>

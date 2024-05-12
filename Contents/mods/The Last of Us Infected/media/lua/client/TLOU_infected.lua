@@ -22,6 +22,11 @@ local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
+local TLOU_ModData
+
+ZomboidForge.initTLOU_ModData = function()
+	TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
+end
 
 --- import GameTime localy for performance reasons
 local gametime = GameTime:getInstance()
@@ -630,7 +635,6 @@ end
 -- Lure `Zombie` to the building during daytime or make it wander around during night time.
 ---@param zombie 		IsoZombie
 ZomboidForge.TLOU_infected.LureZombie = function(zombie)
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
     if TLOU_ModData.IsDay or not ZomboidForge.TLOU_infected.WanderAtNight then
 		local sourcesq = zombie:getCurrentSquare()
 		local squareMoveTo = ZomboidForge.TLOU_infected.GetClosestBuilding(sourcesq)
@@ -689,7 +693,6 @@ ZomboidForge.TLOU_infected.ChunkCheck.SecondCheck = {
 ---@return IsoGridSquare|nil 	closestSquare
 ZomboidForge.TLOU_infected.GetClosestBuilding = function(sourcesq)
 	-- skip if no buildings available
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 	if not sourcesq or not TLOU_ModData.BuildingList then return end
 
 	-- initialize data checks
@@ -755,28 +758,26 @@ end
 ---@return double|nil 			closestDist
 ---@return IsoGridSquare|nil 	closestSquare
 ZomboidForge.TLOU_infected.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-	local squareCheck = nil
-	local distance = nil
-	local building = nil
-
 	if TLOU_ModData.BuildingList[chunkID] then
 		for _,buildingData in pairs(TLOU_ModData.BuildingList[chunkID]) do
 			local square = getSquare(buildingData[1],buildingData[2],0)
-			if not square then return closestDist, closestSquare end
-			building = square:getBuilding()
-			squareCheck = building:getRandomRoom():getRandomFreeSquare()
-			if not squareCheck then return closestDist, closestSquare end
-			distance = IsoUtils.DistanceTo(x_sourcesq, y_sourcesq, squareCheck:getX() , squareCheck:getY())
-
-			-- check if distance < closestDist, if true then next test
-			-- if OnlyUnexplored is false, then ignore the rest and pass
-			-- if OnlyUnexplored is true, check if whole building is explored, if true then don't pass, if false then pass
-			if distance < closestDist and
-			(not ZomboidForge.TLOU_infected.OnlyUnexplored or not building:isAllExplored())
-			then
-				closestDist = distance
-				closestSquare = squareCheck
+			if square then
+				local building = square:getBuilding()
+				if building then
+					local squareCheck = building:getRandomRoom():getRandomFreeSquare()
+					if squareCheck then
+						local distance = IsoUtils.DistanceTo(x_sourcesq, y_sourcesq, squareCheck:getX() , squareCheck:getY())
+						-- check if distance < closestDist, if true then next test
+						-- if OnlyUnexplored is false, then ignore the rest and pass
+						-- if OnlyUnexplored is true, check if whole building is explored, if true then don't pass, if false then pass
+						if distance and distance < closestDist and
+						(not ZomboidForge.TLOU_infected.OnlyUnexplored or not building:isAllExplored())
+						then
+							closestDist = distance
+							closestSquare = squareCheck
+						end
+					end
+				end
 			end
 		end
 	end
@@ -808,14 +809,12 @@ end
 -- Checks if it's daytime by taking into account the seasons and updates the `IsDay` check.
 ZomboidForge.TLOU_infected.IsDay = function()
 	-- update IsDay check
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 	TLOU_ModData.IsDay = season2daytime[ month2season(gametime:getMonth()) ]( math.floor(gametime:getTimeOfDay()) )
 end
 
 -- Adds detected buildings to the list of available buildings in a chunk.
 ZomboidForge.TLOU_infected.AddBuildingList = function(square)
 	-- get moddata and check if BuildingList exists, else initialize it
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 	TLOU_ModData.BuildingList = TLOU_ModData.BuildingList or {}
 
 	-- check if square is in building
@@ -849,14 +848,11 @@ end
 ---@param ZType 		string   	     --Zombie Type ID
 ZomboidForge.StrongBloater = function(zombie,ZType)
 	-- run code if infected has thumping target
-
-
 	local thumped = zombie:getThumpTarget()
 	if not thumped then return end
 
 	-- get zombie info
 	local trueID = ZomboidForge.pID(zombie)
-	local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 	TLOU_ModData.Infected = TLOU_ModData.Infected or {}
 	TLOU_ModData.Infected[trueID] = TLOU_ModData.Infected[trueID] or {}
 
@@ -927,12 +923,12 @@ ZomboidForge.ClickerAgro = function(zombie,ZType)
 	if target and not zombie:getVariableBoolean("ClickerAgro") then
 		zombie:setVariable("ClickerAgro",'true')
 		if isClient() then
-			sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = true})
+			--sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = true})
 		end
 	elseif not target and zombie:getVariableBoolean("ClickerAgro") then
 		zombie:setVariable("ClickerAgro",'false')
 		if isClient() then
-			sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = false})
+			--sendClientCommand('AnimationHandler', 'SetAnimationVariable', {animationVariable = "ClickerAgro", zombie = zombie:getOnlineID(), state = false})
 		end
 	end
 end
