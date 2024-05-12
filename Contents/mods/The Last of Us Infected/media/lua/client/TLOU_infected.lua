@@ -236,6 +236,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			zombieOnHit = {
 				"BloaterHit",
 			},
+			shouldNotStagger = true,
 
 			-- custom behavior
 			zombieDeath = {},
