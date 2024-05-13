@@ -252,30 +252,37 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	-- If runners and stalkers are able to vault
 	if SandboxVars. TLOU_infected.VaultingInfected then
 		ZomboidForge.ZTypes.TLOU_Runner.animationVariable = "isInfected"
-
 		ZomboidForge.ZTypes.TLOU_Stalker.animationVariable = "isInfected"
 	end
 
 	-- if infected should hide indoors in daytime
 	if SandboxVars.TLOU_infected.HideIndoors then
-		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
-			"HideIndoors"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,"StrongBloater") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
+				"HideIndoors"
+			)
+		end
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
-			"HideIndoors"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,"StrongBloater") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
+				"HideIndoors"
+			)
+		end
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
-			"HideIndoors"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+				"HideIndoors"
+			)
+		end
 	end
 
 	-- if Bloaters are allowed to deal more damage to structures
 	if SandboxVars.TLOU_infected.StrongBloater then
-		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
-			"StrongBloater"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+				"StrongBloater"
+			)
+		end
 	end
 
 	-- if Clicker and Bloaters take extra damage from fire but the damage they take is capped
@@ -288,22 +295,30 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
-	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_Overhaul.CordycepsSpawn then
-		table.insert(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,
-			"OnInfectedDeath_cordyceps"
-		)
+	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_infected.CordycepsSpawn then
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,"OnInfectedDeath_cordyceps") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,
+				"OnInfectedDeath_cordyceps"
+			)
+		end
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,
-			"OnInfectedDeath_cordyceps"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,"OnInfectedDeath_cordyceps") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,
+				"OnInfectedDeath_cordyceps"
+			)
+		end
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,
-			"OnInfectedDeath_cordyceps"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,"OnInfectedDeath_cordyceps") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,
+				"OnInfectedDeath_cordyceps"
+			)
+		end
 
-		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,
-			"OnInfectedDeath_cordyceps"
-		)
+		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,"OnInfectedDeath_cordyceps") then
+			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,
+				"OnInfectedDeath_cordyceps"
+			)
+		end
 	end
 end
 
