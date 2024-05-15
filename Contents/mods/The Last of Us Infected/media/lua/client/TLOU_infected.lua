@@ -367,6 +367,8 @@ function ZomboidForge.ClickerHit(player, zombie, handWeapon, damage)
 		else
 			zombie:setOnlyJawStab(false)
 		end
+	elseif zombie:isOnlyJawStab() then
+		zombie:setOnlyJawStab(false)
 	end
 end
 
