@@ -22,7 +22,7 @@ local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
-local TLOU_ModData
+local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 
 ZomboidForge.initTLOU_ModData = function()
 	TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
@@ -257,19 +257,19 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
 	-- if infected should hide indoors in daytime
 	if SandboxVars.TLOU_infected.HideIndoors then
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Stalker and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,"StrongBloater") then
 			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
 				"HideIndoors"
 			)
 		end
 
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Clicker and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,"StrongBloater") then
 			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
 				"HideIndoors"
 			)
 		end
 
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Bloater and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
 			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
 				"HideIndoors"
 			)
@@ -278,7 +278,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
 	-- if Bloaters are allowed to deal more damage to structures
 	if SandboxVars.TLOU_infected.StrongBloater then
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Bloater and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
 			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
 				"StrongBloater"
 			)
@@ -334,7 +334,7 @@ function ZomboidForge.ClickerAttack(player,zombie)
 		end
 
 		-- kill player if oneshot clickers
-		if SandboxVars.TLOU_infected.OneShotClickers then 
+		if SandboxVars.TLOU_infected.OneShotClickers then
 			if player:hasHitReaction() and not player:isGodMod() then
 				--player:setDeathDragDown(true)
 				player:Kill(zombie)
@@ -364,8 +364,6 @@ function ZomboidForge.ClickerHit(player, zombie, handWeapon, damage)
 	if SandboxVars.TLOU_infected.NoPushClickers then
 		if handWeapon:getFullType() == "Base.BareHands" then
 			zombie:setOnlyJawStab(true)
-		else
-			zombie:setOnlyJawStab(false)
 		end
 	elseif zombie:isOnlyJawStab() then
 		zombie:setOnlyJawStab(false)
@@ -484,7 +482,6 @@ end
 ZomboidForge.SetRunnerSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleA") and not zombie:isFemale()
 	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleA") and zombie:isFemale() then
-		zombie:setAge(-2)
 		zombie:getEmitter():stopAll()
 		if zombie:isFemale() then
 			zombie:getEmitter():playVocals("Zombie/Voice/FemaleA")
@@ -500,7 +497,6 @@ end
 ZomboidForge.SetStalkerSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleB") and not zombie:isFemale()
 	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleB") and zombie:isFemale() then
-		zombie:setAge(-2)
 		zombie:getEmitter():stopAll()
 		if zombie:isFemale() then
 			zombie:getEmitter():playVocals("Zombie/Voice/FemaleB")
@@ -515,7 +511,6 @@ end
 ---@param _		 		string   	--Zombie Type ID
 ZomboidForge.SetClickerSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleC")then
-		zombie:setAge(-2)
 		zombie:getEmitter():stopAll()
 		zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
 	end
@@ -526,7 +521,6 @@ end
 ---@param _		 		string   	--Zombie Type ID
 ZomboidForge.SetBloaterSounds = function(zombie,_)
 	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleC") then
-		zombie:setAge(-2)
 		zombie:getEmitter():stopAll()
 		zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
 	end
@@ -875,6 +869,8 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 	TLOU_ModData.Infected[trueID] = TLOU_ModData.Infected[trueID] or {}
 
 	-- update thumped only if infected is thumping
+	-- getThumpTarget outputs the target as long as the zombie is in thumping animation
+	-- but we want to make sure we damage only if a hit is sent
 	local thumpCheck = TLOU_ModData.Infected[trueID].thumpCheck
 	if thumpCheck == zombie:getTimeThumping() then
 		return
@@ -887,7 +883,10 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 	local barricade = nil
 	if thumped:isBarricaded() then
 		---@cast thumped BarricadeAble
-		for i = 1,200 do
+
+		-- loop to damage multiple times, it's set so Bloater remove one plank per hit approximatively
+		for _ = 1,200 do
+			-- need to verify the barricade is not destroyed everytime it's thumped
 			barricade = thumped:getBarricadeForCharacter(zombie)
 			if not barricade then
 				barricade = thumped:getBarricadeOppositeCharacter(zombie)
