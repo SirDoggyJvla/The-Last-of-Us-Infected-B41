@@ -1,0 +1,10 @@
+id=TLOU_PZ_Infected_main_menu_generic
+name=The Last of Us Infected - Main menu Generic
+description=Changes the main menu cover with the main banner showing dead runners from The Last of Us Infected.
+poster=poster.png
+poster=main_banner.png
+authors=SirDoggyJvla
+icon=icon.png
+tags=Build 41,Zombies,Infected,TLOU,The Last of Us,Cordyceps,Post,Apocalypse,Main,Menu
+url=https://ko-fi.com/sirdoggyjvla
+versionMin=41.0
