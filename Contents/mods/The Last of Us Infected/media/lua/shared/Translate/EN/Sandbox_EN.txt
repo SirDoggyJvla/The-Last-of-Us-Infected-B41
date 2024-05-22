@@ -8,19 +8,19 @@ Sandbox_EN = {
 
 	/* Zomboid Forge zombie spawns */
 	Sandbox_TLOU_RunnerSpawn = "Spawn Runners",
-	Sandbox_TLOU_RunnerSpawn_tooltip = "Runners are dangerous and fast humans recently infected by the Cordyceps fungus. They can quickly overwhelm you with their sheer speed and numbers. You may hear them talking and struggling from within, with the soul of the host likely still present but unable to control their body.",
+	Sandbox_TLOU_RunnerSpawn_tooltip = "Runners are dangerous and fast humans recently infected by the Cordyceps fungus. They can quickly overwhelm you with their sheer speed and numbers. <BR> You may hear them talking and struggling from within, with the soul of the host likely still present but unable to control their body. <BR> <IMAGECENTRE:media/ui/runner.png> <LINE>",
 	Sandbox_TLOU_RunnerSpawnWeight = "Runners spawn weight",
 
 	Sandbox_TLOU_StalkerSpawn = "Spawn Stalkers",
-	Sandbox_TLOU_StalkerSpawn_tooltip = "Stalkers evolve from Runners with the Cordycep fully taking over the host's body. They are quicker and stronger than simple Runners, often ambushing you by hiding inside buildings. The human inside likely lost the battle against the fungi, and its cries of struggle are slowly being replaced by a distinctive clicking noise.",
+	Sandbox_TLOU_StalkerSpawn_tooltip = "Stalkers evolve from Runners with the Cordycep fully taking over the host's body. They are quicker and stronger than simple Runners, often ambushing you by hiding inside buildings. <BR> The human inside likely lost the battle against the fungi, and its cries of struggle are slowly being replaced by a distinctive clicking noise. <BR> <IMAGECENTRE:media/ui/stalker.png> <LINE>",
 	Sandbox_TLOU_StalkerSpawnWeight = "Stalkers spawn weight",
 
 	Sandbox_TLOU_ClickerSpawn = "Spawn Clickers",
-	Sandbox_TLOU_ClickerSpawn_tooltip = "Clickers evolve from Stalkers into an even more dangerous state. Their inhuman strength makes them extremely perilous to approach; anyone too close could find themselves dead in mere seconds. The cries of struggle have long been replaced with a clicking noise, used to replace their lost eyes due to the Cordyceps eating through them. Fortunately, this alteration makes them slower than simple Runners and Stalkers. However, they will move in unpredictable ways their arms, catching you whenever they get close enough to you.",
+	Sandbox_TLOU_ClickerSpawn_tooltip = "Clickers evolve from Stalkers into an even more dangerous state. Their inhuman strength makes them extremely perilous to approach; anyone too close could find themselves dead in mere seconds. <BR> The cries of struggle have long been replaced with a clicking noise, used to replace their lost eyes due to the Cordyceps eating through them. <BR> Fortunately, this alteration makes them slower than simple Runners and Stalkers. However, they will move in unpredictable ways their arms, catching you whenever they get close enough to you. <BR> <IMAGECENTRE:media/ui/clicker.png> <LINE>",
 	Sandbox_TLOU_ClickerSpawnWeight = "Clickers spawn weight",
 
 	Sandbox_TLOU_BloaterSpawn = "Spawn Bloaters",
-	Sandbox_TLOU_BloaterSpawn_tooltip = "Bloaters are seen as legends by many due to their rarity among infected types. If a Clicker manages to survive over the years, sustaining its body and the Cordycep within, it evolves into a colossus with thick skin protected by Cordyceps patches. No one wants to contemplate what would happen to a person if they were caught by this creature, so approaching it is out of the question.",
+	Sandbox_TLOU_BloaterSpawn_tooltip = "Bloaters are seen as legends by many due to their rarity among infected types. If a Clicker manages to survive over the years, sustaining its body and the Cordycep within, it evolves into a colossus with thick skin protected by Cordyceps patches. <BR> No one wants to contemplate what would happen to a person if they were caught by this creature, so approaching it is out of the question. <BR> <IMAGECENTRE:media/ui/bloater.png> <LINE>",
 	Sandbox_TLOU_BloaterSpawnWeight = "Bloaters spawn weight",
 
 
