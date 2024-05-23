@@ -35,12 +35,6 @@ ZomboidForge.TLOU_infected = {}
 
 -- Sandbox options imported localy for performance reasons
 -- used here for file reloads in-game
-ZomboidForge.TLOU_infected.lootchance = {
-	TLOU_Runner = SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
-	TLOU_Stalker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
-	TLOU_Clicker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
-	TLOU_Bloater = SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
-}
 ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
 ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOU_infected.OnlyUnexplored
 ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOU_infected.WanderAtNight
@@ -48,21 +42,7 @@ ZomboidForge.TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOU_infected.MaxDis
 
 --- Create zombie types
 ZomboidForge.Initialize_TLOUInfected = function()
-	-- roll lootcount functions depending on infected type
-	ZomboidForge.TLOU_infected.roll_lootcount = {
-		TLOU_Runner = function() return ZombRand(1,3) end,
-		TLOU_Stalker = function() return ZombRand(1,5) end,
-		TLOU_Clicker = function() return ZombRand(3,5) end,
-		TLOU_Bloater = function() return ZombRand(5,15) end,
-	}
-
 	-- Sandbox options imported localy for performance reasons
-	ZomboidForge.TLOU_infected.lootchance = {
-		TLOU_Runner = SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
-		TLOU_Stalker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
-		TLOU_Clicker = SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
-		TLOU_Bloater = SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
-	}
 	ZomboidForge.TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
 	ZomboidForge.TLOU_infected.OnlyUnexplored = SandboxVars.TLOU_infected.OnlyUnexplored
 	ZomboidForge.TLOU_infected.WanderAtNight = SandboxVars.TLOU_infected.WanderAtNight
@@ -80,7 +60,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			walktype = 1,
 			strength = SandboxVars.TLOU_infected.RunnerStrength,
 			toughness = SandboxVars.TLOU_infected.RunnerToughness,
-			cognition = 3,
+			cognition = 2,
 			memory = 2,
 			sight = SandboxVars.TLOU_infected.RunnerVision,
 			hearing = SandboxVars.TLOU_infected.RunnerHearing,
@@ -101,7 +81,13 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			customData = {
 				"SetRunnerSounds",
 			},
+
+			-- custom data for TLOU_infected
+			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
+			roll_lootcount = function() return ZombRand(1,3) end,
 		}
+	else
+		ZomboidForge.ZTypes.TLOU_Runner = nil
 	end
 
     -- STALKER
@@ -118,7 +104,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			walktype = 1,
 			strength = 1,
 			toughness = 2,
-			cognition = 3,
+			cognition = 2,
 			memory = 3,
 			sight = SandboxVars.TLOU_infected.StalkerVision,
 			hearing = SandboxVars.TLOU_infected.StalkerHearing,
@@ -140,7 +126,13 @@ ZomboidForge.Initialize_TLOUInfected = function()
 				"SetStalkerSounds",
 				"RemoveBandages",
 			},
+
+			-- custom data for TLOU_infected
+			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
+			roll_lootcount = function() return ZombRand(1,5) end,
 		}
+	else
+		ZomboidForge.ZTypes.TLOU_Stalker = nil
 	end
 
     -- CLICKER
@@ -169,7 +161,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			walktype = 2,
 			strength = 1,
 			toughness = 1,
-			cognition = 3,
+			cognition = 2,
 			memory = 2,
 			sight = 3,
 			hearing = SandboxVars.TLOU_infected.ClickerHearing,
@@ -200,7 +192,13 @@ ZomboidForge.Initialize_TLOUInfected = function()
 				"SetClickerSounds",
 				"RemoveBandages",
 			},
+
+			-- custom data for TLOU_infected
+			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
+			roll_lootcount = function() return ZombRand(3,8) end,
 		}
+	else
+		ZomboidForge.ZTypes.TLOU_Clicker = nil
 	end
 
     -- BLOATER
@@ -218,7 +216,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			walktype = 2,
 			strength = 1,
 			toughness = 1,
-			cognition = 3,
+			cognition = 2,
 			memory = 2,
 			sight = 3,
 			hearing = SandboxVars.TLOU_infected.BloaterHearing,
@@ -245,30 +243,41 @@ ZomboidForge.Initialize_TLOUInfected = function()
 				"SetBloaterSounds",
 				"RemoveBandages",
 			},
+
+			-- custom data for TLOU_infected
+			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
+			roll_lootcount = function() return ZombRand(5,15) end,
 		}
+	else
+		ZomboidForge.ZTypes.TLOU_Bloater = nil
 	end
 
 	-- If runners and stalkers are able to vault
 	if SandboxVars. TLOU_infected.VaultingInfected then
-		ZomboidForge.ZTypes.TLOU_Runner.animationVariable = "isInfected"
-		ZomboidForge.ZTypes.TLOU_Stalker.animationVariable = "isInfected"
+		if ZomboidForge.ZTypes.TLOU_Runner then
+			ZomboidForge.ZTypes.TLOU_Runner.animationVariable = "isInfected"
+		end
+
+		if ZomboidForge.ZTypes.TLOU_Stalker then
+			ZomboidForge.ZTypes.TLOU_Stalker.animationVariable = "isInfected"
+		end
 	end
 
 	-- if infected should hide indoors in daytime
 	if SandboxVars.TLOU_infected.HideIndoors then
-		if ZomboidForge.ZTypes.TLOU_Stalker and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Stalker then
 			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
 				"HideIndoors"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Clicker and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Clicker then
 			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
 				"HideIndoors"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Bloater and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
+		if ZomboidForge.ZTypes.TLOU_Bloater then
 			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
 				"HideIndoors"
 			)
@@ -276,12 +285,10 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
 	-- if Bloaters are allowed to deal more damage to structures
-	if SandboxVars.TLOU_infected.StrongBloater then
-		if ZomboidForge.ZTypes.TLOU_Bloater and not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,"StrongBloater") then
-			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
-				"StrongBloater"
-			)
-		end
+	if SandboxVars.TLOU_infected.StrongBloater and ZomboidForge.ZTypes.TLOU_Bloater then
+		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+			"StrongBloater"
+		)
 	end
 
 	-- if Clicker and Bloaters take extra damage from fire but the damage they take is capped
@@ -436,9 +443,9 @@ end
 ZomboidForge.OnInfectedDeath_cordyceps = function(zombie,ZType)
 	-- roll to inventory
 	local rand = ZombRand(1,100)
-	if ZomboidForge.TLOU_infected.lootchance[ZType] >= rand then
+	if ZomboidForge.ZTypes[ZType].lootchance >= rand then
 		--zombie:getInventory():AddItems("Cordyceps", ZombRand(ZomboidForge.TLOU_infected.lootcount_min[ZType],ZomboidForge.TLOU_infected.lootcount_max[ZType]))
-		zombie:getInventory():AddItems("Cordyceps", ZomboidForge.TLOU_infected.roll_lootcount[ZType]())
+		zombie:getInventory():AddItems("Cordyceps", ZomboidForge.ZTypes[ZType].roll_lootcount())
 	end
 end
 --#endregion
