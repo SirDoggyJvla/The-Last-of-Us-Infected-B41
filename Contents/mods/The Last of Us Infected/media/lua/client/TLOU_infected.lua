@@ -642,7 +642,10 @@ ZomboidForge.HideIndoors = function(zombie,_)
 	-- if zombie is already in building, completely skip
 	-- elseif has target
 	-- elseif hasn't been at least N seconds since last update 
-	if zombie:getBuilding() or zombie:getTarget() or math.floor(zombie.TimeSinceSeenFlesh / 100)%(ZomboidForge.TLOU_infected.HideIndoorsUpdates) ~= 0 then
+	if zombie:getBuilding()
+	or zombie:getTarget()
+	or math.floor(zombie.TimeSinceSeenFlesh / 100)%(ZomboidForge.TLOU_infected.HideIndoorsUpdates) ~= 0
+	then
 		return
 	end
 
