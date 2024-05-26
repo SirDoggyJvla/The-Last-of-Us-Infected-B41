@@ -386,6 +386,10 @@ function ZomboidForge.BloaterHit(player, zombie, handWeapon, damage)
 	if zombie:getHitTime() ~= 0 then
 		zombie:setHitTime(0)
 	end
+
+	if not zombie:avoidDamage() then
+		zombie:setAvoidDamage(true)
+	end
 end
 
 -- set damage to bloater from player
