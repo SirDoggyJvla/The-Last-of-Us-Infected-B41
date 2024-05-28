@@ -104,7 +104,7 @@ option TLOU_infected.RunnerVision
 {
 	type = enum,
 	numValues = 3,
-	default = 2,
+	default = 1,
 	page = TLOU_infected_stats,
 	translation = TLOU_RunnerVision,
 	valueTranslation = ZF_EyesightEnum,
@@ -114,7 +114,7 @@ option TLOU_infected.RunnerHearing
 {
 	type = enum,
 	numValues = 3,
-	default = 2,
+	default = 3,
 	page = TLOU_infected_stats,
 	translation = TLOU_RunnerHearing,
 	valueTranslation = ZF_HearingEnum,
