@@ -30,19 +30,3 @@ local function initTLOU_ModData()
 end
 Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
-
-
--- Set `Stalker` sounds.
----@param zombie 		IsoZombie
----@param _		 		string   	--Zombie Type ID
-ZomboidForge.SetStalkerSounds = function(zombie,_)
-	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleB") and not zombie:isFemale()
-	or not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleB") and zombie:isFemale() then
-		zombie:getEmitter():stopAll()
-		if zombie:isFemale() then
-			zombie:getEmitter():playVocals("Zombie/Voice/FemaleB")
-		else
-			zombie:getEmitter():playVocals("Zombie/Voice/MaleB")
-		end
-	end
-end

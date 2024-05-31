@@ -60,16 +60,6 @@ ZomboidForge.OnClickerDeath = function(zombie,_)
 	inventory:AddItems("Hat_Fungi_Loot",1)
 end
 
--- Set `Clicker` sounds.
----@param zombie 		IsoZombie
----@param _		 		string   	--Zombie Type ID
-ZomboidForge.SetClickerSounds = function(zombie,_)
-	if not zombie:getEmitter():isPlaying("Zombie/Voice/FemaleC")then
-		zombie:getEmitter():stopAll()
-		zombie:getEmitter():playVocals("Zombie/Voice/FemaleC")
-	end
-end
-
 --#region Custom behavior: `SetClickerClothing`
 
 -- clothing priority to replace
@@ -119,53 +109,6 @@ TLOU_infected.ClothingPriority = {
 	["Shoes"] = 42,
 	["Jacket"] = 43,
 }
-
--- Set clicker clothing by visually replacing one of its clothing based on the priority list of clothings to replace.
----@param zombie 		IsoZombie
----@param _		 		string   	--Zombie Type ID
-ZomboidForge.SetClickerClothing = function(zombie,_)
-	-- get clothing visuals from zombie
-	local visual = zombie:getItemVisuals()
-	if not visual then return end
-
-	-- scroll through every clothing and replace it
-	local hasHat_Fungi = false
-	if visual:size() > 0 then
-		local priority = 100
-		local itemReset = nil
-		for i = 0, visual:size()-1 do
-			local item = visual:get(i)
-			if not item then
-				break
-			end
-			local bodyLocation = item:getScriptItem():getBodyLocation()
-			local priorityTest = TLOU_infected.ClothingPriority[bodyLocation]
-			if item:getItemType() == "Base.Hat_Fungi" then
-				hasHat_Fungi = true
-				break
-			elseif priorityTest and priorityTest < priority then
-				-- if not, then add one to the item
-				priority = priorityTest
-				itemReset = item
-				hasHat_Fungi = false
-			end
-		end
-		if not hasHat_Fungi and itemReset then
-			itemReset:setItemType("Base.Hat_Fungi")
-			itemReset:setClothingItemName("Hat_Fungi")
-			zombie:resetModel()
-		end
-
-	-- if no visuals were found then add a visual item which is the Hat Fungi
-	else
-		local itemVisual = ItemVisual.new()
-		itemVisual:setItemType("Base.Hat_Fungi")
-		itemVisual:setClothingItemName("Hat_Fungi")
-		visual:add(itemVisual)
-
-		zombie:resetModel()
-	end
-end
 
 --#endregion
 

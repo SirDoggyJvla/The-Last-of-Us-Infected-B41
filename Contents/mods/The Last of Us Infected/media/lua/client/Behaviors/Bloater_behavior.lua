@@ -48,17 +48,6 @@ function ZomboidForge.BloaterAttack(ZType,player,zombie)
 	end
 end
 
--- Set `Bloater` sounds.
----@param zombie 		IsoZombie
----@param _		 		string   	--Zombie Type ID
-ZomboidForge.SetBloaterSounds = function(zombie,_)
-	if not zombie:getEmitter():isPlaying("Zombie/Voice/MaleC") then
-		zombie:getEmitter():stopAll()
-		zombie:getEmitter():playVocals("Zombie/Voice/MaleC")
-	end
-end
-
-
 --#region Custom behavior: `DoorOneShot`
 
 -- Manage Bloater strength against structures by making them extra strong.
