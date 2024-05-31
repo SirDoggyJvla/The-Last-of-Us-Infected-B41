@@ -182,7 +182,7 @@ end
 ---@param closestSquare 		IsoGridSquare|nil
 ---@param x_sourcesq 			double
 ---@param y_sourcesq 			double
----@return double|nil 			closestDist
+---@return double	 			closestDist
 ---@return IsoGridSquare|nil 	closestSquare
 TLOU_infected.CheckBuildingDistance = function(chunkID,closestDist,closestSquare,x_sourcesq,y_sourcesq)
 	if TLOU_ModData.BuildingList[chunkID] then

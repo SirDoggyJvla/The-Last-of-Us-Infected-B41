@@ -78,22 +78,6 @@ ZomboidForge.OnInfectedDeath_cordyceps = function(zombie,ZType)
 end
 
 
---#region Custom data: `RemoveBandages`
-
--- Remove visual bandages on Zombies who have some, else skip.
----@param zombie 		IsoZombie
----@param _		 		string   	--Zombie Type ID
-ZomboidForge.RemoveBandages = function(zombie,_)
-	-- Remove bandages
-	local bodyVisuals = zombie:getHumanVisual():getBodyVisuals()
-	if bodyVisuals and bodyVisuals:size() > 0 then
-		zombie:getHumanVisual():getBodyVisuals():clear()
-		zombie:resetModel()
-	end
-end
-
---#endregion
-
 --#region Custom behavior: `HideIndoors`
 
 -- Main function to handle `Zombie` behavior to go hide inside the closest building or wander during night.
@@ -105,6 +89,7 @@ ZomboidForge.HideIndoors = function(zombie,_)
 	-- elseif hasn't been at least N seconds since last update 
 	if zombie:getBuilding()
 	or zombie:getTarget()
+	or zombie:isMoving()
 	or math.floor(zombie.TimeSinceSeenFlesh / 100)%(TLOU_infected.HideIndoorsUpdates) ~= 0
 	then
 		return

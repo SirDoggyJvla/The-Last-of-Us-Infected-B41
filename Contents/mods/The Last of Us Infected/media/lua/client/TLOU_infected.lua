@@ -37,55 +37,57 @@ TLOU_infected = {}
 
 -- Sandbox options imported localy for performance reasons
 -- used here for file reloads in-game
-TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
-TLOU_infected.OnlyUnexplored = SandboxVars.TLOU_infected.OnlyUnexplored
-TLOU_infected.WanderAtNight = SandboxVars.TLOU_infected.WanderAtNight
-TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOU_infected.MaxDistanceToCheck
+TLOU_infected.HideIndoorsUpdates 	=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
+TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
+TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
+TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
 
 --- Create zombie types
 ZomboidForge.Initialize_TLOUInfected = function()
 	-- Sandbox options imported localy for performance reasons
-	TLOU_infected.HideIndoorsUpdates = math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
-	TLOU_infected.OnlyUnexplored = SandboxVars.TLOU_infected.OnlyUnexplored
-	TLOU_infected.WanderAtNight = SandboxVars.TLOU_infected.WanderAtNight
-	TLOU_infected.MaxDistanceToCheck = SandboxVars.TLOU_infected.MaxDistanceToCheck
+	TLOU_infected.HideIndoorsUpdates 	=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
+	TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
+	TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
+	TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
 
     -- RUNNER
 	if SandboxVars.TLOU_infected.RunnerSpawn then
 		ZomboidForge.ZTypes.TLOU_Runner = {
 			-- base informations
-			name = "IGUI_TLOU_Runner",
-			chance = SandboxVars.TLOU_infected.RunnerSpawnWeight,
-
-			-- stats
-			walktype = 1,
-			strength = SandboxVars.TLOU_infected.RunnerStrength,
-			toughness = SandboxVars.TLOU_infected.RunnerToughness,
-			cognition = 2,
-			memory = 2,
-			sight = SandboxVars.TLOU_infected.RunnerVision,
-			hearing = SandboxVars.TLOU_infected.RunnerHearing,
-			HP = SandboxVars.TLOU_infected.RunnerHealth,
-
-			-- UI
-			color = {122, 243, 0,},
-			outline = {0, 0, 0,},
-
-			-- attack functions
-			zombieAgro = {},
-			zombieOnHit = {},
-
-			-- custom behavior
-			zombieDeath = {},
-			customBehavior = {},
-
-			customData = {
-				"SetRunnerSounds",
+			name 					=		"IGUI_TLOU_Runner",
+			chance 					=		SandboxVars.TLOU_infected.RunnerSpawnWeight,
+			customEmitter = {
+				male 				=		"Zombie/Voice/MaleA",
+				female 				=		"Zombie/Voice/FemaleA",
 			},
 
+			-- stats
+			walktype 				=		1,
+			strength 				=		SandboxVars.TLOU_infected.RunnerStrength,
+			toughness 				=		SandboxVars.TLOU_infected.RunnerToughness,
+			cognition 				=		2,
+			memory 					=		2,
+			sight 					=		SandboxVars.TLOU_infected.RunnerVision,
+			hearing 				=		SandboxVars.TLOU_infected.RunnerHearing,
+			HP 						=		SandboxVars.TLOU_infected.RunnerHealth,
+
+			-- UI
+			color 					=		{122, 243, 0,},
+			outline 				=		{0, 0, 0,},
+
+			-- attack functions
+			zombieAgro 				=		{},
+			zombieOnHit 			=		{},
+
+			-- custom behavior
+			zombieDeath 			=		{},
+			customBehavior 			=		{},
+
+			customData 				=		{},
+
 			-- custom data for TLOU_infected
-			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
-			roll_lootcount = function() return ZombRand(1,3) end,
+			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
+			roll_lootcount 			=		function() return ZombRand(1,3) end,
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Runner = nil
@@ -95,42 +97,50 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.StalkerSpawn then
 		ZomboidForge.ZTypes.TLOU_Stalker = {
 			-- base informations
-			name = "IGUI_TLOU_Stalker",
-			chance = SandboxVars.TLOU_infected.StalkerSpawnWeight,
+			name 					= 		"IGUI_TLOU_Stalker",
+			chance 					= 		SandboxVars.TLOU_infected.StalkerSpawnWeight,
+			hairColor = {
+				ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
+			},
 			beard = {
 				"",
 			},
+			beardColor = {
+				ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
+			},
+			customEmitter = {
+				male 				= 		"Zombie/Voice/MaleB",
+				female 				= 		"Zombie/Voice/FemaleB",
+			},
+			removeBandages 			= 		true,
 
 			-- stats
-			walktype = 1,
-			strength = 1,
-			toughness = 2,
-			cognition = 2,
-			memory = 3,
-			sight = SandboxVars.TLOU_infected.StalkerVision,
-			hearing = SandboxVars.TLOU_infected.StalkerHearing,
-			HP = SandboxVars.TLOU_infected.StalkerHealth,
+			walktype 				=		1,
+			strength 				=		1,
+			toughness 				=		2,
+			cognition 				=		2,
+			memory 					=		3,
+			sight 					=		SandboxVars.TLOU_infected.StalkerVision,
+			hearing 				=		SandboxVars.TLOU_infected.StalkerHearing,
+			HP 						=		SandboxVars.TLOU_infected.StalkerHealth,
 
 			-- UI
-			color = {230, 230, 0,},
-			outline = {0, 0, 0,},
+			color 					= 		{230, 230, 0,},
+			outline 				= 		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgro = {},
-			zombieOnHit = {},
+			zombieAgro 				= 		{},
+			zombieOnHit 			= 		{},
 
 			-- custom behavior
-			zombieDeath = {},
-			customBehavior = {},
+			zombieDeath 			= 		{},
+			customBehavior 			= 		{},
 
-			customData = {
-				"SetStalkerSounds",
-				"RemoveBandages",
-			},
+			customData 				= 		{},
 
 			-- custom data for TLOU_infected
-			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
-			roll_lootcount = function() return ZombRand(1,5) end,
+			lootchance 				= 		SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
+			roll_lootcount 			= 		function() return ZombRand(1,5) end,
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Stalker = nil
@@ -140,8 +150,8 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.ClickerSpawn then
 		ZomboidForge.ZTypes.TLOU_Clicker = {
 			-- base informations
-			name = "IGUI_TLOU_Clicker",
-			chance = SandboxVars.TLOU_infected.ClickerSpawnWeight,
+			name 					= 		"IGUI_TLOU_Clicker",
+			chance 					= 		SandboxVars.TLOU_infected.ClickerSpawnWeight,
 			hair = {
 				male = {
 					"",
@@ -150,34 +160,50 @@ ZomboidForge.Initialize_TLOUInfected = function()
 					"",
 				},
 			},
-			hairColor = {
-				ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
-			},
 			beard = {
 				"",
 			},
-			animationVariable = "isClicker",
+			animationVariable 		= 		"isClicker",
+			customEmitter = {
+				general 			=		"Zombie/Voice/FemaleC"
+			},
+			clothingVisuals = {
+				set = {
+					["FullHat"] 	= 		"Base.Hat_Fungi",
+				},
+				remove = {
+					["Mask"] 		= 		true,
+					["Eyes"] 		= 		true,
+					["LeftEye"] 	= 		true,
+					["RightEye"] 	= 		true,
+					["Nose"] 		= 		true,
+					["Ears"] 		= 		true,
+					["EarTop"] 		= 		true,
+					["Scarf"] 		= 		true,
+				},
+			},
+			removeBandages 			= 		true,
 
 			-- stats
-			walktype = 2,
-			strength = 1,
-			toughness = 1,
-			cognition = 2,
-			memory = 2,
-			sight = 3,
-			hearing = SandboxVars.TLOU_infected.ClickerHearing,
-			HP = SandboxVars.TLOU_infected.ClickerHealth,
+			walktype 				= 		2,
+			strength 				= 		1,
+			toughness 				= 		1,
+			cognition 				= 		2,
+			memory 					= 		2,
+			sight 					= 		3,
+			hearing 				= 		SandboxVars.TLOU_infected.ClickerHearing,
+			HP 						= 		SandboxVars.TLOU_infected.ClickerHealth,
 
 			-- UI
-			color = {218, 109, 0,},
-			outline = {0, 0, 0,},
+			color 					=		{218, 109, 0,},
+			outline 				=		{0, 0, 0,},
 
 			-- attack functions
 			zombieAgro = {
 				"ClickerAttack",
 			},
 			zombieOnHit = {
-				"ClickerNoPush",
+				"NoPush",
 			},
 
 			-- custom behavior
@@ -188,16 +214,12 @@ ZomboidForge.Initialize_TLOUInfected = function()
 				"ClickerAgro",
 			},
 
-			customData = {
-				"SetClickerClothing",
-				"SetClickerSounds",
-				"RemoveBandages",
-			},
+			customData = {},
 
 			-- custom data for TLOU_infected
-			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
-			roll_lootcount = function() return ZombRand(3,8) end,
-			fireDamageMultiplier = SandboxVars.TLOU_infected.ExtraFireDamage,
+			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
+			roll_lootcount 			=		function() return ZombRand(3,8) end,
+			fireDamageMultiplier 	=		SandboxVars.TLOU_infected.ExtraFireDamage,
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Clicker = nil
@@ -207,50 +229,51 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.BloaterSpawn then
 		ZomboidForge.ZTypes.TLOU_Bloater = {
 			-- base informations
-			name = "IGUI_TLOU_Bloater",
-			chance = SandboxVars.TLOU_infected.BloaterSpawnWeight,
+			name 					=		"IGUI_TLOU_Bloater",
+			chance 					=		SandboxVars.TLOU_infected.BloaterSpawnWeight,
 			outfit = {
 				"Bloater",
 			},
-			animationVariable = "isBloater",
+			animationVariable 		= 		"isBloater",
+			customEmitter = {
+				general 			= 		"Zombie/Voice/MaleC"
+			},
+			removeBandages = true,
 
 			-- stats
-			walktype = 2,
-			strength = 1,
-			toughness = 1,
-			cognition = 2,
-			memory = 2,
-			sight = 3,
-			hearing = SandboxVars.TLOU_infected.BloaterHearing,
-			HP = SandboxVars.TLOU_infected.BloaterHealth,
+			walktype 				=		2,
+			strength 				=		1,
+			toughness 				=		1,
+			cognition 				=		2,
+			memory 					=		2,
+			sight 					=		3,
+			hearing 				=		SandboxVars.TLOU_infected.BloaterHearing,
+			HP 						=		SandboxVars.TLOU_infected.BloaterHealth,
 
 			-- UI
-			color = {205, 0, 0,},
-			outline = {0, 0, 0,},
+			color 					=		{205, 0, 0,},
+			outline 				=		{0, 0, 0,},
 
 			-- attack functions
 			zombieAgro = {
 				"BloaterAttack",
 			},
 			zombieOnHit = {},
-			shouldNotStagger = true,
-			resetHitTime = true,
-			shouldAvoidDamage = true,
-			onlyJawStab = true,
+			shouldNotStagger 		=		true,
+			resetHitTime 			=		true,
+			shouldAvoidDamage 		=		true,
+			onlyJawStab 			=		true,
 
 			-- custom behavior
 			zombieDeath = {},
 			customBehavior = {},
 
-			customData = {
-				"SetBloaterSounds",
-				"RemoveBandages",
-			},
+			customData = {},
 
 			-- custom data for TLOU_infected
-			lootchance = SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
-			roll_lootcount = function() return ZombRand(5,15) end,
-			fireDamageMultiplier = SandboxVars.TLOU_infected.ExtraFireDamage,
+			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
+			roll_lootcount 			=		function() return ZombRand(5,15) end,
+			fireDamageMultiplier 	=		SandboxVars.TLOU_infected.ExtraFireDamage,
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Bloater = nil
@@ -296,11 +319,11 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
 	-- if Clicker and Bloaters take extra damage from fire but the damage they take is capped
-	if SandboxVars.TLOU_infected.ExtraFireDamage_Clicker then
+	if SandboxVars.TLOU_infected.ExtraFireDamage_Clicker and ZomboidForge.ZTypes.TLOU_Clicker then
 		ZomboidForge.ZTypes.TLOU_Clicker.customDamage = "ExtraFireDamage"
 	end
 
-	if SandboxVars.TLOU_infected.ExtraFireDamage_Bloater then
+	if SandboxVars.TLOU_infected.ExtraFireDamage_Bloater and ZomboidForge.ZTypes.TLOU_Bloater then
 		ZomboidForge.ZTypes.TLOU_Bloater.customDamage = "ExtraFireDamage"
 	end
 
@@ -315,28 +338,30 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_infected.CordycepsSpawn then
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,"OnInfectedDeath_cordyceps") then
+		if ZomboidForge.ZTypes.TLOU_Runner then
 			table.insert(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,"OnInfectedDeath_cordyceps") then
+		if ZomboidForge.ZTypes.TLOU_Stalker then
 			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,"OnInfectedDeath_cordyceps") then
+		if ZomboidForge.ZTypes.TLOU_Clicker then
 			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
-		if not ZomboidForge.CheckInTable(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,"OnInfectedDeath_cordyceps") then
+		if ZomboidForge.ZTypes.TLOU_Bloater then
 			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 	end
 end
+
+return TLOU_infected

@@ -30,6 +30,7 @@ Sandbox_EN = {
 	Sandbox_TLOU_RunnerVision = "Runner Sight",
 	Sandbox_TLOU_RunnerHearing = "Runner Hearing",
 	Sandbox_TLOU_RunnerHP = "Runner health multiplier",
+	Sandbox_TLOU_RunnerHP_tooltip = "Runner health multiplier",
 
 	Sandbox_TLOU_StalkerVision = "Stalker Sight",
 	Sandbox_TLOU_StalkerHearing = "Stalker Hearing",
