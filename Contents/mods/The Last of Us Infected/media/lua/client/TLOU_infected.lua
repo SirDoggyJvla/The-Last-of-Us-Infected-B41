@@ -172,6 +172,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 					["FullHat"] 	= 		"Base.Hat_Fungi",
 				},
 				remove = {
+					["Hat"]			=		true,
 					["Mask"] 		= 		true,
 					["Eyes"] 		= 		true,
 					["LeftEye"] 	= 		true,
