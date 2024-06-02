@@ -5,7 +5,6 @@ Sandbox_EN = {
 	Sandbox_TLOU_infected_customBehavior = "The Last of Us Infected [Custom behavior]",
 	Sandbox_TLOU_infected_other = "The Last of Us Infected [Other]",
 
-
 	/* Zomboid Forge zombie spawns */
 	Sandbox_TLOU_RunnerSpawn = "Spawn Runners",
 	Sandbox_TLOU_RunnerSpawn_tooltip = "Runners are dangerous and fast humans recently infected by the Cordyceps fungus. They can quickly overwhelm you with their sheer speed and numbers. <BR> You may hear them talking and struggling from within, with the soul of the host likely still present but unable to control their body. <BR> <IMAGECENTRE:media/ui/runner.png> <LINE>",

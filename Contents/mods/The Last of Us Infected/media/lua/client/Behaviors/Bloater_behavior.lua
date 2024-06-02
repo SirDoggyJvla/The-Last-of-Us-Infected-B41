@@ -75,10 +75,10 @@ ZomboidForge.StrongBloater = function(zombie,ZType)
 	TLOU_ModData.Infected[trueID].thumpCheck = zombie:getTimeThumping()
 
 	-- check barricades and damage those first if present
-	local barricade = nil
-	if thumped:isBarricaded() then
+	if instanceof(thumped,"BarricadeAble") and thumped:isBarricaded() then
 		---@cast thumped BarricadeAble
 
+		local barricade = nil
 		-- loop to damage multiple times, it's set so Bloater remove one plank per hit approximatively
 		for _ = 1,200 do
 			-- need to verify the barricade is not destroyed everytime it's thumped
