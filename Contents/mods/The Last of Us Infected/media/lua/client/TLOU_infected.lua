@@ -21,6 +21,8 @@ local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
+require "ZomboidForge"
+require "ZomboidForge_tools"
 
 -- localy initialize mod data
 local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
@@ -273,6 +275,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			-- custom behavior
 			zombieDeath = {},
 			customBehavior = {},
+			onThump = {},
 
 			customData = {},
 
@@ -319,7 +322,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 
 	-- if Bloaters are allowed to deal more damage to structures
 	if SandboxVars.TLOU_infected.StrongBloater and ZomboidForge.ZTypes.TLOU_Bloater then
-		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.onThump,
 			"StrongBloater"
 		)
 	end

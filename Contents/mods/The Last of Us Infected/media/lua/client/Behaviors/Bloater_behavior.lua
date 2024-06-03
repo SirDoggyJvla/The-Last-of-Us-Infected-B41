@@ -53,27 +53,7 @@ end
 -- Manage Bloater strength against structures by making them extra strong.
 ---@param zombie 		IsoZombie
 ---@param ZType 		string   	     --Zombie Type ID
-ZomboidForge.StrongBloater = function(zombie,ZType)
-	-- run code if infected has thumping target
-	local thumped = zombie:getThumpTarget()
-	if not thumped then return end
-
-	-- get zombie info
-	local trueID = ZomboidForge.pID(zombie)
-	TLOU_ModData.Infected = TLOU_ModData.Infected or {}
-	TLOU_ModData.Infected[trueID] = TLOU_ModData.Infected[trueID] or {}
-
-	-- update thumped only if infected is thumping
-	-- getThumpTarget outputs the target as long as the zombie is in thumping animation
-	-- but we want to make sure we damage only if a hit is sent
-	local thumpCheck = TLOU_ModData.Infected[trueID].thumpCheck
-	if thumpCheck == zombie:getTimeThumping() then
-		return
-	elseif zombie:getTimeThumping() == 0 then
-		return
-	end
-	TLOU_ModData.Infected[trueID].thumpCheck = zombie:getTimeThumping()
-
+ZomboidForge.StrongBloater = function(zombie,ZType,thumped)
 	-- check barricades and damage those first if present
 	if instanceof(thumped,"BarricadeAble") and thumped:isBarricaded() then
 		---@cast thumped BarricadeAble
