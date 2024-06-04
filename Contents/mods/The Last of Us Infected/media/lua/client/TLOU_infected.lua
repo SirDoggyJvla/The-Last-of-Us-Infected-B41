@@ -32,11 +32,6 @@ end
 Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
--- stop Zomboids from spawning
-ZomboidForge.AddZomboids = function()
-
-end
-
 --- setup local functions
 ZomboidForge.TLOU_infected = {}
 
