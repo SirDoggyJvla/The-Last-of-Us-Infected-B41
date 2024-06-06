@@ -140,3 +140,46 @@ end
 storeZombie = zombie
 zombie:addLineChatElement(tostring(zombie:getTarget()))
 ]]
+
+--#region Custom Behavior: Blind Clickers
+
+local stringZ = ""
+ZomboidForge.BlindClickers = function(zombie,ZType)
+	--[[
+		awake player if action nearby that should, this sets a temporary target to reset
+		TimeSinceSeenFlesh
+		if TimeSinceSeenFlesh goes above a certain number then set zombie back to sleep
+		TimeSinceSeenFlesh resets when struck by an attack
+
+		when awake, force roam around the point of awakening or towards the target
+		also force awake if not in building to go inside nearest building
+
+		setUseless can be used to stop the clicker from setting a target but still 
+		allows him to move around
+	]]
+
+	stringZ = ""
+
+	local target = zombie:getTarget()
+	stringZ = stringZ.."\n".."target = "..tostring(target)
+
+	local alerted = zombie.alerted
+	stringZ = stringZ.."\n".."alerted = "..tostring(alerted)
+
+	local realState = zombie:getRealState()
+	stringZ = stringZ.."\n".."realState = "..tostring(realState)
+
+	local targetTime = math.floor(zombie:getTargetSeenTime())
+	stringZ = stringZ.."\n".."targetTime = "..tostring(targetTime)
+
+	local fleshTime = math.floor(zombie.TimeSinceSeenFlesh)
+	stringZ = stringZ.."\n".."fleshTime = "..tostring(fleshTime)
+
+	local action = zombie:isIgnoreStaggerBack()
+	--zombie:setIgnoreStaggerBack(true)
+	stringZ = stringZ.."\n".."action = "..tostring(action)
+
+	--zombie:addLineChatElement(stringZ)
+end
+
+--#endregion

@@ -340,6 +340,15 @@ ZomboidForge.Initialize_TLOUInfected = function()
 		end
 	end
 
+	-- blind Clickers
+	if SandboxVars.TLOU_infected.BlindClickers or isDebugEnabled() then
+		if ZomboidForge.ZTypes.TLOU_Clicker then
+			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
+				"BlindClickers"
+			)
+		end
+	end
+
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_infected.CordycepsSpawn then
 		if ZomboidForge.ZTypes.TLOU_Runner then

@@ -36,7 +36,7 @@ Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
 -- player cannot push infected
 ZomboidForge.NoPush = function(ZType,player, zombie, handWeapon, damage)
-	if handWeapon:getFullType() == "Base.BareHands" then
+	if handWeapon:getFullType() == "Base.BareHands" and not zombie:isOnlyJawStab() then
 		zombie:setOnlyJawStab(true)
 	end
 end
