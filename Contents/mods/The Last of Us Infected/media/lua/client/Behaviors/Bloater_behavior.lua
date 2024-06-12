@@ -16,8 +16,6 @@ local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
-local print = print -- print function
-local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
@@ -31,19 +29,29 @@ end
 Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
+-- localy initialize player
+local player = getPlayer()
+local function initTLOU_OnGameStart()
+	player = getPlayer()
+end
+Events.OnGameStart.Remove(initTLOU_OnGameStart)
+Events.OnGameStart.Add(initTLOU_OnGameStart)
 
 -- bloater attacks a player
-function ZomboidForge.BloaterAttack(ZType,player,zombie)
-	if player and player:isAlive() then
-		-- bloater grabs player
-		if not player:isGodMod() then
-			player:setSlowFactor(1)
-			player:setSlowTimer(1)
+function ZomboidForge.BloaterAttack(ZType,target,zombie)
+	if target and target:isAlive() then
+		-- bloater grabs target
+		if not target:isGodMod() then
+			target:setSlowFactor(1)
+			target:setSlowTimer(1)
 		end
 
-		-- kill player
-		if player:hasHitReaction() and not player:isGodMod() then
-			player:Kill(zombie)
+		-- kill target
+		if target == player and target:hasHitReaction() and not target:isGodMod() then
+			target:Kill(zombie)
+			if isClient() then
+				sendClientCommand('Behavior','KillTarget',{zombie = zombie:getOnlineID()})
+			end
 		end
 	end
 end

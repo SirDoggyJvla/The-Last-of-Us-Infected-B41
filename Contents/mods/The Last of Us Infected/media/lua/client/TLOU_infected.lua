@@ -16,8 +16,7 @@ local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
-local print = print -- print function
-local tostring = tostring --tostring function
+
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
@@ -35,7 +34,11 @@ Events.OnInitGlobalModData.Add(initTLOU_ModData)
 --- setup local functions
 ZomboidForge.TLOU_infected = {}
 
-TLOU_infected = {}
+TLOU_infected = {
+	Commands = {
+		Behavior = {},
+	},
+}
 
 -- Sandbox options imported localy for performance reasons
 -- used here for file reloads in-game
@@ -45,7 +48,10 @@ TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
 TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
 
 --- Create zombie types
-ZomboidForge.Initialize_TLOUInfected = function()
+TLOU_infected.Initialize_TLOUInfected = function()
+	-- Check for IsDay on load for no problems
+	TLOU_infected.IsDay()
+
 	-- Sandbox options imported localy for performance reasons
 	TLOU_infected.HideIndoorsUpdates 	=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
 	TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
@@ -205,9 +211,7 @@ ZomboidForge.Initialize_TLOUInfected = function()
 			zombieAgro = {
 				"ClickerAttack",
 			},
-			zombieOnHit = {
-				"NoPush",
-			},
+			zombieOnHit = {},
 
 			-- custom behavior
 			zombieDeath = {
@@ -341,12 +345,16 @@ ZomboidForge.Initialize_TLOUInfected = function()
 	end
 
 	-- blind Clickers
-	if SandboxVars.TLOU_infected.BlindClickers or isDebugEnabled() then
-		if ZomboidForge.ZTypes.TLOU_Clicker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
-				"BlindClickers"
-			)
-		end
+	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Clicker then
+		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
+			"ClickerBehavior"
+		)
+	end
+
+	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Stalker then
+		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
+			"StalkerBehavior"
+		)
 	end
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on

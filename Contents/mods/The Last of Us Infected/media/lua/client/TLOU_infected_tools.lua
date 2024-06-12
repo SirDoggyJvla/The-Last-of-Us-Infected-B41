@@ -16,12 +16,14 @@ local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
-local print = print -- print function
 local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 local TLOU_infected = require "TLOU_infected"
+
+--- import GameTime localy for performance reasons
+local gametime = GameTime:getInstance()
 
 -- localy initialize mod data
 local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
@@ -270,4 +272,20 @@ TLOU_infected.IsDay = function()
 	TLOU_ModData.IsDay = season2daytime[ month2season(gametime:getMonth()) ]( math.floor(gametime:getTimeOfDay()) )
 end
 
+--#endregion
+
+
+--#region Behavior tools
+
+---@param zombie 				IsoZombie
+---@param goal 					boolean
+TLOU_infected.SwitchUseless = function(zombie,goal)
+	if zombie:isUseless() ~= goal then
+		zombie:setUseless(goal)
+	end
+end
+
+TLOU_infected.GetZombieVelocity = function(zombie)
+	return Vector2.new(zombie:getNx() - zombie:getX(), zombie:getNy() - zombie:getY())
+end
 --#endregion

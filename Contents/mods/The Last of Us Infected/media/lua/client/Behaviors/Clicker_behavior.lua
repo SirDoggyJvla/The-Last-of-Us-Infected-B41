@@ -16,8 +16,6 @@ local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
-local print = print -- print function
-local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
@@ -31,21 +29,32 @@ end
 Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
+-- localy initialize player
+local player = getPlayer()
+local function initTLOU_OnGameStart()
+	player = getPlayer()
+end
+Events.OnGameStart.Remove(initTLOU_OnGameStart)
+Events.OnGameStart.Add(initTLOU_OnGameStart)
+
 
 -- clicker attacks a player
-function ZomboidForge.ClickerAttack(ZType,player,zombie)
-	if player and player:isAlive() then
-		--clicker grabs player
-		if SandboxVars.TLOU_infected.GrabbyClickers and not player:isGodMod() then
-			player:setSlowFactor(1)
-			player:setSlowTimer(1)
+function ZomboidForge.ClickerAttack(ZType,target,zombie)
+	if target and target:isAlive() then
+		--clicker grabs target
+		if SandboxVars.TLOU_infected.GrabbyClickers and not target:isGodMod() then
+			target:setSlowFactor(1)
+			target:setSlowTimer(1)
 		end
 
-		-- kill player if oneshot clickers
-		if SandboxVars.TLOU_infected.OneShotClickers then
-			if player:hasHitReaction() and not player:isGodMod() then
-				--player:setDeathDragDown(true)
-				player:Kill(zombie)
+		-- kill target if oneshot clickers
+		if target == player and SandboxVars.TLOU_infected.OneShotClickers then
+			if target:hasHitReaction() and not target:isGodMod() then
+				--target:setDeathDragDown(true)
+				target:Kill(zombie)
+				if isClient() then
+					sendClientCommand('Behavior','KillTarget',{zombie = zombie:getOnlineID()})
+				end
 			end
 		end
 	end
@@ -144,7 +153,9 @@ zombie:addLineChatElement(tostring(zombie:getTarget()))
 --#region Custom Behavior: Blind Clickers
 
 local stringZ = ""
-ZomboidForge.BlindClickers = function(zombie,ZType)
+---@param zombie 				IsoZombie
+---@param ZType	 				string   	--Zombie Type ID
+ZomboidForge.ClickerBehavior = function(zombie,ZType)
 	--[[
 		awake player if action nearby that should, this sets a temporary target to reset
 		TimeSinceSeenFlesh

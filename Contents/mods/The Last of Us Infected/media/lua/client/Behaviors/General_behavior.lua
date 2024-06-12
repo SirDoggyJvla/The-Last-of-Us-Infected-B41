@@ -16,15 +16,10 @@ local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
-local print = print -- print function
-local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 local TLOU_infected = require "TLOU_infected"
-
---- import GameTime localy for performance reasons
-local gametime = GameTime:getInstance()
 
 -- localy initialize mod data
 local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
@@ -84,6 +79,10 @@ end
 ---@param zombie 		IsoZombie
 ---@param _		 		string   	--Zombie Type ID
 ZomboidForge.HideIndoors = function(zombie,_)
+	-- get zombie data
+	local trueID = ZomboidForge.pID(zombie)
+	local PersistentZData_TLOU = ZomboidForge.GetPersistentZData(trueID,"TLOU_infected")
+
 	-- if zombie is already in building, completely skip
 	-- elseif has target
 	-- elseif hasn't been at least N seconds since last update 
@@ -91,6 +90,7 @@ ZomboidForge.HideIndoors = function(zombie,_)
 	or zombie:getTarget()
 	or zombie:isMoving()
 	or math.floor(zombie.TimeSinceSeenFlesh / 100)%(TLOU_infected.HideIndoorsUpdates) ~= 0
+	or PersistentZData_TLOU.target
 	then
 		return
 	end
