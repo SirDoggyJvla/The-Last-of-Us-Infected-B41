@@ -270,6 +270,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			resetHitTime 			=		true,
 			shouldAvoidDamage 		=		true,
 			onlyJawStab 			=		true,
+			jawStabImmune			=		true,
 
 			-- custom behavior
 			zombieDeath = {},
