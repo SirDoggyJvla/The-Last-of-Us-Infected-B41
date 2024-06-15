@@ -32,11 +32,11 @@ Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
 -- localy initialize player
 local player = getPlayer()
-local function initTLOU_OnGameStart()
+local function initTLOU_OnGameStart(playerIndex, player_init)
 	player = getPlayer()
 end
-Events.OnGameStart.Remove(initTLOU_OnGameStart)
-Events.OnGameStart.Add(initTLOU_OnGameStart)
+Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
+Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 
 ---@param zombie 				IsoZombie
 ---@param ZType	 				string   	--Zombie Type ID
