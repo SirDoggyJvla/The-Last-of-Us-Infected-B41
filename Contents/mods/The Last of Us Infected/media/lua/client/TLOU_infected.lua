@@ -268,7 +268,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			zombieOnHit = {},
 			shouldNotStagger 		=		true,
 			resetHitTime 			=		true,
-			shouldAvoidDamage 		=		true,
+			shouldAvoidDamage 		=		false, --temporary fix
 			onlyJawStab 			=		true,
 			jawStabImmune			=		true,
 
