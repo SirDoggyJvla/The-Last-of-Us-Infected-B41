@@ -34,10 +34,8 @@ Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 -- Call from server2clients to kill player target.
 TLOU_infected.Commands.Behavior.KillTarget = function(args)
     -- retrieve attacker IsoPlayer
-    local victimID = args.victim
-
-    local victim = getPlayerByOnlineID(victimID)
-    if player ~= victim  then
+    local victim = getPlayerByOnlineID(args.victim)
+    if victim and player ~= victim  then
         -- get zombie info
         local zombie = args.zombie and ZomboidForge.getZombieByOnlineID(args.zombie) or nil
         victim:Kill(zombie)

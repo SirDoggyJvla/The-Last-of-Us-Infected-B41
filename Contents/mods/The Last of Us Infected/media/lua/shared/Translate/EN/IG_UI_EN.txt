@@ -1,5 +1,9 @@
 IGUI_EN = {
-    -- infected types names
+    /* Zombie Name, singular and plurial */
+    IGUI_TLOU_zombieName = "infected",
+    IGUI_TLOU_zombiesName = "infected",
+
+    /* Zombie Name */
 	IGUI_TLOU_Runner = "Runner",
     IGUI_TLOU_Stalker = "Stalker",
     IGUI_TLOU_Clicker = "Clicker",

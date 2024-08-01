@@ -75,11 +75,19 @@ option TLOU_infected.BloaterSpawnWeight
 	translation = TLOU_BloaterSpawnWeight,
 }
 
-
-
 /*---------------------------------------------------------------------
 -- Infected stats: Runner
 ---------------------------------------------------------------------*/
+option TLOU_infected.RunnerSpeed
+{
+	type = enum,
+	numValues = 3,
+	default = 1,
+	page = TLOU_infected_stats,
+	translation = TLOU_RunnerSpeed,
+	valueTranslation = ZF_WalktypeEnum,
+}
+
 option TLOU_infected.RunnerStrength
 {
 	type = enum,
@@ -122,10 +130,10 @@ option TLOU_infected.RunnerHearing
 
 option TLOU_infected.RunnerHealth
 {
-	type = integer,
-	min = 1,
+	type = double,
+	min = 0,
 	max = 1000,
-	default = 1,
+	default = 0,
 	page = TLOU_infected_stats,
 	translation = TLOU_RunnerHP,
 }
@@ -135,6 +143,16 @@ option TLOU_infected.RunnerHealth
 /*---------------------------------------------------------------------
 -- Infected stats: Stalker
 ---------------------------------------------------------------------*/
+option TLOU_infected.StalkerSpeed
+{
+	type = enum,
+	numValues = 3,
+	default = 1,
+	page = TLOU_infected_stats,
+	translation = TLOU_StalkerSpeed,
+	valueTranslation = ZF_WalktypeEnum,
+}
+
 option TLOU_infected.StalkerVision
 {
 	type = enum,
@@ -157,10 +175,10 @@ option TLOU_infected.StalkerHearing
 
 option TLOU_infected.StalkerHealth
 {
-	type = integer,
-	min = 1,
+	type = double,
+	min = 0,
 	max = 1000,
-	default = 1,
+	default = 0,
 	page = TLOU_infected_stats,
 	translation = TLOU_StalkerHP,
 }
@@ -182,8 +200,8 @@ option TLOU_infected.ClickerHearing
 
 option TLOU_infected.ClickerHealth
 {
-	type = integer,
-	min = 1,
+	type = double,
+	min = 0,
 	max = 1000,
 	default = 5,
 	page = TLOU_infected_stats,
@@ -207,10 +225,10 @@ option TLOU_infected.BloaterHearing
 
 option TLOU_infected.BloaterHealth
 {
-	type = integer,
-	default = 50,
-	min = 1,
+	type = double,
+	min = 0,
 	max = 1000,
+	default = 50,
 	page = TLOU_infected_stats,
 	translation = TLOU_BloaterHP,
 }

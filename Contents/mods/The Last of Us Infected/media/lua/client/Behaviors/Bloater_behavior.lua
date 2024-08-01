@@ -37,24 +37,6 @@ end
 Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
 Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 
--- bloater attacks a player
-function ZomboidForge.BloaterAttack(ZType,target,zombie)
-	if target and target:isAlive() then
-		-- bloater grabs target
-		if not target:isGodMod() then
-			target:setSlowFactor(1)
-			target:setSlowTimer(1)
-		end
-
-		-- kill target
-		if target == player and target:hasHitReaction() and not target:isGodMod() then
-			target:Kill(zombie)
-			if isClient() then
-				sendClientCommand('Behavior','KillTarget',{zombie = zombie:getOnlineID()})
-			end
-		end
-	end
-end
 
 --#region Custom behavior: `DoorOneShot`
 

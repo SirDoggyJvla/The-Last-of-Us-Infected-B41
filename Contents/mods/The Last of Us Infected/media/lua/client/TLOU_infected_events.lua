@@ -15,7 +15,7 @@ This file defines the events used by The Last of Us Infected based on Zomboid Fo
 local TLOU_infected = require "TLOU_infected"
 require "TLOU_infected_tools"
 
---- ZomboidForge.TLOU_infected functions
+--- TLOU_infected functions
 Events.OnGameStart.Add(TLOU_infected.Initialize_TLOUInfected)
 
 --- Add buildings to the list of buildings available to check for zombies
@@ -30,3 +30,11 @@ Events.OnServerCommand.Add(function(module, command, args)
 		TLOU_infected.Commands[module][command](args)
 	end
 end)
+
+-- patch for CheckUpstairs, changes the zombie name to show in voicelines
+if getActivatedMods():contains("CheckUpstairs") then
+    local CheckUpstairs = require "CheckUpstairs"
+
+	CheckUpstairs.defaultZombieName = getText("IGUI_TLOU_zombieName")
+	CheckUpstairs.defaultZombiesName = getText("IGUI_TLOU_zombiesName")
+end

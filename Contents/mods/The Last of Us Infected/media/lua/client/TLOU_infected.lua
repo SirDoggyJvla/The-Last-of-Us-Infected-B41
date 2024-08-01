@@ -32,8 +32,6 @@ Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
 --- setup local functions
-ZomboidForge.TLOU_infected = {}
-
 TLOU_infected = {
 	Commands = {
 		Behavior = {},
@@ -62,7 +60,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.RunnerSpawn then
 		ZomboidForge.ZTypes.TLOU_Runner = {
 			-- base informations
-			name 					=		"IGUI_TLOU_Runner",
+			name 					=		getText("IGUI_TLOU_Runner"),
 			chance 					=		SandboxVars.TLOU_infected.RunnerSpawnWeight,
 			customEmitter = {
 				male 				=		"Zombie/Voice/MaleA",
@@ -70,7 +68,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			},
 
 			-- stats
-			walktype 				=		1,
+			walktype 				=		SandboxVars.TLOU_infected.RunnerSpeed,
 			strength 				=		SandboxVars.TLOU_infected.RunnerStrength,
 			toughness 				=		SandboxVars.TLOU_infected.RunnerToughness,
 			cognition 				=		2,
@@ -84,8 +82,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgro 				=		{},
-			zombieOnHit 			=		{},
+			zombieAgroCharacter 	=		{},
 
 			-- custom behavior
 			zombieDeath 			=		{},
@@ -105,7 +102,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.StalkerSpawn then
 		ZomboidForge.ZTypes.TLOU_Stalker = {
 			-- base informations
-			name 					= 		"IGUI_TLOU_Stalker",
+			name 					= 		getText("IGUI_TLOU_Stalker"),
 			chance 					= 		SandboxVars.TLOU_infected.StalkerSpawnWeight,
 			hairColor = {
 				ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
@@ -123,7 +120,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			removeBandages 			= 		true,
 
 			-- stats
-			walktype 				=		1,
+			walktype 				=		SandboxVars.TLOU_infected.StalkerSpeed,
 			strength 				=		1,
 			toughness 				=		2,
 			cognition 				=		2,
@@ -137,8 +134,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				= 		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgro 				= 		{},
-			zombieOnHit 			= 		{},
+			zombieAgroCharacter 	= 		{},
 
 			-- custom behavior
 			zombieDeath 			= 		{},
@@ -158,7 +154,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.ClickerSpawn then
 		ZomboidForge.ZTypes.TLOU_Clicker = {
 			-- base informations
-			name 					= 		"IGUI_TLOU_Clicker",
+			name 					= 		getText("IGUI_TLOU_Clicker"),
 			chance 					= 		SandboxVars.TLOU_infected.ClickerSpawnWeight,
 			hair = {
 				male = {
@@ -172,9 +168,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 				"",
 			},
 			animationVariable 		= 		"isClicker",
-			customEmitter = {
-				general 			=		"Zombie/Voice/FemaleC"
-			},
+			customEmitter 			= 		"Zombie/Voice/FemaleC",
 			clothingVisuals = {
 				set = {
 					["FullHat"] 	= 		"Base.Hat_Fungi",
@@ -208,10 +202,9 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgro = {
-				"ClickerAttack",
-			},
-			zombieOnHit = {},
+			zombieAgroCharacter = {},
+			onHit_zombie2player = {},
+			onHit_player2zombie = {},
 
 			-- custom behavior
 			zombieDeath = {
@@ -236,16 +229,33 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	if SandboxVars.TLOU_infected.BloaterSpawn then
 		ZomboidForge.ZTypes.TLOU_Bloater = {
 			-- base informations
-			name 					=		"IGUI_TLOU_Bloater",
+			name 					=		getText("IGUI_TLOU_Bloater"),
 			chance 					=		SandboxVars.TLOU_infected.BloaterSpawnWeight,
 			outfit = {
-				"Bloater",
+				female = {
+					Weighted = {
+						{
+							name = "Bloater",
+							weight = 100,
+						},
+						{
+							name = "AirCrew",
+							weight = 500,
+						},
+						{
+							name = "Bandit",
+							weight = 300,
+						},
+					},
+				},
+				male = {
+					"Bloater",
+				},
 			},
+			outfit = "Bloater",
 			animationVariable 		= 		"isBloater",
-			customEmitter = {
-				general 			= 		"Zombie/Voice/MaleC"
-			},
-			removeBandages = true,
+			customEmitter 			=		"Zombie/Voice/MaleC",
+			removeBandages 			=		true,
 
 			-- stats
 			walktype 				=		2,
@@ -262,13 +272,14 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgro = {
-				"BloaterAttack",
+			zombieAgroCharacter = {
+				"GrabbyInfected",
 			},
-			zombieOnHit = {},
-			shouldNotStagger 		=		true,
+			onHit_zombie2player = {
+				"KillTarget",
+			},
+			shouldIgnoreStagger 	=		true,
 			resetHitTime 			=		true,
-			shouldAvoidDamage 		=		false, --temporary fix
 			onlyJawStab 			=		true,
 			jawStabImmune			=		true,
 
@@ -339,20 +350,36 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	-- if Clicker can't be pushed
 	if SandboxVars.TLOU_infected.NoPushClickers then
 		if ZomboidForge.ZTypes.TLOU_Clicker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.zombieOnHit,
-				"NoPush"
+			ZomboidForge.ZTypes.TLOU_Clicker.onlyJawStab = "NoPush"
+			ZomboidForge.ZTypes.TLOU_Clicker.shouldIgnoreStagger = "NoPush"
+		end
+	end
+
+	if SandboxVars.TLOU_infected.GrabbyClickers then
+		if ZomboidForge.ZTypes.TLOU_Clicker then
+			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.onHit_player2zombie,
+				"GrabbyInfected"
+			)
+		end
+	end
+
+	-- One shot Clickers
+	if SandboxVars.TLOU_infected.OneShotClickers then
+		if ZomboidForge.ZTypes.TLOU_Clicker then
+			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.onHit_zombie2player,
+				"KillTarget"
 			)
 		end
 	end
 
 	-- blind Clickers
-	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Clicker then
+	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Clicker and false then
 		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
 			"ClickerBehavior"
 		)
 	end
 
-	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Stalker then
+	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Stalker and false then
 		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
 			"StalkerBehavior"
 		)

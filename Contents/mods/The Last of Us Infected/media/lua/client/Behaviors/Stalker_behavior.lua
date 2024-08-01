@@ -195,6 +195,7 @@ TLOU_infected.UpdateAgrometer = function(zombie,target)
 	local AgrometerData = TLOU_infected.AgrometerData
 
 	--- high sensitivity
+	--- this one needs rework, bcs it doesn't take into account the specific stalker
 	local canSee = AgrometerData.canSee[target:getLastSeenZomboidTime() ~= 0]
 	agrometer = agrometer + canSee
 

@@ -38,29 +38,7 @@ Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
 Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 
 
--- clicker attacks a player
-function ZomboidForge.ClickerAttack(ZType,target,zombie)
-	if target and target:isAlive() then
-		--clicker grabs target
-		if SandboxVars.TLOU_infected.GrabbyClickers and not target:isGodMod() then
-			target:setSlowFactor(1)
-			target:setSlowTimer(1)
-		end
-
-		-- kill target if oneshot clickers
-		if target == player and SandboxVars.TLOU_infected.OneShotClickers then
-			if target:hasHitReaction() and not target:isGodMod() then
-				--target:setDeathDragDown(true)
-				target:Kill(zombie)
-				if isClient() then
-					sendClientCommand('Behavior','KillTarget',{zombie = zombie:getOnlineID()})
-				end
-			end
-		end
-	end
-end
-
--- Replace fungi hat clothing with fungi hat food type on a `Clicker`'s death.
+-- Add fungi hat food type on a Clicker's death.
 ---@param zombie 		IsoZombie
 ---@param _		 		string   	--Zombie Type ID
 ZomboidForge.OnClickerDeath = function(zombie,_)
@@ -69,72 +47,25 @@ ZomboidForge.OnClickerDeath = function(zombie,_)
 	inventory:AddItems("Hat_Fungi_Loot",1)
 end
 
---#region Custom behavior: `SetClickerClothing`
-
--- clothing priority to replace
-TLOU_infected.ClothingPriority = {
-	["Hat"] = 1,
-	["Mask"] = 2,
-	["Eyes"] = 3,
-	["LeftEye"] = 4,
-	["RightEye"] = 5,
-	["Nose"] = 6,
-	["BellyButton"] = 7,
-	["Right_MiddleFinge"] = 8,
-	["Left_MiddleFinger"] = 9,
-	["Right_RingFinger"] = 10,
-	["Left_RingFinger"] = 11,
-	["Ears"] = 12,
-	["EarTop"] = 13,
-	["Necklace"] = 14,
-	["Necklace_Long"] = 15,
-	["UnderwearTop"] = 16,
-	["UnderwearBottom"] = 17,
-	["UnderwearExtra1"] = 18,
-	["UnderwearExtra2"] = 19,
-	["Underwear"] = 20,
-	["Socks"] = 21,
-	["RightWrist"] = 22,
-	["LeftWrist"] = 23,
-	["Tail"] = 24,
-
-	["Hands"] = 25,
-	["Belt"] = 26,
-	["BeltExtra"] = 27,
-	["AmmoStrap"] = 28,
-	["Scarf"] = 29,
-	["Neck"] = 30,
-	["TorsoExtra"] = 31,
-	["TankTop"] = 32,
-	["Tshirt"] = 33,
-	["ShortSleeveShirt"] = 34,
-	["Shirt"] = 35,
-	["Sweater"] = 36,
-	["TorsoExtraVest"] = 37,
-	["Pants"] = 38,
-	["Skirt"] = 39,
-	["Torso1Legs1"] = 40,
-	["Legs1"] = 41,
-	["Shoes"] = 42,
-	["Jacket"] = 43,
-}
-
---#endregion
-
 --#region Custom behavior: `ClickerAgro`
 
--- Manage Clicker agro to change their animation when 
--- they run after a player.
+-- Manage Clicker agro to change their animation when they run after a player.
 ---@param zombie 		IsoZombie
 ---@param ZType 		string   	     --Zombie Type ID
 ZomboidForge.ClickerAgro = function(zombie,ZType)
 	local target = zombie:getTarget()
-	if target and not zombie:getVariableBoolean("ClickerAgro") then
-		zombie:setVariable("ClickerAgro",'true')
-	elseif not target and zombie:getVariableBoolean("ClickerAgro") then
-		zombie:setVariable("ClickerAgro",'false')
+	local agro = zombie:getVariableBoolean("ClickerAgro")
+	if target then
+		if not agro then
+			zombie:setVariable("ClickerAgro",'true')
+		end
+	else
+		if agro and zombie.TimeSinceSeenFlesh > 1000 then
+			zombie:setVariable("ClickerAgro",'false')
+		end
 	end
 end
+
 --#endregion
 
 

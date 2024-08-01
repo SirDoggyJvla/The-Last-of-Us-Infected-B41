@@ -17,7 +17,7 @@ local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
 
---- import module from ZomboidForge
+--- import module
 local ZomboidForge = require "ZomboidForge_module"
 local TLOU_infected = require "TLOU_infected"
 
@@ -30,12 +30,33 @@ Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
 -- player cannot push infected
-ZomboidForge.NoPush = function(ZType,player, zombie, handWeapon, damage)
-	if handWeapon:getFullType() == "Base.BareHands" and not zombie:isOnlyJawStab() then
-		zombie:setOnlyJawStab(true)
+ZomboidForge.NoPush = function(zombie, ZType)
+	local target = zombie:getTarget()
+	if not target or instanceof(target:getPrimaryHandItem(),"HandWeapon") then
+		return false
+	else
+		return true
 	end
 end
 
+-- grabby infected, slowing you down in place
+function ZomboidForge.GrabbyInfected(ZType,target,zombie)
+	if target:isAlive() then
+		--clicker grabs target
+		if not target:isGodMod() then
+			target:setSlowFactor(1)
+			target:setSlowTimer(1)
+		end
+	end
+end
+
+-- One shot target
+ZomboidForge.KillTarget = function(ZType,zombie,victim,handWeapon)
+	-- zombie kills victim
+	if not victim:isGodMod() then
+		victim:Kill(zombie)
+	end
+end
 
 -- cap damage to clicker and bloater from player
 -- increase damage if on fire
