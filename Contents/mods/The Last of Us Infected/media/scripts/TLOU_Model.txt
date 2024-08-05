@@ -1,0 +1,13 @@
+module FoxMask
+{
+	imports
+	{
+		Base
+	}
+	
+	model FoxMaskWI
+	{
+		mesh = WorldItems/FoxMaskWI,
+		texture = Clothes/Hat/Masks/FoxMask,
+	}
+}

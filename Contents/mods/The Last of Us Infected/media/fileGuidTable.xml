@@ -11,4 +11,15 @@
 		<path>media/clothing/clothingItems/Hat_Fungi.xml</path>
 		<guid>b2308062-293a-4598-933a-d22da4e69f27</guid>
 	</files>
+
+
+	<!-- Clicker clothings -->
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_01.xml</path>
+		<guid>70dd2f19-bef3-42ac-94f6-f10bbf5957a1</guid>
+	</files>
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_02.xml</path>
+		<guid>81b1d260-dde0-439e-aea8-2f25724f3f5b</guid>
+	</files>
 </fileGuidTable>

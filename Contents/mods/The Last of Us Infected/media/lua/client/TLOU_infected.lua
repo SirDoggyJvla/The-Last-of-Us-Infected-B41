@@ -171,7 +171,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			customEmitter 			= 		"Zombie/Voice/FemaleC",
 			clothingVisuals = {
 				set = {
-					["FullHat"] 	= 		"Base.Hat_Fungi",
+					["MaskFull"] 	= 		"TLOU.ClickerBody_01",
 				},
 				remove = {
 					["Hat"]			=		true,
@@ -231,27 +231,27 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			-- base informations
 			name 					=		getText("IGUI_TLOU_Bloater"),
 			chance 					=		SandboxVars.TLOU_infected.BloaterSpawnWeight,
-			outfit = {
-				female = {
-					Weighted = {
-						{
-							name = "Bloater",
-							weight = 100,
-						},
-						{
-							name = "AirCrew",
-							weight = 500,
-						},
-						{
-							name = "Bandit",
-							weight = 300,
-						},
-					},
-				},
-				male = {
-					"Bloater",
-				},
-			},
+			-- outfit = {
+			-- 	female = {
+			-- 		Weighted = {
+			-- 			{
+			-- 				name = "Bloater",
+			-- 				weight = 100,
+			-- 			},
+			-- 			{
+			-- 				name = "AirCrew",
+			-- 				weight = 500,
+			-- 			},
+			-- 			{
+			-- 				name = "Bandit",
+			-- 				weight = 300,
+			-- 			},
+			-- 		},
+			-- 	},
+			-- 	male = {
+			-- 		"Bloater",
+			-- 	},
+			-- },
 			outfit = "Bloater",
 			animationVariable 		= 		"isBloater",
 			customEmitter 			=		"Zombie/Voice/MaleC",

@@ -1,13 +1,22 @@
 from PIL import Image
 import os
 
-image = "C:\\Users\\simon\\Zomboid\\Workshop\\The Last of Us Infected - Beta\\images\\main menu images"
-file = "stalker_banner.png"
-export = "C:\\Users\\simon\\Zomboid\\Workshop\\The Last of Us Infected - Beta\\Contents\\mods\\The Last of Us Infected - Main menu Stalker\\media\\ui"
+# Add your paths to the image, the name of the image and the path where to export the images
+image = r'path_to_image'
+file = r'your_image.extension'
+export = r'path_to_export'
+
+image = r'C:\Users\simon\Zomboid\Workshop\The Last of Us Infected\images\main menu images'
+file = r'clicker2_banner.png'
+export = r'C:\Users\simon\Zomboid\Workshop\The Last of Us Infected\images\main menu images\test'
 
 
-path2image = image + "\\" + file
-path2image = path2image.replace("\\", "/")
+
+
+
+image = image.replace("\\", "/")
+export = export.replace("\\", "/")
+path2image = image + '/' + file
 
 # Open the original image
 image = Image.open(path2image)

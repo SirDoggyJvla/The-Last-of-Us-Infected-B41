@@ -1,5 +1,8 @@
-module Base
-{
+module TLOU {
+	imports {
+		Base
+	}
+
     item Bloater
     {
         Type = Clothing,
@@ -61,6 +64,56 @@ module Base
 		Lipids = 7,
 		Proteins = 16,
 		CustomEatSound = EatingFruit,
+		WorldStaticModel = W_Fungi,
+    }
+
+
+
+	item ClickerBody_01
+    {
+		DisplayCategory = Clothing,
+		Type = Clothing,
+		ClothingItem = ClickerBody_01,
+		BodyLocation = MaskFull,
+		BloodLocation = Head,
+		Icon = ficon,
+		CanHaveHoles = false,
+		WorldStaticModel = W_Fungi,
+    }
+
+	item ClickerBody_02
+    {
+		DisplayCategory = Clothing,
+		Type = Clothing,
+		ClothingItem = ClickerBody_02,
+		BodyLocation = MaskFull,
+		BloodLocation = Head,
+		Icon = ficon,
+		CanHaveHoles = false,
+		WorldStaticModel = W_Fungi,
+    }
+
+	item ClickerBody_03
+    {
+		DisplayCategory = Clothing,
+		Type = Clothing,
+		ClothingItem = ClickerBody_03,
+		BodyLocation = MaskFull,
+		BloodLocation = Head,
+		Icon = ficon,
+		CanHaveHoles = false,
+		WorldStaticModel = W_Fungi,
+    }
+
+	item ClickerBody_04
+    {
+		DisplayCategory = Clothing,
+		Type = Clothing,
+		ClothingItem = ClickerBody_04,
+		BodyLocation = MaskFull,
+		BloodLocation = Head,
+		Icon = ficon,
+		CanHaveHoles = false,
 		WorldStaticModel = W_Fungi,
     }
 }
