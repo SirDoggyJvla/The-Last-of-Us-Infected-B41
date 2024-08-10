@@ -29,6 +29,240 @@ end
 Events.OnInitGlobalModData.Remove(initTLOU_ModData)
 Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
+-- localy initialize player
+local client_player = getPlayer()
+local objectList = client_player and client_player:getCell():getObjectList()
+local function initTLOU_OnGameStart(playerIndex, player_init)
+	client_player = getPlayer()
+	objectList = client_player:getCell():getObjectList()
+end
+Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
+Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
+
+
+--#region Custom infection system
+
+-- Associated area of the body for each body parts
+TLOU_infected.bodyParts = {
+	["Head"]			=		"top",
+	["Neck"]			=		"top",
+	["Hand_L"]			=		"middle",
+	["Hand_R"]			=		"middle",
+	["ForeArm_L"]		=		"middle",
+	["ForeArm_R"]		=		"middle",
+	["UpperArm_L"]		=		"middle",
+	["UpperArm_R"]		=		"middle",
+	["Torso_Upper"]		=		"middle",
+	["Torso_Lower"]		=		"middle",
+	["Groin"]			=		"middle",
+	["UpperLeg_L"]		=		"bottom",
+	["UpperLeg_R"]		=		"bottom",
+	["LowerLeg_L"]		=		"bottom",
+	["LowerLeg_R"]		=		"bottom",
+	["Foot_L"]			=		"bottom",
+	["Foot_R"]			=		"bottom",
+}
+
+TLOU_infected.areaInfectionTime = {
+	top = 1,
+	middle = 2,
+	bottom = 3,
+}
+
+-- Minimal and maximum infection time associated to the area of the body
+TLOU_infected.areaInfectionTime = {
+	top = {
+		min = 5,
+		max = 15,
+	},
+	middle = {
+		min = 120,
+		max = 480,
+	},
+	bottom = {
+		min = 720,
+		max = 1440,
+	},
+}
+
+-- Retrieves a random infection time for a body part based on it's area on the body.
+---@param area string
+---@return number
+TLOU_infected.GetAreaInfectionTime = function(area)
+	local time = TLOU_infected.areaInfectionTime[area]
+	return ZombRand(time.min,time.max + 1)
+end
+
+-- Checks for infected body parts of a player and the number of it then stores them in mod data.
+---@param player IsoPlayer
+TLOU_infected.HasInfectedBodyParts = function(player)
+	-- initialize mod data
+	local playerModData = player:getModData()
+	playerModData.TLOU = playerModData.TLOU or {}
+	local playerModData_TLOU = playerModData.TLOU or {}
+
+	local infected = playerModData_TLOU.infected or {top = {}, middle = {}, bottom = {}}
+	local totalInfection = 0
+	local infectionTime
+
+	-- check every body parts
+	local bodyParts = player:getBodyDamage():getBodyParts()
+	for i = 0, bodyParts:size() - 1 do
+		-- retrieve bodyPart i
+		local bodyPart = bodyParts:get(i)
+
+		-- get bodyPart name
+		local bodyPartID = tostring(bodyPart:getType())
+		local area = TLOU_infected.bodyParts[bodyPartID]
+
+		-- retrieve the area associated
+		if area then
+			-- check bodyPart is already acknowledged as bitten
+			infectionTime = infected[area][bodyPartID]
+
+			-- check if bitten
+			if bodyPart:IsInfected() then
+				-- count bites in this area
+				if not infectionTime then
+					infected[area][bodyPartID] = TLOU_infected.GetAreaInfectionTime(area)
+				end
+
+				-- count bodyParts that are bitten
+				totalInfection = totalInfection + 1
+			elseif infectionTime then
+				infected[area][bodyPartID] = nil
+				playerModData_TLOU.oldInfectionTime = nil
+			end
+		end
+	end
+
+	playerModData_TLOU.infected = infected
+	playerModData_TLOU.totalInfection = totalInfection
+end
+
+-- Retrieve area priority to get infection time:
+-- 1. top
+-- 2. middle
+-- 3. bottom
+--
+-- Returns area, infected bodyparts and number of infected body parts.
+---@param infected table
+---@return table
+---@return int
+---@return string
+TLOU_infected.GetAreaPriority = function(infected)
+	local size
+	for area,bodyParts in pairs(infected) do
+		size = 0
+		for _,_ in pairs(bodyParts) do
+			size = size + 1
+		end
+
+		if size > 0 then
+			return bodyParts,size,area
+		end
+	end
+
+	return {},0,""
+end
+
+-- Retieve the time before death after being infected, based on the body parts.
+---@param bodyParts table
+---@param numberInfected int
+---@return number
+TLOU_infected.GetInfectionTime = function(bodyParts,numberInfected)
+	local totalTime = 0
+	for _, time in pairs(bodyParts) do
+		totalTime = totalTime + time
+	end
+
+	return totalTime/numberInfected
+end
+
+-- Updates the infection time of each body parts to suit the general infection time of the player.
+---@param infectionTime number
+---@param area string
+TLOU_infected.UpdateInfectionTime = function(infectionTime,area)
+	local playerModData_TLOU = client_player:getModData().TLOU
+
+	-- infection time can't go up, so it should either stay same as before or reduce due to new bite
+	local oldInfectionTime = client_player:getModData().TLOU.oldInfectionTime
+	local newInfectionTime = oldInfectionTime and math.min(infectionTime,oldInfectionTime) or infectionTime
+
+	-- updates oldInfectionTime to keep track of old state bite infection time
+	client_player:getModData().TLOU.oldInfectionTime = infectionTime
+
+	-- get bodyParts to update infection time
+	local bodyParts = playerModData_TLOU.infected[area]
+
+	-- normalize infection time for each body parts, to reduce the total infection time
+	for bodyPart, _ in pairs(bodyParts) do
+		bodyParts[bodyPart] = newInfectionTime
+	end
+end
+
+-- Get how long the player has been infected in hours.
+---@param player IsoPlayer
+---@return number
+TLOU_infected.GetTimeSinceInfected = function(player)
+	return player:getHoursSurvived() - player:getBodyDamage():getInfectionTime()
+end
+
+math.floor_decimals = function(x,decimales)
+	local n = 10^decimales
+
+	return math.floor(x*n)/n
+end
+
+-- Handles the custom infection of the player if it was infected.
+TLOU_infected.CustomInfection = function()
+	local bodyDamage = client_player:getBodyDamage()
+
+	-- check if player is infected
+	if bodyDamage:IsInfected() then
+		-- check which parts are infected
+		TLOU_infected.HasInfectedBodyParts(client_player)
+		local playerModData_TLOU = client_player:getModData().TLOU
+
+		-- retrieve bites and check for priority
+		local infected = playerModData_TLOU.infected
+		local bodyParts, numberInfected, area = TLOU_infected.GetAreaPriority(infected)
+
+		-- retrieve infection time and reduce by a minute
+		local infectionTime = TLOU_infected.GetInfectionTime(bodyParts,numberInfected)
+		local infectionTime_hour = infectionTime/60
+
+		-- updates oldInfectionTime to keep track of old state body parts infection time
+		-- also makes sure the time is never increased if it was modified
+		local oldInfectionTime = playerModData_TLOU.oldInfectionTime
+		if infectionTime ~= oldInfectionTime then
+			TLOU_infected.UpdateInfectionTime(infectionTime,area)
+		end
+
+		-- update mortalityDuration if needed
+		if bodyDamage:getInfectionMortalityDuration() ~= infectionTime_hour then
+			bodyDamage:setInfectionMortalityDuration(infectionTime_hour)
+		end
+
+		-- local timeSinceInfected = math.floor_decimals(TLOU_infected.GetTimeSinceInfected(client_player),3)
+		-- local timeUntilDeath = math.floor_decimals(infectionTime_hour - timeSinceInfected,3)
+		-- local level = math.floor_decimals(client_player:getBodyDamage():getInfectionLevel(),3)
+		-- local mortalityDuration = math.floor_decimals(bodyDamage:getInfectionMortalityDuration(),3)
+
+		-- client_player:addLineChatElement(
+		-- 	"infectionTime = "..infectionTime_hour.."\n"..
+		-- 	"mortalityDuration = "..mortalityDuration.."\n"..
+		-- 	"level = "..level.."\n"..
+		-- 	"timeSinceInfected = "..timeSinceInfected.."\n"..
+		-- 	"timeUntilDeath = "..timeUntilDeath
+		-- )
+	end
+end
+
+--#endregion
+
+
+
 -- player cannot push infected
 ZomboidForge.NoPush = function(zombie, ZType)
 	local target = zombie:getTarget()
@@ -40,7 +274,7 @@ ZomboidForge.NoPush = function(zombie, ZType)
 end
 
 -- grabby infected, slowing you down in place
-function ZomboidForge.GrabbyInfected(ZType,target,zombie)
+ZomboidForge.GrabbyInfected = function(ZType,target,zombie)
 	if target:isAlive() then
 		--clicker grabs target
 		if not target:isGodMod() then
@@ -50,7 +284,7 @@ function ZomboidForge.GrabbyInfected(ZType,target,zombie)
 	end
 end
 
--- One shot target
+-- One shot victim
 ZomboidForge.KillTarget = function(ZType,zombie,victim,handWeapon)
 	-- zombie kills victim
 	if not victim:isGodMod() then

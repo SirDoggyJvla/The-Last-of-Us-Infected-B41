@@ -16,10 +16,18 @@
 	<!-- Clicker clothings -->
 	<files>
 		<path>media/clothing/clothingItems/ClickerBody_01.xml</path>
-		<guid>70dd2f19-bef3-42ac-94f6-f10bbf5957a1</guid>
+		<guid>fe15360b-8de1-4b10-a32a-440d7c423a5f</guid>
 	</files>
 	<files>
 		<path>media/clothing/clothingItems/ClickerBody_02.xml</path>
+		<guid>6dfd4a55-0fc0-4783-87ea-28cddebe609d</guid>
+	</files>
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_03.xml</path>
+		<guid>c96cc7c9-7260-4ed0-a15a-fa402192150b</guid>
+	</files>
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_04.xml</path>
 		<guid>81b1d260-dde0-439e-aea8-2f25724f3f5b</guid>
 	</files>
 </fileGuidTable>

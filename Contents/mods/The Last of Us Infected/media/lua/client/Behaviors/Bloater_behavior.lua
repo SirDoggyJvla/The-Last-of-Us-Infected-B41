@@ -64,7 +64,7 @@ ZomboidForge.StrongBloater = function(zombie,ZType,thumped)
 	else
 		local health = nil
 		-- need to make a difference between each classes
-		-- IsoThumpable is player built
+		-- IsoThumpable is player built structures
 		if instanceof(thumped,"IsoThumpable") then
 			---@cast thumped IsoThumpable
 
@@ -92,4 +92,5 @@ ZomboidForge.StrongBloater = function(zombie,ZType,thumped)
 		end
 	end
 end
+
 --#endregion

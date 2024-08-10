@@ -44,7 +44,7 @@ Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 ZomboidForge.OnClickerDeath = function(zombie,_)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
-	inventory:AddItems("Hat_Fungi_Loot",1)
+	inventory:AddItems("TLOU.Hat_Fungi_Loot",1)
 end
 
 --#region Custom behavior: `ClickerAgro`

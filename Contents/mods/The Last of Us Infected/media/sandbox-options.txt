@@ -239,6 +239,15 @@ option TLOU_infected.BloaterHealth
 -- Infected custom behavior
 ---------------------------------------------------------------------*/
 /* Dangerous Clickers */
+option TLOU_infected.CustomInfectionSystem
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_CustomInfectionSystem,
+}
+
+/* Dangerous Clickers */
 option TLOU_infected.NoPushClickers
 {
 	type = boolean,

@@ -23,6 +23,7 @@ local ZomboidForge = require "ZomboidForge_module"
 require "ZomboidForge"
 require "ZomboidForge_tools"
 
+
 -- localy initialize mod data
 local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
 local function initTLOU_ModData()
@@ -117,6 +118,11 @@ TLOU_infected.Initialize_TLOUInfected = function()
 				male 				= 		"Zombie/Voice/MaleB",
 				female 				= 		"Zombie/Voice/FemaleB",
 			},
+			clothingVisuals = {
+				dirty = 0.5,
+				bloody = 0.5,
+				holes = true,
+			},
 			removeBandages 			= 		true,
 
 			-- stats
@@ -171,8 +177,16 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			customEmitter 			= 		"Zombie/Voice/FemaleC",
 			clothingVisuals = {
 				set = {
-					["MaskFull"] 	= 		"TLOU.ClickerBody_01",
+					["UnderwearBottom"] 	= 		{
+						"TLOU.ClickerBody_01",
+						"TLOU.ClickerBody_02",
+						"TLOU.ClickerBody_03",
+						"TLOU.ClickerBody_04",
+					},
 				},
+				dirty = true,
+				bloody = true,
+				holes = true,
 				remove = {
 					["Hat"]			=		true,
 					["Mask"] 		= 		true,
@@ -183,8 +197,16 @@ TLOU_infected.Initialize_TLOUInfected = function()
 					["Ears"] 		= 		true,
 					["EarTop"] 		= 		true,
 					["Scarf"] 		= 		true,
+					["Socks"]		=		true,
+					["Shoes"]		=		true,
 				},
 			},
+			-- outfit = {
+			-- 	"Clicker_01",
+			-- 	"Clicker_02",
+			-- 	"Clicker_03",
+			-- 	"Clicker_04",
+			-- },
 			removeBandages 			= 		true,
 
 			-- stats

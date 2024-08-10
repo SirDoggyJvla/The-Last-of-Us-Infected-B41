@@ -6,9 +6,9 @@ image = r'path_to_image'
 file = r'your_image.extension'
 export = r'path_to_export'
 
-image = r'C:\Users\simon\Zomboid\Workshop\The Last of Us Infected\images\main menu images'
-file = r'clicker2_banner.png'
-export = r'C:\Users\simon\Zomboid\Workshop\The Last of Us Infected\images\main menu images\test'
+image = r'C:\Users\simon\Zomboid\Workshop\The Last of Us Infected - Beta\images\main menu images'
+file = r'clicker_cycle4.png'
+export = r'C:\Users\simon\Zomboid\Workshop\The Last of Us Infected - Beta\Contents\mods\The Last of Us Infected - Main menu Clicker 2\media\ui'
 
 
 

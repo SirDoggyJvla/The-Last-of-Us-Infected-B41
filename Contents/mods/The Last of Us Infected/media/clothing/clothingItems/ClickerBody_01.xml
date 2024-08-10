@@ -2,7 +2,7 @@
 <clothingItem>
 	<m_MaleModel>media\models_X\Skinned\Clicker_02.FBX</m_MaleModel>
 	<m_FemaleModel>media\models_X\Skinned\Clicker_02.FBX</m_FemaleModel>
-	<m_GUID>70dd2f19-bef3-42ac-94f6-f10bbf5957a1</m_GUID>
+	<m_GUID>fe15360b-8de1-4b10-a32a-440d7c423a5f</m_GUID>
 	<m_Static>false</m_Static>
 	<m_AllowRandomHue>false</m_AllowRandomHue>
 	<m_AllowRandomTint>false</m_AllowRandomTint>
