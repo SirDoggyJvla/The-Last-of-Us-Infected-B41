@@ -46,3 +46,6 @@ if getActivatedMods():contains("CheckUpstairs") then
 	CheckUpstairs.defaultZombieName = getText("IGUI_TLOU_zombieName")
 	CheckUpstairs.defaultZombiesName = getText("IGUI_TLOU_zombiesName")
 end
+
+-- debug tool
+-- Events.OnPostRender.Add(TLOU_infected.RenderHighLights)

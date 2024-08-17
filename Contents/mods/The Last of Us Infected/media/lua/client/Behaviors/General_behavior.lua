@@ -243,19 +243,6 @@ TLOU_infected.CustomInfection = function()
 		if bodyDamage:getInfectionMortalityDuration() ~= infectionTime_hour then
 			bodyDamage:setInfectionMortalityDuration(infectionTime_hour)
 		end
-
-		-- local timeSinceInfected = math.floor_decimals(TLOU_infected.GetTimeSinceInfected(client_player),3)
-		-- local timeUntilDeath = math.floor_decimals(infectionTime_hour - timeSinceInfected,3)
-		-- local level = math.floor_decimals(client_player:getBodyDamage():getInfectionLevel(),3)
-		-- local mortalityDuration = math.floor_decimals(bodyDamage:getInfectionMortalityDuration(),3)
-
-		-- client_player:addLineChatElement(
-		-- 	"infectionTime = "..infectionTime_hour.."\n"..
-		-- 	"mortalityDuration = "..mortalityDuration.."\n"..
-		-- 	"level = "..level.."\n"..
-		-- 	"timeSinceInfected = "..timeSinceInfected.."\n"..
-		-- 	"timeUntilDeath = "..timeUntilDeath
-		-- )
 	end
 end
 
@@ -264,9 +251,16 @@ end
 
 
 -- player cannot push infected
-ZomboidForge.NoPush = function(zombie, ZType)
-	local target = zombie:getTarget()
-	if not target or instanceof(target:getPrimaryHandItem(),"HandWeapon") then
+ZomboidForge.NoPush = function(ZType,zombie,bonusData)
+	local handWeapon
+	if not SandboxVars.TLOU_infected.AllowWeaponPush and bonusData then
+		handWeapon = bonusData.handWeapon
+	else
+		local target = zombie:getTarget()
+		handWeapon = target and target:getPrimaryHandItem()
+	end
+
+	if instanceof(handWeapon,"HandWeapon") and handWeapon:getFullType() ~= "Base.BareHands" then
 		return false
 	else
 		return true
@@ -280,6 +274,7 @@ ZomboidForge.GrabbyInfected = function(ZType,target,zombie)
 		if not target:isGodMod() then
 			target:setSlowFactor(1)
 			target:setSlowTimer(1)
+			-- target:setHitReaction("HitReaction")
 		end
 	end
 end

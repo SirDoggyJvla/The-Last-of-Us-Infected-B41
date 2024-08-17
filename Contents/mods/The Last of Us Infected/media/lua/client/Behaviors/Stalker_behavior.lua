@@ -38,6 +38,84 @@ end
 Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
 Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 
+
+
+-- Code by Rodriguo
+
+local enabled = true
+TLOU_infected.highlightsSquares = {}
+
+function TLOU_infected.AddHighlightSquare(square, ISColors)
+    if not square or not ISColors then return end
+    table.insert(TLOU_infected.highlightsSquares, {square = square, color = ISColors})
+end
+
+function TLOU_infected.RenderHighLights()
+    if not enabled then return end
+
+    if #TLOU_infected.highlightsSquares == 0 then return end
+    for _, highlight in ipairs(TLOU_infected.highlightsSquares) do
+        if highlight.square ~= nil and instanceof(highlight.square, "IsoGridSquare") then
+            local x,y,z = highlight.square:getX(), highlight.square:getY(), highlight.square:getZ()
+            local r,g,b,a = highlight.color.r, highlight.color.g, highlight.color.b, 0.8
+
+            local floorSprite = IsoSprite.new()
+            floorSprite:LoadFramesNoDirPageSimple('media/ui/FloorTileCursor.png')
+            floorSprite:RenderGhostTileColor(x, y, z, r, g, b, a)
+        else
+            print("Invalid square")
+        end
+    end
+end
+
+TLOU_infected.setForwardDirection = function(zombie,r_x,r_y)
+	local r = math.sqrt(r_x*r_x + r_y*r_y)
+
+	local rt_x, rt_y = -r_y, r_x
+
+	local zombieVelocity = TLOU_infected.GetZombieVelocity(zombie)
+
+	local multi = math.sqrt(zombieVelocity:getX()^2 + zombieVelocity:getY()^2)
+	local velocity_x, velocity_y = multi*rt_x/r, multi*rt_y/r
+
+	local vector = Vector2.new(velocity_x,velocity_y)
+	zombie:setForwardDirection(vector)
+end
+
+TLOU_infected.MoveToCoordinates = function(zombie,target,coordinates)
+	local modData = zombie:getModData()
+	if not zombie:getVariableBoolean("MovingToCoordinates") and coordinates then
+		local x, y, z = coordinates.x, coordinates.y, coordinates.z
+
+		zombie:getPathFindBehavior2():pathToLocation(x, y, z)
+		zombie:getPathFindBehavior2():cancel()
+		zombie:setPath2(nil)
+
+		zombie:setVariable("MovingToCoordinates",true)
+
+		zombie:setWalkType("sprint1")
+
+		-- highlight square
+		local square = getSquare(x,y,z)
+		TLOU_infected.highlightsSquares = {}
+		TLOU_infected.AddHighlightSquare(square,{r=0.75, g=0.00, b=0.25, a=1})
+	else
+		local update = zombie:getPathFindBehavior2():update()
+		-- modData.time = modData.time - 1
+
+		zombie:setWalkType("sprint1")
+
+		local done = update == BehaviorResult.Failed or update == BehaviorResult.Succeeded
+
+		if done then
+			zombie:getPathFindBehavior2():cancel()
+			-- zombie:setPath2(nil)
+			zombie:setVariable("MovingToCoordinates",false)
+		end
+	end
+end
+
+
 ---@param zombie 				IsoZombie
 ---@param ZType	 				string   	--Zombie Type ID
 ZomboidForge.StalkerBehavior = function(zombie,ZType)
@@ -109,43 +187,43 @@ ZomboidForge.StalkerBehavior = function(zombie,ZType)
 
 	-- if agrometer is above threshold, make stalker rush at target
 	-- elseif below lose agro threshold then doesn't have enough agro to fuck around with its target anymore
-	-- else go back to useless mode
+	-- else go back to useless mode and circle around the player
 	if agrometer > threshold then
+		if zombie:getVariableBoolean("MovingToCoordinates") then
+			TLOU_infected.MoveToCoordinates(zombie,target,nil)
+		end
+
 		TLOU_infected.SwitchUseless(zombie,false)
 		zombie:setTarget(target)
-		zombie:pathToLocation(target:getX(),target:getY(),target:getZ())
-		--zombie:pathToCharacter(target)
 	elseif agrometer < -100 then
 		TLOU_infected.SwitchUseless(zombie,false)
 		PersistentZData_TLOU.target = nil
 
-		--sq smoke stops target selecting
-		zombie:getSquare():getProperties():Set(smokeFlag)
+		zombie:getPathFindBehavior2():cancel()
 	else
-		--sq smoke stops target selecting
-		zombie:getSquare():getProperties():Set(smokeFlag)
+		TLOU_infected.SwitchUseless(zombie,true)
 		zombie:setTarget(nil)
-
-		local zombieVelocity = TLOU_infected.GetZombieVelocity(zombie)
-
-		-- Negate game movement.
-		local negativeZombieVelocity = zombieVelocity:clone():set(-zombieVelocity:getX(), -zombieVelocity:getY())
-		zombie:MoveUnmodded(negativeZombieVelocity)
 
 		local target_x, target_y, target_z = target:getX(), target:getY(), target:getZ()
 		local zombie_x, zombie_y, zombie_z = zombie:getX(), zombie:getY(), zombie:getZ()
-
+		
+		-- Calculate the difference in positions
 		local r_x, r_y = zombie_x - target_x, zombie_y - target_y
-		local r = math.sqrt(r_x*r_x + r_y*r_y)
-		local rt_x, rt_y = -r_y, r_x
-
-		local multi = math.sqrt(zombieVelocity:getX()^2 + zombieVelocity:getY()^2)
-		local velocity_x, velocity_y = multi*rt_x/r, multi*rt_y/r
-
-		local vector = Vector2.new(velocity_x,velocity_y)
-		zombie:MoveUnmodded(vector)
-		zombie:setForwardDirection(vector)
-		--zombie:pathToLocationF(zombie_x + velocity_x,zombie_y + velocity_y,zombie_z)
+		
+		-- Calculate the distance (radius) between the zombie and the target
+		local radius = math.sqrt(r_x^2 + r_y^2)
+		
+		-- Set the angle for movement around the target
+		-- This angle can be incremented to move the zombie along the circle
+		local angle = math.atan2(r_y, r_x) + 0.2 -- Adjust the increment to control speed/direction
+		
+		-- Calculate the new position on the circle
+		local moveTo_x = target_x + radius * math.cos(angle)
+		local moveTo_y = target_y + radius * math.sin(angle)
+		local moveTo_z = target_z
+		
+		TLOU_infected.MoveToCoordinates(zombie, target, {x = moveTo_x, y = moveTo_y, z = moveTo_z})
+		
 	end
 end
 
@@ -257,7 +335,7 @@ TLOU_infected.UpdateAgrometer = function(zombie,target)
 	stringZ = stringZ.."\n".."isUseless = "..tostring(zombie:isUseless())
 	stringZ = stringZ.."\n".."target = "..tostring(zombie:getTarget())
 	stringZ = stringZ.."\n".."agrometer = "..tostring(agrometer)
-	zombie:addLineChatElement(stringZ)
+	-- zombie:addLineChatElement(stringZ)
 	--zombie:addLineChatElement("Stalker")
 
 	return agrometer

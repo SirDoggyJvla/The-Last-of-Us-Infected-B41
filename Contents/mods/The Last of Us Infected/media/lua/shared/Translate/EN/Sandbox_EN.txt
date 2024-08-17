@@ -53,6 +53,9 @@ Sandbox_EN = {
 	Sandbox_TLOU_NoPushClickers = "No pushing/stomping clickers",
 	Sandbox_TLOU_NoPushClickers_tooltip = "Makes players unable to push or head stomp clickers.",
 
+	Sandbox_TLOU_AllowWeaponPush = "Allow push when weapon in hand",
+	Sandbox_TLOU_AllowWeaponPush_tooltip = "This makes the no pushing a little bit less punishing, allowing you to push Clickers when you have a weapon in hand. You won't be able to push Clickers if you don't have a weapon however.",
+
 	Sandbox_TLOU_GrabbyClickers = "Grabby clickers",
 	Sandbox_TLOU_GrabbyClickers_tooltip = "Clickers can grab you, making you unable to move. You can save yourself with short blades if you time it well. By default is deactivated due to how unfair it can be but if you want an even harder challenge, go for it.",
 

@@ -238,7 +238,6 @@ option TLOU_infected.BloaterHealth
 /*---------------------------------------------------------------------
 -- Infected custom behavior
 ---------------------------------------------------------------------*/
-/* Dangerous Clickers */
 option TLOU_infected.CustomInfectionSystem
 {
 	type = boolean,
@@ -254,6 +253,14 @@ option TLOU_infected.NoPushClickers
 	default = true,
 	page = TLOU_infected_customBehavior,
 	translation = TLOU_NoPushClickers,
+}
+
+option TLOU_infected.AllowWeaponPush
+{
+	type = boolean,
+	default = false,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_AllowWeaponPush,
 }
 
 option TLOU_infected.GrabbyClickers
