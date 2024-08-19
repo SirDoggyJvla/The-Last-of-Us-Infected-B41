@@ -280,7 +280,7 @@ ZomboidForge.GrabbyInfected = function(ZType,target,zombie)
 end
 
 -- One shot victim
-ZomboidForge.KillTarget = function(ZType,zombie,victim,handWeapon)
+ZomboidForge.KillTarget = function(ZType,zombie,victim)
 	-- zombie kills victim
 	if not victim:isGodMod() then
 		victim:Kill(zombie)
@@ -329,18 +329,14 @@ end
 ---@param zombie 		IsoZombie
 ---@param _		 		string   	--Zombie Type ID
 ZomboidForge.HideIndoors = function(zombie,_)
-	-- get zombie data
-	local trueID = ZomboidForge.pID(zombie)
-	local PersistentZData_TLOU = ZomboidForge.GetPersistentZData(trueID,"TLOU_infected")
-
+	local timeSinceFlesh = zombie.TimeSinceSeenFlesh/120
 	-- if zombie is already in building, completely skip
 	-- elseif has target
 	-- elseif hasn't been at least N seconds since last update 
 	if zombie:getBuilding()
 	or zombie:getTarget()
 	or zombie:isMoving()
-	or math.floor(zombie.TimeSinceSeenFlesh / 100)%(TLOU_infected.HideIndoorsUpdates) ~= 0
-	or PersistentZData_TLOU.target
+	or (timeSinceFlesh - timeSinceFlesh%1)%(TLOU_infected.HideIndoorsUpdates) ~= 0
 	then
 		return
 	end

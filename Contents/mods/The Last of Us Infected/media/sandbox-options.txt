@@ -138,6 +138,16 @@ option TLOU_infected.RunnerHealth
 	translation = TLOU_RunnerHP,
 }
 
+option TLOU_infected.RunnerBurnRate
+{
+	type = double,
+	min = 0,
+	max = 50,
+	default = 5,
+	page = TLOU_infected_stats,
+	translation = TLOU_RunnerBurnRate,
+}
+
 
 
 /*---------------------------------------------------------------------
@@ -183,6 +193,16 @@ option TLOU_infected.StalkerHealth
 	translation = TLOU_StalkerHP,
 }
 
+option TLOU_infected.StalkerBurnRate
+{
+	type = double,
+	min = 0,
+	max = 50,
+	default = 10,
+	page = TLOU_infected_stats,
+	translation = TLOU_StalkerBurnRate,
+}
+
 
 
 /*---------------------------------------------------------------------
@@ -208,6 +228,15 @@ option TLOU_infected.ClickerHealth
 	translation = TLOU_ClickerHP,
 }
 
+option TLOU_infected.ClickerBurnRate
+{
+	type = double,
+	min = 0,
+	max = 50,
+	default = 10,
+	page = TLOU_infected_stats,
+	translation = TLOU_ClickerBurnRate,
+}
 
 
 /*---------------------------------------------------------------------
@@ -231,6 +260,16 @@ option TLOU_infected.BloaterHealth
 	default = 50,
 	page = TLOU_infected_stats,
 	translation = TLOU_BloaterHP,
+}
+
+option TLOU_infected.BloaterBurnRate
+{
+	type = double,
+	min = 0,
+	max = 50,
+	default = 10,
+	page = TLOU_infected_stats,
+	translation = TLOU_BloaterBurnRate,
 }
 
 

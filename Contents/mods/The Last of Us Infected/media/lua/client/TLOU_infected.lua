@@ -48,9 +48,6 @@ TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToChec
 
 --- Create zombie types
 TLOU_infected.Initialize_TLOUInfected = function()
-	-- Check for IsDay on load for no problems
-	TLOU_infected.IsDay()
-
 	-- Sandbox options imported localy for performance reasons
 	TLOU_infected.HideIndoorsUpdates 	=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
 	TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
@@ -77,6 +74,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					=		SandboxVars.TLOU_infected.RunnerVision,
 			hearing 				=		SandboxVars.TLOU_infected.RunnerHearing,
 			HP 						=		SandboxVars.TLOU_infected.RunnerHealth,
+			fireKillRate			=		0.0038*TLOU_infected.RunnerBurnRate,
 
 			-- UI
 			color 					=		{122, 243, 0,},
@@ -134,6 +132,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					=		SandboxVars.TLOU_infected.StalkerVision,
 			hearing 				=		SandboxVars.TLOU_infected.StalkerHearing,
 			HP 						=		SandboxVars.TLOU_infected.StalkerHealth,
+			fireKillRate			=		0.0038*TLOU_infected.StalkerBurnRate,
 
 			-- UI
 			color 					= 		{230, 230, 0,},
@@ -201,12 +200,6 @@ TLOU_infected.Initialize_TLOUInfected = function()
 					["Shoes"]		=		true,
 				},
 			},
-			-- outfit = {
-			-- 	"Clicker_01",
-			-- 	"Clicker_02",
-			-- 	"Clicker_03",
-			-- 	"Clicker_04",
-			-- },
 			removeBandages 			= 		true,
 
 			-- stats
@@ -218,6 +211,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					= 		3,
 			hearing 				= 		SandboxVars.TLOU_infected.ClickerHearing,
 			HP 						= 		SandboxVars.TLOU_infected.ClickerHealth,
+			fireKillRate			=		0.0038*TLOU_infected.ClickerBurnRate,
 
 			-- UI
 			color 					=		{218, 109, 0,},
@@ -288,6 +282,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					=		3,
 			hearing 				=		SandboxVars.TLOU_infected.BloaterHearing,
 			HP 						=		SandboxVars.TLOU_infected.BloaterHealth,
+			fireKillRate			=		0.0038*TLOU_infected.BloaterBurnRate,
 
 			-- UI
 			color 					=		{205, 0, 0,},

@@ -31,20 +31,29 @@ Sandbox_EN = {
 	Sandbox_TLOU_RunnerHearing = "Runner Hearing",
 	Sandbox_TLOU_RunnerHP = "Runner health multiplier",
 	Sandbox_TLOU_RunnerHP_tooltip = "0 means default vanilla zombie health (depends on Runner toughness).",
+	Sandbox_TLOU_RunnerBurnRate = "Runner burn multiplier",
+	Sandbox_TLOU_RunnerBurnRate_tooltip = "Dictates how fast a Runner will burn and die from fire.",
+
 
 	Sandbox_TLOU_StalkerSpeed = "Stalker Speed",
 	Sandbox_TLOU_StalkerVision = "Stalker Sight",
 	Sandbox_TLOU_StalkerHearing = "Stalker Hearing",
 	Sandbox_TLOU_StalkerHP = "Stalker health multiplier",
 	Sandbox_TLOU_StalkerHP_tooltip = "0 means default vanilla zombie health (depends on Stalker toughness).",
+	Sandbox_TLOU_StalkerBurnRate = "Stalker burn multiplier",
+	Sandbox_TLOU_StalkerBurnRate_tooltip = "Dictates how fast a Stalker will burn and die from fire.",
 
 	Sandbox_TLOU_ClickerHearing = "Clicker Hearing",
 	Sandbox_TLOU_ClickerHP = "Clicker health multiplier",
 	Sandbox_TLOU_ClickerHP_tooltip = "0 means default vanilla zombie health (depends on Clicker toughness).",
+	Sandbox_TLOU_ClickerBurnRate = "Clicker burn multiplier",
+	Sandbox_TLOU_ClickerBurnRate_tooltip = "Dictates how fast a Clicker will burn and die from fire.",
 
 	Sandbox_TLOU_BloaterHearing = "Bloater Hearing",
 	Sandbox_TLOU_BloaterHP = "Bloater health multiplier",
 	Sandbox_TLOU_BloaterHP_tooltip = "0 means default vanilla zombie health (depends on Bloater toughness).",
+	Sandbox_TLOU_BloaterBurnRate = "Bloater burn multiplier",
+	Sandbox_TLOU_BloaterBurnRate_tooltip = "Dictates how fast a Bloater will burn and die from fire.",
 
 	/* Dangerous Clickers */
 	Sandbox_TLOU_CustomInfectionSystem = "Custom infection system",

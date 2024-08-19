@@ -27,7 +27,7 @@ Events.OnGameStart.Add(TLOU_infected.Initialize_TLOUInfected)
 Events.EveryOneMinute.Add(TLOU_infected.CustomInfection)
 
 --- Add buildings to the list of buildings available to check for zombies
-Events.LoadGridsquare.Add(TLOU_infected.AddBuildingList)
+-- Events.LoadGridsquare.Add(TLOU_infected.AddBuildingList)
 
 --- Add a check if it's day every hours
 Events.EveryHours.Add(TLOU_infected.IsDay)
