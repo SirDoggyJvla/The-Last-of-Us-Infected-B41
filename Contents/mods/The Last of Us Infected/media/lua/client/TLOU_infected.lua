@@ -74,7 +74,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					=		SandboxVars.TLOU_infected.RunnerVision,
 			hearing 				=		SandboxVars.TLOU_infected.RunnerHearing,
 			HP 						=		SandboxVars.TLOU_infected.RunnerHealth,
-			fireKillRate			=		0.0038*TLOU_infected.RunnerBurnRate,
+			fireKillRate			=		0.0038*SandboxVars.TLOU_infected.RunnerBurnRate,
 
 			-- UI
 			color 					=		{122, 243, 0,},
@@ -132,7 +132,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					=		SandboxVars.TLOU_infected.StalkerVision,
 			hearing 				=		SandboxVars.TLOU_infected.StalkerHearing,
 			HP 						=		SandboxVars.TLOU_infected.StalkerHealth,
-			fireKillRate			=		0.0038*TLOU_infected.StalkerBurnRate,
+			fireKillRate			=		0.0038*SandboxVars.TLOU_infected.StalkerBurnRate,
 
 			-- UI
 			color 					= 		{230, 230, 0,},
@@ -211,7 +211,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					= 		3,
 			hearing 				= 		SandboxVars.TLOU_infected.ClickerHearing,
 			HP 						= 		SandboxVars.TLOU_infected.ClickerHealth,
-			fireKillRate			=		0.0038*TLOU_infected.ClickerBurnRate,
+			fireKillRate			=		0.0038*SandboxVars.TLOU_infected.ClickerBurnRate,
 
 			-- UI
 			color 					=		{218, 109, 0,},
@@ -282,7 +282,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			sight 					=		3,
 			hearing 				=		SandboxVars.TLOU_infected.BloaterHearing,
 			HP 						=		SandboxVars.TLOU_infected.BloaterHealth,
-			fireKillRate			=		0.0038*TLOU_infected.BloaterBurnRate,
+			fireKillRate			=		0.0038*SandboxVars.TLOU_infected.BloaterBurnRate,
 
 			-- UI
 			color 					=		{205, 0, 0,},
