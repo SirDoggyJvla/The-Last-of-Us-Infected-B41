@@ -225,6 +225,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
 			roll_lootcount 			=		function() return ZombRand(3,8) end,
 			fireDamageMultiplier 	=		SandboxVars.TLOU_infected.ExtraFireDamage,
+			damageLimiter			=		SandboxVars.TLOU_infected.DamageLimiterClicker
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Clicker = nil
@@ -294,6 +295,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
 			roll_lootcount 			=		function() return ZombRand(5,15) end,
 			fireDamageMultiplier 	=		SandboxVars.TLOU_infected.ExtraFireDamage,
+			damageLimiter			=		SandboxVars.TLOU_infected.DamageLimiterBloater
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Bloater = nil

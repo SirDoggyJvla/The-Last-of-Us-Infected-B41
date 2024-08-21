@@ -288,15 +288,34 @@ end
 
 -- cap damage to clicker and bloater from player
 -- increase damage if on fire
-ZomboidForge.ExtraFireDamage = function(ZType,player, zombie, handWeapon, damage)
-	-- maximum damage output
-	if damage >= 3 then
-		damage = 3
+ZomboidForge.ExtraFireDamage = function(data)
+	-- ZType,player,zombie,handWeapon,damage
+    -- process inputs
+    local zombie = data.zombie
+    local ZombieTable = data.ZombieTable
+
+	-- if not ZombieTable, retrieve it
+	if not ZombieTable then
+		local ZType = data.ZType
+		if not ZType then
+			local trueID = data.trueID or ZomboidForge.pID(zombie)
+			ZType = ZomboidForge.GetZType(trueID)
+		end
+		ZombieTable = ZomboidForge.ZTypes[ZType]
 	end
 
-	-- if Zombie is on fire, deal more damage even past max damage output
+	-- get damage
+	local damage = data.damage
+	local damageLimiter = ZombieTable.damageLimiter
+
+	-- maximum damage output
+	if damageLimiter ~= 0 and damage > damageLimiter then
+		damage = damageLimiter
+	end
+
+	-- if zombie is on fire, deal more damage even past max damage output
 	if zombie:isOnFire() then
-		return damage * ZomboidForge.ZTypes[ZType].fireDamageMultiplier
+		return damage * ZombieTable.fireDamageMultiplier
 	end
 
 	return damage

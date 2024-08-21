@@ -88,6 +88,14 @@ Sandbox_EN = {
 	Sandbox_TLOU_ExtraFireDamage_tooltip = "Defines the multiplier applied to the damage dealt to flammable infected. The base damage to flammable infected is capped at 3, times this multiplier when on fire. <BR> By default, Bloaters take ~20 shotgun shells to kill with the default health setting. Fire reduces this to ~7 shells.",
 
 
+	/* Damage limiter */
+	Sandbox_TLOU_DamageLimiterClicker = "Limit damages to Clickers",
+	Sandbox_TLOU_DamageLimiterClicker_tooltip = "Clickers take a limit amount of damage from attacks thanks to their armor, change this value to adapt the max amount of damage a Clicker can take. Damages boosted by fire on Clickers can overpass this value, fire tick damage doesn't take this limiter into account either. Set this value to 0 to deactivate.",
+
+	Sandbox_TLOU_DamageLimiterBloater = "Limit damages to Bloaters",
+	Sandbox_TLOU_DamageLimiterBloater_tooltip = "Bloaters take a limit amount of damage from attacks thanks to their armor, change this value to adapt the max amount of damage a Bloater can take. Damages boosted by fire on Bloaters can overpass this value, fire tick damage doesn't take this limiter into account either. Set this value to 0 to deactivate.",
+
+
 	/* Hide Indoors */
 	Sandbox_TLOU_HideIndoors = "Hide Indoors",
 	Sandbox_TLOU_HideIndoors_tooltip = "All the infected besides Runners have a tendency to hide from the sun within the dark corners of buildings. This makes exploration of a building particularly dangerous while the streets are safer. Make sure to pay attention to your surrondings when exploring.",

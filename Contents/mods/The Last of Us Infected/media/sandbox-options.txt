@@ -354,6 +354,27 @@ option TLOU_infected.ExtraFireDamage
 	translation = TLOU_ExtraFireDamage,
 }
 
+/* Damage limiter */
+option TLOU_infected.DamageLimiterClicker
+{
+	type = integer, 
+	min = 0,
+	max = 1000, 
+	default = 3,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_DamageLimiterClicker,
+}
+
+option TLOU_infected.DamageLimiterBloater
+{
+	type = integer, 
+	min = 0, 
+	max = 1000, 
+	default = 3,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_DamageLimiterBloater,
+}
+
 /* Hide Indoors */
 option TLOU_infected.HideIndoors
 {
