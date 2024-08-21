@@ -268,13 +268,12 @@ ZomboidForge.NoPush = function(ZType,zombie,bonusData)
 end
 
 -- grabby infected, slowing you down in place
-ZomboidForge.GrabbyInfected = function(ZType,target,zombie)
-	if target:isAlive() then
+ZomboidForge.GrabbyInfected = function(ZType,zombie,victim)
+	if victim:isAlive() then
 		--clicker grabs target
-		if not target:isGodMod() then
-			target:setSlowFactor(1)
-			target:setSlowTimer(1)
-			-- target:setHitReaction("HitReaction")
+		if not victim:isGodMod() then
+			victim:setSlowFactor(1)
+			victim:setSlowTimer(1)
 		end
 	end
 end

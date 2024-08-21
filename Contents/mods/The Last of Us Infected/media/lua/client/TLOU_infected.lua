@@ -81,13 +81,8 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgroCharacter 	=		{},
 
 			-- custom behavior
-			zombieDeath 			=		{},
-			customBehavior 			=		{},
-
-			customData 				=		{},
 
 			-- custom data for TLOU_infected
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
@@ -139,13 +134,8 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				= 		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgroCharacter 	= 		{},
 
 			-- custom behavior
-			zombieDeath 			= 		{},
-			customBehavior 			= 		{},
-
-			customData 				= 		{},
 
 			-- custom data for TLOU_infected
 			lootchance 				= 		SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
@@ -218,9 +208,10 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgroCharacter = {},
-			onHit_zombie2player = {},
-			onHit_player2zombie = {},
+			-- zombieAgroCharacter = {},
+			-- onHit_zombieAttacking = {},
+			-- onHit_zombie2player = {},
+			-- onHit_player2zombie = {},
 
 			-- custom behavior
 			zombieDeath = {
@@ -229,8 +220,6 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			customBehavior = {
 				"ClickerAgro",
 			},
-
-			customData = {},
 
 			-- custom data for TLOU_infected
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
@@ -289,7 +278,8 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			zombieAgroCharacter = {
+			-- zombieAgroCharacter = {},
+			onHit_zombieAttacking = {
 				"GrabbyInfected",
 			},
 			onHit_zombie2player = {
@@ -300,13 +290,6 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			onlyJawStab 			=		true,
 			jawStabImmune			=		true,
 
-			-- custom behavior
-			zombieDeath = {},
-			customBehavior = {},
-			onThump = {},
-
-			customData = {},
-
 			-- custom data for TLOU_infected
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
 			roll_lootcount 			=		function() return ZombRand(5,15) end,
@@ -316,65 +299,76 @@ TLOU_infected.Initialize_TLOUInfected = function()
 		ZomboidForge.ZTypes.TLOU_Bloater = nil
 	end
 
+	-- add sandbox option based functions
+	local runner = ZomboidForge.ZTypes.TLOU_Runner
+	local stalker = ZomboidForge.ZTypes.TLOU_Stalker
+	local clicker = ZomboidForge.ZTypes.TLOU_Clicker
+	local bloater = ZomboidForge.ZTypes.TLOU_Bloater
+
 	-- If runners and stalkers are able to vault
-	if SandboxVars. TLOU_infected.VaultingInfected then
-		if ZomboidForge.ZTypes.TLOU_Runner then
-			ZomboidForge.ZTypes.TLOU_Runner.animationVariable = "isInfected"
+	if SandboxVars.TLOU_infected.VaultingInfected then
+		if runner then
+			runner.animationVariable = "isInfected"
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Stalker then
-			ZomboidForge.ZTypes.TLOU_Stalker.animationVariable = "isInfected"
+		if stalker then
+			stalker.animationVariable = "isInfected"
 		end
 	end
 
 	-- if infected should hide indoors in daytime
 	if SandboxVars.TLOU_infected.HideIndoors then
-		if ZomboidForge.ZTypes.TLOU_Stalker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
+		if stalker then
+			stalker.customBehavior = stalker.customBehavior or {}
+			table.insert(stalker.customBehavior,
 				"HideIndoors"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Clicker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
+		if clicker then
+			clicker.customBehavior = clicker.customBehavior or {}
+			table.insert(clicker.customBehavior,
 				"HideIndoors"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Bloater then
-			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.customBehavior,
+		if bloater then
+			bloater.customBehavior = bloater.customBehavior or {}
+			table.insert(bloater.customBehavior,
 				"HideIndoors"
 			)
 		end
 	end
 
 	-- if Bloaters are allowed to deal more damage to structures
-	if SandboxVars.TLOU_infected.StrongBloater and ZomboidForge.ZTypes.TLOU_Bloater then
-		table.insert(ZomboidForge.ZTypes.TLOU_Bloater.onThump,
+	if SandboxVars.TLOU_infected.StrongBloater and bloater then
+		bloater.onThump = bloater.onThump or {}
+		table.insert(bloater.onThump,
 			"StrongBloater"
 		)
 	end
 
 	-- if Clicker and Bloaters take extra damage from fire but the damage they take is capped
-	if SandboxVars.TLOU_infected.ExtraFireDamage_Clicker and ZomboidForge.ZTypes.TLOU_Clicker then
-		ZomboidForge.ZTypes.TLOU_Clicker.customDamage = "ExtraFireDamage"
+	if SandboxVars.TLOU_infected.ExtraFireDamage_Clicker and clicker then
+		clicker.customDamage = "ExtraFireDamage"
 	end
 
-	if SandboxVars.TLOU_infected.ExtraFireDamage_Bloater and ZomboidForge.ZTypes.TLOU_Bloater then
-		ZomboidForge.ZTypes.TLOU_Bloater.customDamage = "ExtraFireDamage"
+	if SandboxVars.TLOU_infected.ExtraFireDamage_Bloater and bloater then
+		bloater.customDamage = "ExtraFireDamage"
 	end
 
 	-- if Clicker can't be pushed
 	if SandboxVars.TLOU_infected.NoPushClickers then
-		if ZomboidForge.ZTypes.TLOU_Clicker then
-			ZomboidForge.ZTypes.TLOU_Clicker.onlyJawStab = "NoPush"
-			ZomboidForge.ZTypes.TLOU_Clicker.shouldIgnoreStagger = "NoPush"
+		if clicker then
+			clicker.onlyJawStab = "NoPush"
+			clicker.shouldIgnoreStagger = "NoPush"
 		end
 	end
 
 	if SandboxVars.TLOU_infected.GrabbyClickers then
-		if ZomboidForge.ZTypes.TLOU_Clicker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.onHit_player2zombie,
+		if clicker then
+			clicker.onHit_zombieAttacking = clicker.onHit_zombieAttacking or {}
+			table.insert(clicker.onHit_zombieAttacking,
 				"GrabbyInfected"
 			)
 		end
@@ -382,48 +376,55 @@ TLOU_infected.Initialize_TLOUInfected = function()
 
 	-- One shot Clickers
 	if SandboxVars.TLOU_infected.OneShotClickers then
-		if ZomboidForge.ZTypes.TLOU_Clicker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.onHit_zombie2player,
+		if clicker then
+			clicker.onHit_zombie2player = clicker.onHit_zombie2player or {}
+			table.insert(clicker.onHit_zombie2player,
 				"KillTarget"
 			)
 		end
 	end
 
 	-- blind Clickers
-	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Clicker and false then
-		table.insert(ZomboidForge.ZTypes.TLOU_Clicker.customBehavior,
+	if isDebugEnabled() and clicker and false then
+		clicker.customBehavior = clicker.customBehavior or {}
+		table.insert(clicker.customBehavior,
 			"ClickerBehavior"
 		)
 	end
 
-	if isDebugEnabled() and ZomboidForge.ZTypes.TLOU_Stalker and false then
-		table.insert(ZomboidForge.ZTypes.TLOU_Stalker.customBehavior,
+	if isDebugEnabled() and stalker and false then
+		stalker.customBehavior = stalker.customBehavior or {}
+		table.insert(stalker.customBehavior,
 			"StalkerBehavior"
 		)
 	end
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_infected.CordycepsSpawn then
-		if ZomboidForge.ZTypes.TLOU_Runner then
-			table.insert(ZomboidForge.ZTypes.TLOU_Runner.zombieDeath,
+		if runner then
+			runner.zombieDeath = runner.zombieDeath or {}
+			table.insert(runner.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Stalker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Stalker.zombieDeath,
+		if stalker then
+			stalker.zombieDeath = stalker.zombieDeath or {}
+			table.insert(stalker.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Clicker then
-			table.insert(ZomboidForge.ZTypes.TLOU_Clicker.zombieDeath,
+		if clicker then
+			clicker.zombieDeath = clicker.zombieDeath or {}
+			table.insert(clicker.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
-		if ZomboidForge.ZTypes.TLOU_Bloater then
-			table.insert(ZomboidForge.ZTypes.TLOU_Bloater.zombieDeath,
+		if bloater then
+			bloater.zombieDeath = bloater.zombieDeath or {}
+			table.insert(bloater.zombieDeath,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
