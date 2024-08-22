@@ -20,6 +20,7 @@ local ZombRand = ZombRand -- java function
 --- import module
 local ZomboidForge = require "ZomboidForge_module"
 local TLOU_infected = require "TLOU_infected"
+require "ZomboidForge_tools"
 
 -- localy initialize mod data
 local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
