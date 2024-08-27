@@ -197,8 +197,10 @@ TLOU_infected.UpdateInfectionTime = function(infectionTime,area)
 	local bodyParts = playerModData_TLOU.infected[area]
 
 	-- normalize infection time for each body parts, to reduce the total infection time
-	for bodyPart, _ in pairs(bodyParts) do
-		bodyParts[bodyPart] = newInfectionTime
+	if bodyParts then
+		for bodyPart, _ in ipairs(bodyParts) do
+			bodyParts[bodyPart] = newInfectionTime
+		end
 	end
 end
 
@@ -223,6 +225,7 @@ TLOU_infected.CustomInfection = function()
 	if bodyDamage:IsInfected() then
 		-- check which parts are infected
 		TLOU_infected.HasInfectedBodyParts(client_player)
+
 		local playerModData_TLOU = client_player:getModData().TLOU
 
 		-- retrieve bites and check for priority
@@ -244,6 +247,8 @@ TLOU_infected.CustomInfection = function()
 		if bodyDamage:getInfectionMortalityDuration() ~= infectionTime_hour then
 			bodyDamage:setInfectionMortalityDuration(infectionTime_hour)
 		end
+	elseif client_player:getModData().TLOU then
+		client_player:getModData().TLOU = nil
 	end
 end
 
@@ -269,7 +274,9 @@ ZomboidForge.NoPush = function(ZType,zombie,bonusData)
 end
 
 -- grabby infected, slowing you down in place
-ZomboidForge.GrabbyInfected = function(ZType,zombie,victim)
+ZomboidForge.GrabbyInfected = function(data)
+	local victim = data.victim
+
 	if victim:isAlive() then
 		--clicker grabs target
 		if not victim:isGodMod() then
@@ -280,9 +287,17 @@ ZomboidForge.GrabbyInfected = function(ZType,zombie,victim)
 end
 
 -- One shot victim
-ZomboidForge.KillTarget = function(ZType,zombie,victim)
+ZomboidForge.KillTarget = function(data)
+	local victim = data.victim
+
 	-- zombie kills victim
 	if not victim:isGodMod() then
+		local zombie = data.zombie
+		local attackOutcome = data.attackOutcome
+		if attackOutcome ~= "success" then return end
+
+		if data.hitReaction ~= "Bite" then return end
+
 		victim:Kill(zombie)
 	end
 end
