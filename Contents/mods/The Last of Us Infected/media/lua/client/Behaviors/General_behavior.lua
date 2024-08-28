@@ -70,22 +70,6 @@ TLOU_infected.areaInfectionTime = {
 	bottom = 3,
 }
 
--- Minimal and maximum infection time associated to the area of the body
-TLOU_infected.areaInfectionTime = {
-	top = {
-		min = 5,
-		max = 15,
-	},
-	middle = {
-		min = 120,
-		max = 480,
-	},
-	bottom = {
-		min = 720,
-		max = 1440,
-	},
-}
-
 -- Retrieves a random infection time for a body part based on it's area on the body.
 ---@param area string
 ---@return number
@@ -100,45 +84,48 @@ TLOU_infected.HasInfectedBodyParts = function(player)
 	-- initialize mod data
 	local playerModData = player:getModData()
 	playerModData.TLOU = playerModData.TLOU or {}
-	local playerModData_TLOU = playerModData.TLOU or {}
+	local playerModData_TLOU = playerModData.TLOU
 
+	-- retrieve infection table or define it
 	local infected = playerModData_TLOU.infected or {top = {}, middle = {}, bottom = {}}
-	local totalInfection = 0
-	local infectionTime
 
-	-- check every body parts
+	-- check every body parts for infections
 	local bodyParts = player:getBodyDamage():getBodyParts()
+	local bodyPart
+	local bodyPartID
+	local area
+	local infectionTime
 	for i = 0, bodyParts:size() - 1 do
 		-- retrieve bodyPart i
-		local bodyPart = bodyParts:get(i)
+		bodyPart = bodyParts:get(i)
 
-		-- get bodyPart name
-		local bodyPartID = tostring(bodyPart:getType())
-		local area = TLOU_infected.bodyParts[bodyPartID]
+		-- get bodyPart name and area
+		bodyPartID = tostring(bodyPart:getType())
+		area = TLOU_infected.bodyParts[bodyPartID]
 
-		-- retrieve the area associated
+		-- verify bodyPart has an area associated
 		if area then
 			-- check bodyPart is already acknowledged as bitten
 			infectionTime = infected[area][bodyPartID]
 
-			-- check if bitten
+			-- check if infected
 			if bodyPart:IsInfected() then
 				-- count bites in this area
 				if not infectionTime then
 					infected[area][bodyPartID] = TLOU_infected.GetAreaInfectionTime(area)
 				end
 
-				-- count bodyParts that are bitten
-				totalInfection = totalInfection + 1
+			-- no longer infected, so just remove it from the list
 			elseif infectionTime then
 				infected[area][bodyPartID] = nil
+
+				-- reset old infection time
 				playerModData_TLOU.oldInfectionTime = nil
 			end
 		end
 	end
 
 	playerModData_TLOU.infected = infected
-	playerModData_TLOU.totalInfection = totalInfection
 end
 
 -- Retrieve area priority to get infection time:
@@ -172,12 +159,14 @@ end
 ---@param numberInfected int
 ---@return number
 TLOU_infected.GetInfectionTime = function(bodyParts,numberInfected)
-	local totalTime = 0
+	local chosenTime = 1000000
 	for _, time in pairs(bodyParts) do
-		totalTime = totalTime + time
+		if time < chosenTime then
+			chosenTime = time
+		end
 	end
 
-	return totalTime/numberInfected
+	return chosenTime*(1 - numberInfected*0.05)
 end
 
 -- Updates the infection time of each body parts to suit the general infection time of the player.

@@ -56,9 +56,6 @@ Sandbox_EN = {
 	Sandbox_TLOU_BloaterBurnRate_tooltip = "Dictates how fast a Bloater will burn and die from fire.",
 
 	/* Dangerous Clickers */
-	Sandbox_TLOU_CustomInfectionSystem = "Custom infection system",
-	Sandbox_TLOU_CustomInfectionSystem_tooltip = "Bites on various area of the body part won't make the player die in the same time. The higher on the body the bites are, the faster your character gets zombified. The transmission settings still apply but the infection mortality is replaced. <BR> <IMAGECENTRE:media/ui/infection_time.png,290,410> <LINE>",
-
 	Sandbox_TLOU_NoPushClickers = "No pushing/stomping clickers",
 	Sandbox_TLOU_NoPushClickers_tooltip = "Makes players unable to push or head stomp clickers.",
 
@@ -116,6 +113,26 @@ Sandbox_EN = {
 	/* Vaulting Infected */
 	Sandbox_TLOU_VaultingInfected = "Vaulting Runners and Stalkers",
 	Sandbox_TLOU_VaultingInfected_tooltip = "Runners and Stalkers will be able to vault fences, making them more dangerous and less vulnerable to fence abuses. Lore accurate infected are also able to vault.",
+
+
+	/* Other: custom infection */
+	Sandbox_TLOU_CustomInfectionSystem = "Custom infection system",
+	Sandbox_TLOU_CustomInfectionSystem_tooltip = "Bites on various area of the body part won't make the player die in the same time. The higher on the body the bites are, the faster your character gets zombified. The transmission settings still apply but the infection mortality is replaced. <BR> <IMAGECENTRE:media/ui/infection_time.png,290,410> <LINE>",
+
+	Sandbox_TLOU_CustomInfectionSystemTopMin = "Custom infection system: top min [minutes]",
+	Sandbox_TLOU_CustomInfectionSystemTopMin_tooltip = "Minimum infection time from getting infected on the top area of the body: head, neck.",
+	Sandbox_TLOU_CustomInfectionSystemTopMax = "Custom infection system: top max [minutes]",
+	Sandbox_TLOU_CustomInfectionSystemTopMax_tooltip = "Maximum infection time from getting infected on the top area of the body: head, neck.",
+
+	Sandbox_TLOU_CustomInfectionSystemMiddleMin = "Custom infection system: middle min [minutes]",
+	Sandbox_TLOU_CustomInfectionSystemMiddleMin_tooltip = "Minimum infection time from getting infected on the middle area of the body: hands, forearms, upper arms, torso, groin.",
+	Sandbox_TLOU_CustomInfectionSystemMiddleMax = "Custom infection system: middle max [minutes]",
+	Sandbox_TLOU_CustomInfectionSystemMiddleMax_tooltip = "Maximum infection time from getting infected on the middle area of the body: hands, forearms, upper arms, torso, groin.",
+
+	Sandbox_TLOU_CustomInfectionSystemBottomMin = "Custom infection system: bottom min [minutes]",
+	Sandbox_TLOU_CustomInfectionSystemBottomMin_tooltip = "Minimum infection time from getting infected on the bottom area of the body: upper legs, lower legs, feet.",
+	Sandbox_TLOU_CustomInfectionSystemBottomMax = "Custom infection system: bottom max [minutes]",
+	Sandbox_TLOU_CustomInfectionSystemBottomMax_tooltip = "Maximum infection time from getting infected on the bottom area of the body: upper legs, lower legs, feet.",
 
 
 	/* Mod compatibility: Cordyceps Spore Zones */

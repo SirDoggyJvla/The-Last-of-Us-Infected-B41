@@ -54,6 +54,22 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
 	TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
 
+	-- retrieve infection time
+	TLOU_infected.areaInfectionTime = {
+		top = {
+			min = SandboxVars.TLOU_infected.CustomInfectionSystemTopMin,
+			max = SandboxVars.TLOU_infected.CustomInfectionSystemTopMax,
+		},
+		middle = {
+			min = SandboxVars.TLOU_infected.CustomInfectionSystemMiddleMin,
+			max = SandboxVars.TLOU_infected.CustomInfectionSystemMiddleMax,
+		},
+		bottom = {
+			min = SandboxVars.TLOU_infected.CustomInfectionSystemBottomMin,
+			max = SandboxVars.TLOU_infected.CustomInfectionSystemBottomMax,
+		},
+	}
+
     -- RUNNER
 	if SandboxVars.TLOU_infected.RunnerSpawn then
 		ZomboidForge.ZTypes.TLOU_Runner = {

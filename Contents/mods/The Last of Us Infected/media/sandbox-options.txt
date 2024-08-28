@@ -277,14 +277,6 @@ option TLOU_infected.BloaterBurnRate
 /*---------------------------------------------------------------------
 -- Infected custom behavior
 ---------------------------------------------------------------------*/
-option TLOU_infected.CustomInfectionSystem
-{
-	type = boolean,
-	default = true,
-	page = TLOU_infected_customBehavior,
-	translation = TLOU_CustomInfectionSystem,
-}
-
 /* Dangerous Clickers */
 option TLOU_infected.NoPushClickers
 {
@@ -429,6 +421,77 @@ option TLOU_infected.VaultingInfected
 	translation = TLOU_VaultingInfected,
 }
 
+
+/*---------------------------------------------------------------------
+-- Other
+---------------------------------------------------------------------*/
+option TLOU_infected.CustomInfectionSystem
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystem,
+}
+
+option TLOU_infected.CustomInfectionSystemTopMin
+{
+	type = integer, 
+	min = 0, 
+	max = 43200, 
+	default = 5,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystemTopMin,
+}
+
+option TLOU_infected.CustomInfectionSystemTopMax
+{
+	type = integer, 
+	min = 0, 
+	max = 43200, 
+	default = 15,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystemTopMax,
+}
+
+option TLOU_infected.CustomInfectionSystemMiddleMin
+{
+	type = integer, 
+	min = 0, 
+	max = 43200, 
+	default = 120,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystemMiddleMin,
+}
+
+option TLOU_infected.CustomInfectionSystemMiddleMax
+{
+	type = integer, 
+	min = 0, 
+	max = 43200, 
+	default = 480,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystemMiddleMax,
+}
+
+option TLOU_infected.CustomInfectionSystemBottomMin
+{
+	type = integer, 
+	min = 0, 
+	max = 43200, 
+	default = 720,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystemBottomMin,
+}
+
+option TLOU_infected.CustomInfectionSystemBottomMax
+{
+	type = integer, 
+	min = 0, 
+	max = 43200, 
+	default = 1440,
+	page = TLOU_infected_other,
+	translation = TLOU_CustomInfectionSystemBottomMax,
+}
 
 
 /*---------------------------------------------------------------------
