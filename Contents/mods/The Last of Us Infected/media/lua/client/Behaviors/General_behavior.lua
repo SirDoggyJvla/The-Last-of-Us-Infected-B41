@@ -248,7 +248,7 @@ end
 -- player cannot push infected
 ZomboidForge.NoPush = function(ZType,zombie,bonusData)
 	local handWeapon
-	if not SandboxVars.TLOU_infected.AllowWeaponPush and bonusData then
+	if not TLOU_infected.AllowWeaponPush and bonusData then
 		handWeapon = bonusData.handWeapon
 	else
 		local target = zombie:getTarget()
@@ -264,31 +264,27 @@ end
 
 -- grabby infected, slowing you down in place
 ZomboidForge.GrabbyInfected = function(data)
+	-- verify victim is alive and not in god mode
 	local victim = data.victim
+	if not victim:isAlive() or victim:isGodMod() then return end
 
-	if victim:isAlive() then
-		--clicker grabs target
-		if not victim:isGodMod() then
-			victim:setSlowFactor(1)
-			victim:setSlowTimer(1)
-		end
-	end
+	-- infected grabs target
+	victim:setSlowFactor(1)
+	victim:setSlowTimer(1)
 end
 
 -- One shot victim
 ZomboidForge.KillTarget = function(data)
+	-- verify victim is alive and not in god mode
 	local victim = data.victim
+	if not victim:isAlive() or victim:isGodMod() then return end
 
-	-- zombie kills victim
-	if not victim:isGodMod() then
-		local zombie = data.zombie
-		local attackOutcome = data.attackOutcome
-		if attackOutcome ~= "success" then return end
+	-- verify attack is valid
+	if data.attackOutcome ~= "success" or data.hitReaction ~= "Bite" then return end
 
-		if data.hitReaction ~= "Bite" then return end
-
-		victim:Kill(zombie)
-	end
+	-- kill player
+	local zombie = data.zombie
+	victim:Kill(zombie)
 end
 
 -- cap damage to clicker and bloater from player

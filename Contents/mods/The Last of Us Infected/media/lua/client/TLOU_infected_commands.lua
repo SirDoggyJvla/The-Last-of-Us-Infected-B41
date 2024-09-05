@@ -15,7 +15,6 @@ This file defines the server2clients commands of the mod of The Last of Us Infec
 local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
-local ZombRand = ZombRand -- java function
 
 
 --- import module from ZomboidForge

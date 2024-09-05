@@ -15,7 +15,6 @@ This file defines the tools for the mod of The Last of Us Infected
 local table = table -- Lua's table module
 local ipairs = ipairs -- ipairs function
 local pairs = pairs -- pairs function
-local ZombRand = ZombRand -- java function
 local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
@@ -62,10 +61,11 @@ end
 
 --#region General tools
 
+local randCoinFlip = newrandom()
 -- Coin flips either `1` or `-1`
 ---@return integer coinFlip
 TLOU_infected.CoinFlip = function()
-    local randomNumber = ZombRand(2)
+    local randomNumber = randCoinFlip(0,1)
 
     if randomNumber == 0 then
         return -1

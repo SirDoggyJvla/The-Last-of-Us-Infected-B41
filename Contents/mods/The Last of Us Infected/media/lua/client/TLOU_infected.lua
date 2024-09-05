@@ -39,13 +39,6 @@ TLOU_infected = {
 	},
 }
 
--- Sandbox options imported localy for performance reasons
--- used here for file reloads in-game
-TLOU_infected.HideIndoorsUpdates 	=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
-TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
-TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
-TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
-
 --- Create zombie types
 TLOU_infected.Initialize_TLOUInfected = function()
 	-- Sandbox options imported localy for performance reasons
@@ -53,6 +46,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
 	TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
 	TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
+	TLOU_infected.AllowWeaponPush		=		SandboxVars.TLOU_infected.AllowWeaponPush
 
 	-- retrieve infection time
 	TLOU_infected.areaInfectionTime = {
