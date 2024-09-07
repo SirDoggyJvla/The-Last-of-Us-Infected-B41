@@ -65,7 +65,7 @@ local randCoinFlip = newrandom()
 -- Coin flips either `1` or `-1`
 ---@return integer coinFlip
 TLOU_infected.CoinFlip = function()
-    local randomNumber = randCoinFlip(0,1)
+    local randomNumber = randCoinFlip:random(0,1)
 
     if randomNumber == 0 then
         return -1
