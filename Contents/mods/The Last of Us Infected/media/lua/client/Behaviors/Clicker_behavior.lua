@@ -11,12 +11,6 @@ The Clicker behavior is written in this file
 ]]--
 --[[ ================================================ ]]--
 
---- Import functions localy for performances reasons
-local table = table -- Lua's table module
-local ipairs = ipairs -- ipairs function
-local pairs = pairs -- pairs function
-local ZombRand = ZombRand -- java function
-
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
 local TLOU_infected = require "TLOU_infected"
@@ -39,9 +33,10 @@ Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
 
 
 -- Add fungi hat food type on a Clicker's death.
----@param zombie 		IsoZombie
----@param _		 		string   	--Zombie Type ID
-ZomboidForge.OnClickerDeath = function(zombie,_)
+---@param zombie IsoZombie
+---@param ZType string
+---@param ZombieTable table
+ZomboidForge.OnClickerDeath = function(zombie,ZType,ZombieTable)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
 	inventory:AddItems("TLOU.Hat_Fungi_Loot",1)
@@ -50,9 +45,15 @@ end
 --#region Custom behavior: `ClickerAgro`
 
 -- Manage Clicker agro to change their animation when they run after a player.
----@param zombie 		IsoZombie
----@param ZType 		string   	     --Zombie Type ID
-ZomboidForge.ClickerAgro = function(zombie,ZType)
+---@param zombie IsoZombie
+---@param ZType string
+---@param ZombieTable table
+---@param tick int
+ZomboidForge.ClickerAgro = function(zombie,ZType,ZombieTable,tick)
+	-- check only every 15 ticks
+	if tick%15 ~= 0 then return end
+
+	-- if target, then Clicker is in agro stance, else go back to chill after a while
 	local target = zombie:getTarget()
 	local agro = zombie:getVariableBoolean("ClickerAgro")
 	if target then
@@ -86,7 +87,7 @@ zombie:addLineChatElement(tostring(zombie:getTarget()))
 local stringZ = ""
 ---@param zombie 				IsoZombie
 ---@param ZType	 				string   	--Zombie Type ID
-ZomboidForge.ClickerBehavior = function(zombie,ZType)
+ZomboidForge.ClickerBehavior = function(zombie,ZType,ZombieTable,tick)
 	--[[
 		awake player if action nearby that should, this sets a temporary target to reset
 		TimeSinceSeenFlesh

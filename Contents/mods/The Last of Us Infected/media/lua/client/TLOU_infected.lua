@@ -42,11 +42,13 @@ TLOU_infected = {
 --- Create zombie types
 TLOU_infected.Initialize_TLOUInfected = function()
 	-- Sandbox options imported localy for performance reasons
-	TLOU_infected.HideIndoorsUpdates 	=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
-	TLOU_infected.OnlyUnexplored 		=		SandboxVars.TLOU_infected.OnlyUnexplored
-	TLOU_infected.WanderAtNight 		=		SandboxVars.TLOU_infected.WanderAtNight
-	TLOU_infected.MaxDistanceToCheck 	=		SandboxVars.TLOU_infected.MaxDistanceToCheck
-	TLOU_infected.AllowWeaponPush		=		SandboxVars.TLOU_infected.AllowWeaponPush
+	TLOU_infected.HideIndoorsUpdates 		=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
+	TLOU_infected.OnlyUnexplored 			=		SandboxVars.TLOU_infected.OnlyUnexplored
+	TLOU_infected.WanderAtNight 			=		SandboxVars.TLOU_infected.WanderAtNight
+	TLOU_infected.MaxDistanceToCheck 		=		SandboxVars.TLOU_infected.MaxDistanceToCheck
+	TLOU_infected.AllowWeaponPush			=		SandboxVars.TLOU_infected.AllowWeaponPush
+	TLOU_infected.NoStompClickers			=		SandboxVars.TLOU_infected.NoStompClickers
+	TLOU_infected.StandOnInfected_Stagger	=		SandboxVars.TLOU_infected.StandOnInfected_Stagger
 
 	-- retrieve infection time
 	TLOU_infected.areaInfectionTime = {
@@ -91,6 +93,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
+			canCrawlUnderVehicles	=		true,
 
 			-- custom behavior
 
@@ -138,6 +141,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			hearing 				=		SandboxVars.TLOU_infected.StalkerHearing,
 			HP 						=		SandboxVars.TLOU_infected.StalkerHealth,
 			fireKillRate			=		0.0038*SandboxVars.TLOU_infected.StalkerBurnRate,
+			canCrawlUnderVehicles	=		true,
 
 			-- UI
 			color 					= 		{230, 230, 0,},
@@ -230,12 +234,18 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			customBehavior = {
 				"ClickerAgro",
 			},
+			customDamage 			= 		"customDamage_tankyInfected",
+			hitTime 				=		"hitTimeReaction",
+			canCrawlUnderVehicles	=		true,
 
 			-- custom data for TLOU_infected
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Clicker,
 			roll_lootcount 			=		function() return ZombRand(3,8) end,
 			fireDamageMultiplier 	=		SandboxVars.TLOU_infected.ExtraFireDamage,
-			damageLimiter			=		SandboxVars.TLOU_infected.DamageLimiterClicker
+			damageLimiter			=		SandboxVars.TLOU_infected.DamageLimiterClicker,
+			extrafireDamage			=		SandboxVars.TLOU_infected.ExtraFireDamage_Clicker,
+			totalArmor				=		SandboxVars.TLOU_infected.ClickerArmor,
+			energyRequired			=		SandboxVars.TLOU_infected.ClickerEnergyRequired, -- Joule
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Clicker = nil
@@ -290,22 +300,25 @@ TLOU_infected.Initialize_TLOUInfected = function()
 
 			-- attack functions
 			-- zombieAgroCharacter = {},
-			onHit_zombieAttacking = {
-				"GrabbyInfected",
-			},
+			-- onHit_zombieAttacking = {},
 			onHit_zombie2player = {
 				"KillTarget",
 			},
+			customDamage 			= 		"customDamage_tankyInfected",
 			shouldIgnoreStagger 	=		true,
-			resetHitTime 			=		true,
+			hitTime 				=		"hitTimeReaction",
 			onlyJawStab 			=		true,
 			jawStabImmune			=		true,
+			canCrawlUnderVehicles	=		true,
 
 			-- custom data for TLOU_infected
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Bloater,
 			roll_lootcount 			=		function() return ZombRand(5,15) end,
 			fireDamageMultiplier 	=		SandboxVars.TLOU_infected.ExtraFireDamage,
-			damageLimiter			=		SandboxVars.TLOU_infected.DamageLimiterBloater
+			damageLimiter			=		SandboxVars.TLOU_infected.DamageLimiterBloater,
+			extrafireDamage			=		SandboxVars.TLOU_infected.ExtraFireDamage_Bloater,
+			totalArmor				=		SandboxVars.TLOU_infected.BloaterArmor,
+			energyRequired			=		SandboxVars.TLOU_infected.BloaterEnergyRequired, -- Joule
 		}
 	else
 		ZomboidForge.ZTypes.TLOU_Bloater = nil
@@ -318,17 +331,19 @@ TLOU_infected.Initialize_TLOUInfected = function()
 	local bloater = ZomboidForge.ZTypes.TLOU_Bloater
 
 	-- If runners and stalkers are able to vault
-	if SandboxVars.TLOU_infected.VaultingInfected then
+	if SandboxVars.TLOU_infected.VaultingRunner then
 		if runner then
 			runner.animationVariable = "isInfected"
 		end
+	end
 
+	if SandboxVars.TLOU_infected.VaultingStalker then
 		if stalker then
 			stalker.animationVariable = "isInfected"
 		end
 	end
 
-	-- if infected should hide indoors in daytime
+	-- if infected should hide indoors during daytime
 	if SandboxVars.TLOU_infected.HideIndoors then
 		if stalker then
 			stalker.customBehavior = stalker.customBehavior or {}
@@ -352,6 +367,51 @@ TLOU_infected.Initialize_TLOUInfected = function()
 		end
 	end
 
+	-- can't stand on infected
+	if runner then
+		local runner_stand = SandboxVars.TLOU_infected.StandOnInfected_Runner
+		if runner_stand ~= 0 then
+			runner.standOnInfected = runner_stand
+			runner.customBehavior = runner.customBehavior or {}
+			table.insert(runner.customBehavior,
+				"CantStantOnInfected"
+			)
+		end
+	end
+
+	if stalker then
+		local stalker_stand = SandboxVars.TLOU_infected.StandOnInfected_Stalker
+		if stalker_stand ~= 0 then
+			stalker.standOnInfected = stalker_stand
+			stalker.customBehavior = stalker.customBehavior or {}
+			table.insert(stalker.customBehavior,
+				"CantStantOnInfected"
+			)
+		end
+	end
+
+	if clicker then
+		local clicker_stand = SandboxVars.TLOU_infected.StandOnInfected_Clicker
+		if clicker_stand ~= 0 then
+			clicker.standOnInfected = clicker_stand
+			clicker.customBehavior = clicker.customBehavior or {}
+			table.insert(clicker.customBehavior,
+				"CantStantOnInfected"
+			)
+		end
+	end
+
+	if bloater then
+		local bloater_stand = SandboxVars.TLOU_infected.StandOnInfected_Bloater
+		if bloater_stand ~= 0 then
+			bloater.standOnInfected = bloater_stand
+			bloater.customBehavior = bloater.customBehavior or {}
+			table.insert(bloater.customBehavior,
+				"CantStantOnInfected"
+			)
+		end
+	end
+
 	-- if Bloaters are allowed to deal more damage to structures
 	if SandboxVars.TLOU_infected.StrongBloater and bloater then
 		bloater.onThump = bloater.onThump or {}
@@ -360,13 +420,13 @@ TLOU_infected.Initialize_TLOUInfected = function()
 		)
 	end
 
-	-- if Clicker and Bloaters take extra damage from fire but the damage they take is capped
-	if SandboxVars.TLOU_infected.ExtraFireDamage_Clicker and clicker then
-		clicker.customDamage = "ExtraFireDamage"
-	end
-
-	if SandboxVars.TLOU_infected.ExtraFireDamage_Bloater and bloater then
-		bloater.customDamage = "ExtraFireDamage"
+	if SandboxVars.TLOU_infected.GrabbyBloaters then
+		if bloater then
+			bloater.onHit_zombieAttacking = bloater.onHit_zombieAttacking or {}
+			table.insert(bloater.onHit_zombieAttacking,
+				"GrabbyInfected"
+			)
+		end
 	end
 
 	-- if Clicker can't be pushed
@@ -385,6 +445,14 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			)
 		end
 	end
+
+	-- -- if Bloater can't be pushed
+	-- if SandboxVars.TLOU_infected.NoPushBloaters then
+	-- 	if bloater then
+	-- 		bloater.onlyJawStab = "NoPush"
+	-- 		bloater.shouldIgnoreStagger = "NoPush"
+	-- 	end
+	-- end
 
 	-- One shot Clickers
 	if SandboxVars.TLOU_infected.OneShotClickers then

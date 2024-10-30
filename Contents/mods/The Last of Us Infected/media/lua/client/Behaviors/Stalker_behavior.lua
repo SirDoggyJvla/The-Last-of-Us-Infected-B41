@@ -118,7 +118,7 @@ end
 
 ---@param zombie 				IsoZombie
 ---@param ZType	 				string   	--Zombie Type ID
-ZomboidForge.StalkerBehavior = function(zombie,ZType)
+ZomboidForge.StalkerBehavior = function(zombie,ZType,ZombieTable,tick)
 	--[[
 	The idea is that the Stalker picks up a target the first time and this target is registered in
 	PersistentZData.TLOU_infected.target or just PersistentZData.target (not decided yet)

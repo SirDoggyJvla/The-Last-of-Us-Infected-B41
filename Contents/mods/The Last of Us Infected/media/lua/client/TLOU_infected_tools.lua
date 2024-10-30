@@ -85,61 +85,6 @@ end
 
 --#region Building and lure tools
 
--- Lure `Zombie` to the building during daytime or make it wander around during night time.
---
--- When on a server the zombie is handled by its owner, if no owner then skip.
----@param zombie 		IsoZombie
-TLOU_infected.LureZombie = function(zombie)
-	local onServer = isClient()
-	if onServer then
-		-- if on server, verify owner of the zombie is the client to handle zombie
-		local zombieOwner = zombie.authOwnerPlayer
-		if not zombieOwner or zombieOwner ~= client_player then return end
-	end
-
-	-- max distance and intialize local variables
-	local maxDistance = TLOU_infected.MaxDistanceToCheck
-	local x
-	local y
-	local z = 0
-
-	-- verify if zombie should hide inside
-    if gametime:getNight() < 0.5 or not TLOU_infected.WanderAtNight then
-		-- retrieve nearest building
-		local squareMoveTo = TLOU_infected.GetClosestBuildingSquareAroundZombie(zombie,maxDistance)
-		if not squareMoveTo then return end
-
-		-- get coordinates of building square
-		x = squareMoveTo:getX()
-		y = squareMoveTo:getY()
-		z = squareMoveTo:getZ()
-
-	-- or roam around during night time
-    else
-		x = zombie:getX() + ZombRand(10,maxDistance) * TLOU_infected.CoinFlip()
-		y = zombie:getY() + ZombRand(10,maxDistance) * TLOU_infected.CoinFlip()
-    end
-
-	if x then
-		-- path towards coordinates
-		if not onServer then
-			zombie:pathToSound(x, y ,z)
-
-		-- send a call to server to tell everyone to path
-		else
-			sendClientCommand(
-				'ZombieHandler',
-				'PathToSound',
-				{
-					zombie = zombie:getOnlineID(),
-					x=x, y=y, z=z,
-				}
-			)
-		end
-	end
-end
-
-
 -- Retrieves a square within the closest building to the `zombie` in a `radius`.
 ---@param zombie IsoZombie
 ---@param radius int
@@ -205,4 +150,17 @@ end
 TLOU_infected.GetZombieVelocity = function(zombie)
 	return Vector2.new(zombie:getNx() - zombie:getX(), zombie:getNy() - zombie:getY())
 end
+--#endregion
+
+--#region Damage to Infected
+
+local class_HandWeapon = __classmetatables[HandWeapon.class].__index
+TLOU_infected.WeaponCheck = {
+	{func = class_HandWeapon.getKnockdownMod, multiplier = 1, name = "knockdown"},
+	{func = class_HandWeapon.getStopPower, multiplier = 1, name = "stopPower"},
+	{func = class_HandWeapon.getPushBackMod, multiplier = 1, name = "pushBackMod"},
+	{func = class_HandWeapon.getDoorDamage, multiplier = 1, name = "doorDamage"},
+	-- {func = class_HandWeapon.isPiercingBullets, multiplier = 1, defaultTrue = 10, defaultFalse = -20, name = "doorDamage"},
+}
+
 --#endregion

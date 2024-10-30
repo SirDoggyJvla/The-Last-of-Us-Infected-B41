@@ -78,6 +78,19 @@ option TLOU_infected.BloaterSpawnWeight
 /*---------------------------------------------------------------------
 -- Infected stats: Runner
 ---------------------------------------------------------------------*/
+/*
+option TLOU_infected.Separation_EmptyBox1
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_EmptyBox,
+}
+*/
+option TLOU_infected.Separation_Runners
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_Runners,
+}
+
 option TLOU_infected.RunnerSpeed
 {
 	type = enum,
@@ -153,6 +166,17 @@ option TLOU_infected.RunnerBurnRate
 /*---------------------------------------------------------------------
 -- Infected stats: Stalker
 ---------------------------------------------------------------------*/
+option TLOU_infected.Separation_EmptyBox2
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_Stalkers
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_Stalkers,
+}
+
 option TLOU_infected.StalkerSpeed
 {
 	type = enum,
@@ -208,6 +232,17 @@ option TLOU_infected.StalkerBurnRate
 /*---------------------------------------------------------------------
 -- Infected stats: Clicker
 ---------------------------------------------------------------------*/
+option TLOU_infected.Separation_EmptyBox3
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_Clickers
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_Clickers,
+}
+
 option TLOU_infected.ClickerHearing
 {
 	type = enum,
@@ -223,7 +258,7 @@ option TLOU_infected.ClickerHealth
 	type = double,
 	min = 0,
 	max = 1000,
-	default = 5,
+	default = 1,
 	page = TLOU_infected_stats,
 	translation = TLOU_ClickerHP,
 }
@@ -242,6 +277,17 @@ option TLOU_infected.ClickerBurnRate
 /*---------------------------------------------------------------------
 -- Infected stats: Bloater
 ---------------------------------------------------------------------*/
+option TLOU_infected.Separation_EmptyBox4
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_Bloaters
+{
+	type = boolean, default = false,
+	page = TLOU_infected_stats, translation = TLOU_Separation_Bloaters,
+}
+
 option TLOU_infected.BloaterHearing
 {
 	type = enum,
@@ -257,7 +303,7 @@ option TLOU_infected.BloaterHealth
 	type = double,
 	min = 0,
 	max = 1000,
-	default = 50,
+	default = 1,
 	page = TLOU_infected_stats,
 	translation = TLOU_BloaterHP,
 }
@@ -277,13 +323,74 @@ option TLOU_infected.BloaterBurnRate
 /*---------------------------------------------------------------------
 -- Infected custom behavior
 ---------------------------------------------------------------------*/
+/* Dangerous Runners */
+/*
+option TLOU_infected.Separation_EmptyBox5
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+*/
+option TLOU_infected.Separation_DangerousRunners
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_DangerousRunners,
+}
+
+option TLOU_infected.VaultingRunner
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_VaultingRunner,
+}
+
+/* Dangerous Stalkers */
+option TLOU_infected.Separation_EmptyBox6
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_DangerousStalkers
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_DangerousStalkers,
+}
+
+option TLOU_infected.VaultingStalker
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_VaultingStalker,
+}
+
 /* Dangerous Clickers */
+option TLOU_infected.Separation_EmptyBox7
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_DangerousClickers
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_DangerousClickers,
+}
+
 option TLOU_infected.NoPushClickers
 {
 	type = boolean,
 	default = true,
 	page = TLOU_infected_customBehavior,
 	translation = TLOU_NoPushClickers,
+}
+
+option TLOU_infected.NoStompClickers
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_NoStompClickers,
 }
 
 option TLOU_infected.AllowWeaponPush
@@ -310,7 +417,36 @@ option TLOU_infected.OneShotClickers
 	translation = TLOU_OneShotClickers,
 }
 
-/* Strong Bloaters */
+/* Dangerous Bloaters */
+option TLOU_infected.Separation_EmptyBox8
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_DangerousBloaters
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_DangerousBloaters,
+}
+
+/*
+option TLOU_infected.NoPushBloaters
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_NoPushBloaters,
+}
+*/
+
+option TLOU_infected.GrabbyBloaters
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_GrabbyBloaters,
+}
+
 option TLOU_infected.StrongBloater
 {
 	type = boolean,
@@ -319,7 +455,80 @@ option TLOU_infected.StrongBloater
 	translation = TLOU_StrongBloater,
 }
 
+
+/* Can't stand on infected */
+option TLOU_infected.Separation_EmptyBox9
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_StandOnInfected
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_StandOnInfected,
+}
+
+option TLOU_infected.StandOnInfected_Stagger
+{
+	type = boolean,
+	default = true,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_StandOnInfected_Stagger,
+}
+
+option TLOU_infected.StandOnInfected_Runner
+{
+	type = double,
+	min = 0,
+	max = 30,
+	default = 4,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_StandOnInfected_Runner,
+}
+
+option TLOU_infected.StandOnInfected_Stalker
+{
+	type = double,
+	min = 0,
+	max = 30,
+	default = 2,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_StandOnInfected_Stalker,
+}
+
+option TLOU_infected.StandOnInfected_Clicker
+{
+	type = double,
+	min = 0,
+	max = 30,
+	default = 1,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_StandOnInfected_Clicker,
+}
+
+option TLOU_infected.StandOnInfected_Bloater
+{
+	type = double,
+	min = 0,
+	max = 30,
+	default = 0.5,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_StandOnInfected_Bloater,
+}
+
+
 /* Extra fire damage */
+option TLOU_infected.Separation_EmptyBox10
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_ExtraFireDamage
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_ExtraFireDamage,
+}
+
 option TLOU_infected.ExtraFireDamage_Clicker
 {
 	type = boolean,
@@ -346,28 +555,72 @@ option TLOU_infected.ExtraFireDamage
 	translation = TLOU_ExtraFireDamage,
 }
 
+/* Infected armor */
+option TLOU_infected.Separation_EmptyBox14
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_TankyInfected
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_TankyInfected,
+}
+
 /* Damage limiter */
-option TLOU_infected.DamageLimiterClicker
+option TLOU_infected.ClickerArmor
 {
 	type = integer, 
 	min = 0,
-	max = 1000, 
-	default = 3,
+	max = 50, 
+	default = 5,
 	page = TLOU_infected_customBehavior,
-	translation = TLOU_DamageLimiterClicker,
+	translation = TLOU_ClickerArmor,
 }
 
-option TLOU_infected.DamageLimiterBloater
+option TLOU_infected.ClickerEnergyRequired
 {
 	type = integer, 
-	min = 0, 
-	max = 1000, 
-	default = 3,
+	min = 0,
+	max = 10000, 
+	default = 1000,
 	page = TLOU_infected_customBehavior,
-	translation = TLOU_DamageLimiterBloater,
+	translation = TLOU_ClickerEnergyRequired,
 }
 
+option TLOU_infected.BloaterArmor
+{
+	type = integer, 
+	min = 0,
+	max = 50, 
+	default = 40,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_BloaterArmor,
+}
+
+option TLOU_infected.BloaterEnergyRequired
+{
+	type = integer, 
+	min = 0,
+	max = 10000, 
+	default = 1800,
+	page = TLOU_infected_customBehavior,
+	translation = TLOU_BloaterEnergyRequired,
+}
+
+
 /* Hide Indoors */
+option TLOU_infected.Separation_EmptyBox11
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_HideIndoors
+{
+	type = boolean, default = false,
+	page = TLOU_infected_customBehavior, translation = TLOU_Separation_HideIndoors,
+}
+
 option TLOU_infected.HideIndoors
 {
 	type = boolean,
@@ -412,19 +665,24 @@ option TLOU_infected.HideIndoorsUpdates
 	translation = TLOU_HideIndoorsUpdates,
 }
 
-/* Vaulting Infected */
-option TLOU_infected.VaultingInfected
-{
-	type = boolean,
-	default = true,
-	page = TLOU_infected_customBehavior,
-	translation = TLOU_VaultingInfected,
-}
-
 
 /*---------------------------------------------------------------------
 -- Other
 ---------------------------------------------------------------------*/
+/* Custom infected system */
+/*
+option TLOU_infected.Separation_EmptyBox12
+{
+	type = boolean, default = false,
+	page = TLOU_infected_other, translation = TLOU_Separation_EmptyBox,
+}
+*/
+option TLOU_infected.Separation_CustomInfectionSystem
+{
+	type = boolean, default = false,
+	page = TLOU_infected_other, translation = TLOU_Separation_CustomInfectionSystem,
+}
+
 option TLOU_infected.CustomInfectionSystem
 {
 	type = boolean,
@@ -497,6 +755,17 @@ option TLOU_infected.CustomInfectionSystemBottomMax
 /*---------------------------------------------------------------------
 -- Mod compatibility: Cordyceps Spore Zones
 ---------------------------------------------------------------------*/
+option TLOU_infected.Separation_EmptyBox13
+{
+	type = boolean, default = false,
+	page = TLOU_infected_other, translation = TLOU_Separation_EmptyBox,
+}
+option TLOU_infected.Separation_CSZ
+{
+	type = boolean, default = false,
+	page = TLOU_infected_other, translation = TLOU_Separation_CSZ,
+}
+
 option TLOU_infected.CordycepsSpawn
 {
 	type = boolean,
