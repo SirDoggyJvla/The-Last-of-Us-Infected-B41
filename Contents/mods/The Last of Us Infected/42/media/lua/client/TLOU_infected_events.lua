@@ -20,8 +20,9 @@ require "Stalker_behavior"
 require "Clicker_behavior"
 require "Bloater_behavior"
 
---- TLOU_infected functions
-Events.OnGameStart.Add(TLOU_infected.Initialize_TLOUInfected)
+--- add ZTypes
+require "ZomboidForge_module"
+Events.OnLoadZTypes.Add(TLOU_infected.Initialize_TLOUInfected)
 
 --- Handle player
 Events.EveryOneMinute.Add(TLOU_infected.CustomInfection)
@@ -31,13 +32,6 @@ Events.EveryOneMinute.Add(TLOU_infected.CustomInfection)
 
 --- Add a check if it's day every hours
 Events.EveryHours.Add(TLOU_infected.IsDay)
-
---- handling of commands sent 
-Events.OnServerCommand.Add(function(module, command, args)
-	if TLOU_infected.Commands[module] and TLOU_infected.Commands[module][command] then
-		TLOU_infected.Commands[module][command](args)
-	end
-end)
 
 -- patch for CheckUpstairs, changes the zombie name to show in voicelines
 if getActivatedMods():contains("CheckUpstairs") then

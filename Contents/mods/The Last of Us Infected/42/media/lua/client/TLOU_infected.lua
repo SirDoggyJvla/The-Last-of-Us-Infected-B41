@@ -20,17 +20,6 @@ local ZombRand = ZombRand -- java function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
-require "ZomboidForge_core"
-require "ZomboidForge_tools"
-
-
--- localy initialize mod data
-local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-local function initTLOU_ModData()
-	TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-end
-Events.OnInitGlobalModData.Remove(initTLOU_ModData)
-Events.OnInitGlobalModData.Add(initTLOU_ModData)
 
 --- setup local functions
 TLOU_infected = {
@@ -40,7 +29,7 @@ TLOU_infected = {
 }
 
 --- Create zombie types
-TLOU_infected.Initialize_TLOUInfected = function()
+TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 	-- Sandbox options imported localy for performance reasons
 	TLOU_infected.HideIndoorsUpdates 		=		math.floor(SandboxVars.TLOU_infected.HideIndoorsUpdates * 1.2)
 	TLOU_infected.OnlyUnexplored 			=		SandboxVars.TLOU_infected.OnlyUnexplored
@@ -68,7 +57,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 
     -- RUNNER
 	if SandboxVars.TLOU_infected.RunnerSpawn then
-		ZomboidForge.ZTypes.TLOU_Runner = {
+		ZTypes.TLOU_Runner = {
 			-- base informations
 			name 					=		getText("IGUI_TLOU_Runner"),
 			chance 					=		SandboxVars.TLOU_infected.RunnerSpawnWeight,
@@ -78,7 +67,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			},
 
 			-- stats
-			walktype 				=		SandboxVars.TLOU_infected.RunnerSpeed,
+			walkType 				=		ZomboidForge.SpeedOptionToWalktype[SandboxVars.TLOU_infected.RunnerSpeed],
 			strength 				=		SandboxVars.TLOU_infected.RunnerStrength,
 			toughness 				=		SandboxVars.TLOU_infected.RunnerToughness,
 			cognition 				=		2,
@@ -87,6 +76,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			hearing 				=		SandboxVars.TLOU_infected.RunnerHearing,
 			HP 						=		SandboxVars.TLOU_infected.RunnerHealth,
 			fireKillRate			=		0.0038*SandboxVars.TLOU_infected.RunnerBurnRate,
+			shouldCrawl = false,
 
 			-- UI
 			color 					=		{122, 243, 0,},
@@ -101,13 +91,11 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			lootchance 				=		SandboxVars.TLOU_infected.CordycepsSpawnRate_Runner,
 			roll_lootcount 			=		function() return ZombRand(1,3) end,
 		}
-	else
-		ZomboidForge.ZTypes.TLOU_Runner = nil
 	end
 
     -- STALKER
 	if SandboxVars.TLOU_infected.StalkerSpawn then
-		ZomboidForge.ZTypes.TLOU_Stalker = {
+		ZTypes.TLOU_Stalker = {
 			-- base informations
 			name 					= 		getText("IGUI_TLOU_Stalker"),
 			chance 					= 		SandboxVars.TLOU_infected.StalkerSpawnWeight,
@@ -132,7 +120,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			removeBandages 			= 		true,
 
 			-- stats
-			walktype 				=		SandboxVars.TLOU_infected.StalkerSpeed,
+			walkType 				=		ZomboidForge.SpeedOptionToWalktype[SandboxVars.TLOU_infected.StalkerSpeed],
 			strength 				=		1,
 			toughness 				=		2,
 			cognition 				=		2,
@@ -155,13 +143,11 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			lootchance 				= 		SandboxVars.TLOU_infected.CordycepsSpawnRate_Stalker,
 			roll_lootcount 			= 		function() return ZombRand(1,5) end,
 		}
-	else
-		ZomboidForge.ZTypes.TLOU_Stalker = nil
 	end
 
     -- CLICKER
 	if SandboxVars.TLOU_infected.ClickerSpawn then
-		ZomboidForge.ZTypes.TLOU_Clicker = {
+		ZTypes.TLOU_Clicker = {
 			-- base informations
 			name 					= 		getText("IGUI_TLOU_Clicker"),
 			chance 					= 		SandboxVars.TLOU_infected.ClickerSpawnWeight,
@@ -207,7 +193,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			removeBandages 			= 		true,
 
 			-- stats
-			walktype 				= 		2,
+			walkType 				=		ZomboidForge.SpeedOptionToWalktype[2],
 			strength 				= 		1,
 			toughness 				= 		1,
 			cognition 				= 		2,
@@ -247,13 +233,11 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			totalArmor				=		SandboxVars.TLOU_infected.ClickerArmor,
 			energyRequired			=		SandboxVars.TLOU_infected.ClickerEnergyRequired, -- Joule
 		}
-	else
-		ZomboidForge.ZTypes.TLOU_Clicker = nil
 	end
 
     -- BLOATER
 	if SandboxVars.TLOU_infected.BloaterSpawn then
-		ZomboidForge.ZTypes.TLOU_Bloater = {
+		ZTypes.TLOU_Bloater = {
 			-- base informations
 			name 					=		getText("IGUI_TLOU_Bloater"),
 			chance 					=		SandboxVars.TLOU_infected.BloaterSpawnWeight,
@@ -284,7 +268,7 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			removeBandages 			=		true,
 
 			-- stats
-			walktype 				=		2,
+			walkType 				=		ZomboidForge.SpeedOptionToWalktype[2],
 			strength 				=		1,
 			toughness 				=		1,
 			cognition 				=		2,
@@ -320,15 +304,17 @@ TLOU_infected.Initialize_TLOUInfected = function()
 			totalArmor				=		SandboxVars.TLOU_infected.BloaterArmor,
 			energyRequired			=		SandboxVars.TLOU_infected.BloaterEnergyRequired, -- Joule
 		}
-	else
-		ZomboidForge.ZTypes.TLOU_Bloater = nil
 	end
 
-	-- add sandbox option based functions
-	local runner = ZomboidForge.ZTypes.TLOU_Runner
-	local stalker = ZomboidForge.ZTypes.TLOU_Stalker
-	local clicker = ZomboidForge.ZTypes.TLOU_Clicker
-	local bloater = ZomboidForge.ZTypes.TLOU_Bloater
+
+
+	--- ADD SANDBOX OPTIONS BASED ZTYPE CARACTERISTICS ---
+
+	-- cache infected tables
+	local runner = ZTypes.TLOU_Runner
+	local stalker = ZTypes.TLOU_Stalker
+	local clicker = ZTypes.TLOU_Clicker
+	local bloater = ZTypes.TLOU_Bloater
 
 	-- If runners and stalkers are able to vault
 	if SandboxVars.TLOU_infected.VaultingRunner then
