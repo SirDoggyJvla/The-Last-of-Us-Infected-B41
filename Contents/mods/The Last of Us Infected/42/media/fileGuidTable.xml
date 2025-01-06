@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fileGuidTable>
+	<!-- Bloater Clothing -->
+	<files>
+        <path>media/clothing/clothingItems/Bloater.xml</path>
+        <guid>6b9a55dd-a875-46d9-8205-b3454358b9d5</guid>
+    </files>
+	
+	<!-- Fungi Clothing -->
+	<files>
+		<path>media/clothing/clothingItems/Hat_Fungi.xml</path>
+		<guid>b2308062-293a-4598-933a-d22da4e69f27</guid>
+	</files>
+
+
+	<!-- Clicker clothings -->
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_01.xml</path>
+		<guid>fe15360b-8de1-4b10-a32a-440d7c423a5f</guid>
+	</files>
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_02.xml</path>
+		<guid>6dfd4a55-0fc0-4783-87ea-28cddebe609d</guid>
+	</files>
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_03.xml</path>
+		<guid>c96cc7c9-7260-4ed0-a15a-fa402192150b</guid>
+	</files>
+	<files>
+		<path>media/clothing/clothingItems/ClickerBody_04.xml</path>
+		<guid>81b1d260-dde0-439e-aea8-2f25724f3f5b</guid>
+	</files>
+</fileGuidTable>

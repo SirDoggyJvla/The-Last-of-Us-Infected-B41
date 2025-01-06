@@ -26,6 +26,11 @@ TLOU_infected = {
 	Commands = {
 		Behavior = {},
 	},
+
+	Runner = {},
+	Stalker = {},
+	Clicker = {},
+	Bloater = {},
 }
 
 --- Create zombie types
@@ -214,11 +219,11 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			-- onHit_player2zombie = {},
 
 			-- custom behavior
-			zombieDeath = {
-				"OnClickerDeath",
+			onZombieDead = {
+				TLOU_infected.Clicker.OnClickerDeath,
 			},
-			customBehavior = {
-				"ClickerAgro",
+			onTick = {
+				TLOU_infected.Clicker.ClickerAgro,
 			},
 			customDamage 			= 		"customDamage_tankyInfected",
 			hitTime 				=		"hitTimeReaction",
@@ -468,29 +473,29 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_infected.CordycepsSpawn then
 		if runner then
-			runner.zombieDeath = runner.zombieDeath or {}
-			table.insert(runner.zombieDeath,
+			runner.onZombieDead = runner.onZombieDead or {}
+			table.insert(runner.onZombieDead,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
 		if stalker then
-			stalker.zombieDeath = stalker.zombieDeath or {}
-			table.insert(stalker.zombieDeath,
+			stalker.onZombieDead = stalker.onZombieDead or {}
+			table.insert(stalker.onZombieDead,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
 		if clicker then
-			clicker.zombieDeath = clicker.zombieDeath or {}
-			table.insert(clicker.zombieDeath,
+			clicker.onZombieDead = clicker.onZombieDead or {}
+			table.insert(clicker.onZombieDead,
 				"OnInfectedDeath_cordyceps"
 			)
 		end
 
 		if bloater then
-			bloater.zombieDeath = bloater.zombieDeath or {}
-			table.insert(bloater.zombieDeath,
+			bloater.onZombieDead = bloater.onZombieDead or {}
+			table.insert(bloater.onZombieDead,
 				"OnInfectedDeath_cordyceps"
 			)
 		end

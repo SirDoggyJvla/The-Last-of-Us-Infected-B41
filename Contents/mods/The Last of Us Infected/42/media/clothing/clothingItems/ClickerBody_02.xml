@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<clothingItem>
+	<m_MaleModel>media\models_X\Skinned\Clicker_02.FBX</m_MaleModel>
+	<m_FemaleModel>media\models_X\Skinned\Clicker_02.FBX</m_FemaleModel>
+	<m_GUID>6dfd4a55-0fc0-4783-87ea-28cddebe609d</m_GUID>
+	<m_Static>false</m_Static>
+	<m_AllowRandomHue>false</m_AllowRandomHue>
+	<m_AllowRandomTint>false</m_AllowRandomTint>
+	<m_HatCategory>Group01</m_HatCategory>
+	<m_Masks>10</m_Masks>
+	<m_Masks>0</m_Masks>
+	<m_Masks>1</m_Masks>
+	<m_Masks>2</m_Masks>
+	<m_Masks>3</m_Masks>
+	<m_Masks>4</m_Masks>
+	<m_Masks>5</m_Masks>
+	<m_Masks>6</m_Masks>
+	<m_Masks>7</m_Masks>
+	<m_Masks>8</m_Masks>
+	<m_Masks>9</m_Masks>
+	<m_Masks>11</m_Masks>
+	<m_Masks>12</m_Masks>
+	<m_Masks>13</m_Masks>
+	<m_Masks>14</m_Masks>
+	<m_Masks>15</m_Masks>
+	<textureChoices>clothes\TLOU\TLOU_TEX_02</textureChoices>
+</clothingItem>

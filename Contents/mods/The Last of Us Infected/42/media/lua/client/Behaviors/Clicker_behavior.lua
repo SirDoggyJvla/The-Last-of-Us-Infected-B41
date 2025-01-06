@@ -15,28 +15,12 @@ The Clicker behavior is written in this file
 local ZomboidForge = require "ZomboidForge_module"
 local TLOU_infected = require "TLOU_infected"
 
--- localy initialize mod data
-local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-local function initTLOU_ModData()
-	TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-end
-Events.OnInitGlobalModData.Remove(initTLOU_ModData)
-Events.OnInitGlobalModData.Add(initTLOU_ModData)
-
--- localy initialize player
-local player = getPlayer()
-local function initTLOU_OnGameStart(playerIndex, player_init)
-	player = getPlayer()
-end
-Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
-Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
-
 
 -- Add fungi hat food type on a Clicker's death.
 ---@param zombie IsoZombie
 ---@param ZType string
 ---@param ZombieTable table
-ZomboidForge.OnClickerDeath = function(zombie,ZType,ZombieTable)
+TLOU_infected.Clicker.OnClickerDeath = function(zombie,ZType,ZombieTable)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
 	inventory:AddItems("TLOU.Hat_Fungi_Loot",1)
@@ -44,12 +28,12 @@ end
 
 --#region Custom behavior: `ClickerAgro`
 
--- Manage Clicker agro to change their animation when they run after a player.
+---Manage Clicker agro to change their animation when they run after a player.
 ---@param zombie IsoZombie
 ---@param ZType string
 ---@param ZombieTable table
 ---@param tick int
-ZomboidForge.ClickerAgro = function(zombie,ZType,ZombieTable,tick)
+TLOU_infected.Clicker.ClickerAgro = function(zombie,ZType,ZombieTable,tick)
 	-- check only every 15 ticks
 	if tick%15 ~= 0 then return end
 
