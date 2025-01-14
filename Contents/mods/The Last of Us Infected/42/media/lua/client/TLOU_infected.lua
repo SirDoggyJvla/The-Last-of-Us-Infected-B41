@@ -13,25 +13,12 @@ This file defines the core of the mod of The Last of Us Infected
 
 --- Import functions localy for performances reasons
 local table = table -- Lua's table module
-local ipairs = ipairs -- ipairs function
-local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
 
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
-
---- setup local functions
-TLOU_infected = {
-	Commands = {
-		Behavior = {},
-	},
-
-	Runner = {},
-	Stalker = {},
-	Clicker = {},
-	Bloater = {},
-}
+local TLOU_infected = require "TLOU_infected_module"
 
 --- Create zombie types
 TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
@@ -66,10 +53,10 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			-- base informations
 			name 					=		getText("IGUI_TLOU_Runner"),
 			chance 					=		SandboxVars.TLOU_infected.RunnerSpawnWeight,
-			customEmitter = {
-				male 				=		"Zombie/Voice/MaleA",
-				female 				=		"Zombie/Voice/FemaleA",
-			},
+			-- customEmitter = {
+			-- 	male 				=		"Zombie/Voice/MaleA",
+			-- 	female 				=		"Zombie/Voice/FemaleA",
+			-- },
 
 			-- stats
 			walkType 				=		ZomboidForge.SpeedOptionToWalktype[SandboxVars.TLOU_infected.RunnerSpeed],
@@ -113,10 +100,10 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			beardColor = {
 				ImmutableColor.new(Color.new(0.70, 0.70, 0.70, 1)),
 			},
-			customEmitter = {
-				male 				= 		"Zombie/Voice/MaleB",
-				female 				= 		"Zombie/Voice/FemaleB",
-			},
+			-- customEmitter = {
+			-- 	male 				= 		"Zombie/Voice/MaleB",
+			-- 	female 				= 		"Zombie/Voice/FemaleB",
+			-- },
 			clothingVisuals = {
 				dirty = 0.5,
 				bloody = 0.5,
@@ -168,7 +155,7 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 				"",
 			},
 			animationVariable 		= 		"isClicker",
-			customEmitter 			= 		"Zombie/Voice/FemaleC",
+			-- customEmitter 			= 		"Zombie/Voice/FemaleC",
 			clothingVisuals = {
 				set = {
 					["UnderwearBottom"] 	= 		{
@@ -213,17 +200,16 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			-- zombieAgroCharacter = {},
-			-- onHit_zombieAttacking = {},
-			-- onHit_zombie2player = {},
-			-- onHit_player2zombie = {},
+			onZombieHitCharacter = {
+				TLOU_infected.KillTarget,
+			},
 
 			-- custom behavior
 			onZombieDead = {
-				TLOU_infected.Clicker.OnClickerDeath,
+				TLOU_infected.OnClickerDeath,
 			},
 			onTick = {
-				TLOU_infected.Clicker.ClickerAgro,
+				TLOU_infected.ClickerAgro,
 			},
 			customDamage 			= 		"customDamage_tankyInfected",
 			hitTime 				=		"hitTimeReaction",
@@ -246,30 +232,9 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			-- base informations
 			name 					=		getText("IGUI_TLOU_Bloater"),
 			chance 					=		SandboxVars.TLOU_infected.BloaterSpawnWeight,
-			-- outfit = {
-			-- 	female = {
-			-- 		Weighted = {
-			-- 			{
-			-- 				name = "Bloater",
-			-- 				weight = 100,
-			-- 			},
-			-- 			{
-			-- 				name = "AirCrew",
-			-- 				weight = 500,
-			-- 			},
-			-- 			{
-			-- 				name = "Bandit",
-			-- 				weight = 300,
-			-- 			},
-			-- 		},
-			-- 	},
-			-- 	male = {
-			-- 		"Bloater",
-			-- 	},
-			-- },
 			outfit = "Bloater",
 			animationVariable 		= 		"isBloater",
-			customEmitter 			=		"Zombie/Voice/MaleC",
+			-- customEmitter 			=		"Zombie/Voice/MaleC",
 			removeBandages 			=		true,
 
 			-- stats
@@ -288,12 +253,9 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			outline 				=		{0, 0, 0,},
 
 			-- attack functions
-			-- zombieAgroCharacter = {},
-			-- onHit_zombieAttacking = {},
-			onHit_zombie2player = {
-				"KillTarget",
+			onZombieHitCharacter = {
+				TLOU_infected.KillTarget,
 			},
-			customDamage 			= 		"customDamage_tankyInfected",
 			shouldIgnoreStagger 	=		true,
 			hitTime 				=		"hitTimeReaction",
 			onlyJawStab 			=		true,
@@ -363,10 +325,8 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 		local runner_stand = SandboxVars.TLOU_infected.StandOnInfected_Runner
 		if runner_stand ~= 0 then
 			runner.standOnInfected = runner_stand
-			runner.customBehavior = runner.customBehavior or {}
-			table.insert(runner.customBehavior,
-				"CantStantOnInfected"
-			)
+			runner.onTick = runner.onTick or {}
+			table.insert(runner.onTick,TLOU_infected.CantStantOnInfected)
 		end
 	end
 
@@ -374,10 +334,8 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 		local stalker_stand = SandboxVars.TLOU_infected.StandOnInfected_Stalker
 		if stalker_stand ~= 0 then
 			stalker.standOnInfected = stalker_stand
-			stalker.customBehavior = stalker.customBehavior or {}
-			table.insert(stalker.customBehavior,
-				"CantStantOnInfected"
-			)
+			stalker.onTick = stalker.onTick or {}
+			table.insert(stalker.onTick,TLOU_infected.CantStantOnInfected)
 		end
 	end
 
@@ -385,10 +343,8 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 		local clicker_stand = SandboxVars.TLOU_infected.StandOnInfected_Clicker
 		if clicker_stand ~= 0 then
 			clicker.standOnInfected = clicker_stand
-			clicker.customBehavior = clicker.customBehavior or {}
-			table.insert(clicker.customBehavior,
-				"CantStantOnInfected"
-			)
+			clicker.onTick = clicker.onTick or {}
+			table.insert(clicker.onTick,TLOU_infected.CantStantOnInfected)
 		end
 	end
 
@@ -396,79 +352,56 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 		local bloater_stand = SandboxVars.TLOU_infected.StandOnInfected_Bloater
 		if bloater_stand ~= 0 then
 			bloater.standOnInfected = bloater_stand
-			bloater.customBehavior = bloater.customBehavior or {}
-			table.insert(bloater.customBehavior,
-				"CantStantOnInfected"
-			)
+			bloater.onTick = bloater.onTick or {}
+			table.insert(bloater.onTick,TLOU_infected.CantStantOnInfected)
 		end
 	end
 
 	-- if Bloaters are allowed to deal more damage to structures
 	if SandboxVars.TLOU_infected.StrongBloater and bloater then
-		bloater.onThump = bloater.onThump or {}
-		table.insert(bloater.onThump,
-			"StrongBloater"
-		)
+		bloater.onZombieThump = bloater.onZombieThump or {}
+		table.insert(bloater.onZombieThump,TLOU_infected.StrongBloater)
+	end
+
+
+
+	--- CLICKERS ---
+
+	if SandboxVars.TLOU_infected.NoPushClickers then
+		if clicker then
+			clicker.onCharacterHitZombie = clicker.onCharacterHitZombie or {}
+			table.insert(clicker.onCharacterHitZombie,TLOU_infected.NoPush)
+		end
+	end
+
+	if SandboxVars.TLOU_infected.OneShotClickers then
+		if clicker then
+			clicker.onZombieHitCharacter = clicker.onZombieHitCharacter or {}
+			table.insert(clicker.onZombieHitCharacter,TLOU_infected.KillTarget)
+		end
+	end
+
+
+
+	--- GRABBY INFECTED ---
+
+	if SandboxVars.TLOU_infected.GrabbyClickers then
+		if clicker then
+			clicker.onZombieHitCharacter = clicker.onZombieHitCharacter or {}
+			table.insert(clicker.onZombieHitCharacter,TLOU_infected.GrabbyInfected)
+		end
 	end
 
 	if SandboxVars.TLOU_infected.GrabbyBloaters then
 		if bloater then
-			bloater.onHit_zombieAttacking = bloater.onHit_zombieAttacking or {}
-			table.insert(bloater.onHit_zombieAttacking,
-				"GrabbyInfected"
-			)
+			bloater.onZombieHitCharacter = bloater.onZombieHitCharacter or {}
+			table.insert(bloater.onZombieHitCharacter,TLOU_infected.GrabbyInfected)
 		end
 	end
 
-	-- if Clicker can't be pushed
-	if SandboxVars.TLOU_infected.NoPushClickers then
-		if clicker then
-			clicker.onlyJawStab = "NoPush"
-			clicker.shouldIgnoreStagger = "NoPush"
-		end
-	end
 
-	if SandboxVars.TLOU_infected.GrabbyClickers then
-		if clicker then
-			clicker.onHit_zombieAttacking = clicker.onHit_zombieAttacking or {}
-			table.insert(clicker.onHit_zombieAttacking,
-				"GrabbyInfected"
-			)
-		end
-	end
 
-	-- -- if Bloater can't be pushed
-	-- if SandboxVars.TLOU_infected.NoPushBloaters then
-	-- 	if bloater then
-	-- 		bloater.onlyJawStab = "NoPush"
-	-- 		bloater.shouldIgnoreStagger = "NoPush"
-	-- 	end
-	-- end
-
-	-- One shot Clickers
-	if SandboxVars.TLOU_infected.OneShotClickers then
-		if clicker then
-			clicker.onHit_zombie2player = clicker.onHit_zombie2player or {}
-			table.insert(clicker.onHit_zombie2player,
-				"KillTarget"
-			)
-		end
-	end
-
-	-- blind Clickers
-	if isDebugEnabled() and clicker and false then
-		clicker.customBehavior = clicker.customBehavior or {}
-		table.insert(clicker.customBehavior,
-			"ClickerBehavior"
-		)
-	end
-
-	if isDebugEnabled() and stalker and false then
-		stalker.customBehavior = stalker.customBehavior or {}
-		table.insert(stalker.customBehavior,
-			"StalkerBehavior"
-		)
-	end
+	--- COMPATBILITY PATCHES ---
 
 	-- if Cordyceps Spore Zone is installed and sandbox options for cordyceps spawn is on
 	if getActivatedMods():contains("BB_SporeZones") and SandboxVars.TLOU_infected.CordycepsSpawn then

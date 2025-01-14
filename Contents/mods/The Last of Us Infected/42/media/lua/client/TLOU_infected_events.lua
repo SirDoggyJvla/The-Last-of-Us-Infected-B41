@@ -12,7 +12,7 @@ This file defines the events used by The Last of Us Infected based on Zomboid Fo
 --[[ ================================================ ]]--
 
 --- Makes sure files are loaded before adding events is loaded before
-local TLOU_infected = require "TLOU_infected"
+local TLOU_infected = require "TLOU_infected_module"
 require "TLOU_infected_tools"
 require "General_behavior"
 require "Runner_behavior"

@@ -20,7 +20,7 @@ local smokeFlag = IsoFlagType.smoke
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
-local TLOU_infected = require "TLOU_infected"
+local TLOU_infected = require "TLOU_infected_module"
 
 -- localy initialize mod data
 local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")

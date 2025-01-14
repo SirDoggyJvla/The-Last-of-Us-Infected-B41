@@ -13,14 +13,14 @@ The Clicker behavior is written in this file
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
-local TLOU_infected = require "TLOU_infected"
+local TLOU_infected = require "TLOU_infected_module"
 
 
 -- Add fungi hat food type on a Clicker's death.
 ---@param zombie IsoZombie
 ---@param ZType string
 ---@param ZombieTable table
-TLOU_infected.Clicker.OnClickerDeath = function(zombie,ZType,ZombieTable)
+TLOU_infected.OnClickerDeath = function(zombie,ZType,ZombieTable)
 	-- add fungi hat food type to inventory
 	local inventory = zombie:getInventory()
 	inventory:AddItems("TLOU.Hat_Fungi_Loot",1)
@@ -33,7 +33,7 @@ end
 ---@param ZType string
 ---@param ZombieTable table
 ---@param tick int
-TLOU_infected.Clicker.ClickerAgro = function(zombie,ZType,ZombieTable,tick)
+TLOU_infected.ClickerAgro = function(zombie,ZType,ZombieTable,tick)
 	-- check only every 15 ticks
 	if tick%15 ~= 0 then return end
 

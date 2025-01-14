@@ -19,7 +19,7 @@ local tostring = tostring --tostring function
 
 --- import module from ZomboidForge
 local ZomboidForge = require "ZomboidForge_module"
-local TLOU_infected = require "TLOU_infected"
+local TLOU_infected = require "TLOU_infected_module"
 
 --- import GameTime localy for performance reasons
 local gametime = GameTime:getInstance()

@@ -18,32 +18,18 @@ local pairs = pairs -- pairs function
 local ZombRand = ZombRand -- java function
 
 --- import module from ZomboidForge
-local ZomboidForge = require "ZomboidForge_module"
-local TLOU_infected = require "TLOU_infected"
-
--- localy initialize mod data
-local TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-local function initTLOU_ModData()
-	TLOU_ModData = ModData.getOrCreate("TLOU_Infected")
-end
-Events.OnInitGlobalModData.Remove(initTLOU_ModData)
-Events.OnInitGlobalModData.Add(initTLOU_ModData)
-
--- localy initialize player
-local player = getPlayer()
-local function initTLOU_OnGameStart(playerIndex, player_init)
-	player = getPlayer()
-end
-Events.OnCreatePlayer.Remove(initTLOU_OnGameStart)
-Events.OnCreatePlayer.Add(initTLOU_OnGameStart)
+local TLOU_infected = require "TLOU_infected_module"
 
 
 --#region Custom behavior: `DoorOneShot`
 
 -- Manage Bloater strength against structures by making them extra strong.
----@param zombie 		IsoZombie
----@param ZType 		string   	     --Zombie Type ID
-ZomboidForge.StrongBloater = function(zombie,ZType,thumped)
+---@param zombie IsoZombie
+---@param ZType string   	     --Zombie Type ID
+---@param ZombieTable table
+---@param thumped any
+---@param timeThumping integer
+TLOU_infected.StrongBloater = function(zombie,ZType,ZombieTable,thumped,timeThumping)
 	-- check barricades and damage those first if present
 	if instanceof(thumped,"BarricadeAble") and thumped:isBarricaded() then
 		---@cast thumped BarricadeAble

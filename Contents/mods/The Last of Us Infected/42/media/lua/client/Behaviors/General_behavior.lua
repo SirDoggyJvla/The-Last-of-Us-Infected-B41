@@ -19,7 +19,7 @@ local ZombRand = ZombRand -- java function
 
 --- import module
 local ZomboidForge = require "ZomboidForge_module"
-local TLOU_infected = require "TLOU_infected"
+local TLOU_infected = require "TLOU_infected_module"
 require "ZomboidForge_tools"
 local CaliberData = require "TLOU_infected_caliberStats"
 local random = newrandom()
@@ -250,231 +250,127 @@ end
 
 --#region Can't stand on infected
 
-TLOU_infected.StandOnInfectedPriority = {
+TLOU_infected.ZombieStandOnZombiePriority = {
 	TLOU_Bloater = 1,
 	TLOU_Clicker = 2,
 	TLOU_Stalker = 3,
 	TLOU_Runner = 4,
 }
 
+TLOU_infected.StandOnInfectedFallChance = {
+	TLOU_Bloater = 100, -- check is done directly
+	TLOU_Clicker = 75,
+	TLOU_Stalker = 50,
+	TLOU_Runner = 25,
+}
+
 -- can't stand on infected
-ZomboidForge.CantStantOnInfected = function(zombie,ZType,ZombieTable,tick)
+TLOU_infected.CantStantOnInfected = function(zombie,ZType,ZombieTable,tick)
 	-- check only every 15 ticks to reduce performance impact
 	if tick%15 ~= 0 then return end
 
+	-- check zombie didn't get staggered
 	local staggered = TLOU_infected.StandOnInfected_Stagger and not zombie:isProne()
-	if zombie:isBeingSteppedOn() and not staggered then
-		local z_x = zombie:getX()
-		local z_y = zombie:getY()
+	if not zombie:isBeingSteppedOn() or staggered then
+		-- reset timer
+		if zombie:getModData().TLOU_standOnMeTimer then
+			zombie:getModData().TLOU_standOnMeTimer = nil
+		end
+		return
+	end
 
-		-- take into account when in stairs
-		local z_z = zombie:getZ()
-		z_z = z_z - z_z%1
+	-- get zombie coordinates
+	local z_x = zombie:getX()
+	local z_y = zombie:getY()
 
-		-- check squares around the zombie for either players or zombies and stagger all of these after some time
-		local square
-		local movingObjects
-		local StandOnInfectedPriority = TLOU_infected.StandOnInfectedPriority
-		local zombie_priority = StandOnInfectedPriority[ZType]
-		for i = -1,1 do
-			for j = -1,1 do
-				square = getSquare(z_x+i,z_y+j,z_z)
-				if square then
-					-- access moving objects
-					movingObjects = square:getMovingObjects()
-					for k = 0, movingObjects:size() - 1 do
-						local movingObject = movingObjects:get(k)
+	-- take into account when in stairs
+	local z_z = zombie:getZ()
+	z_z = z_z - z_z%1
 
-						-- zed needs to be on the same level
-						local m_z = movingObject:getZ()
-						if m_z - m_z%1 == z_z then
-							-- check if the moving objects are other zombies or players
-							local isZombie = instanceof(movingObject,"IsoZombie")
-							local isPlayer = instanceof(movingObject,"IsoPlayer")
-							if isPlayer or isZombie and movingObject ~= zombie then
-								-- verify the moving object is standing on the zombie
-								if ZombieOnGroundState.isCharacterStandingOnOther(movingObject,zombie) then
-									-- check how long the zombie has been stepped on
-									local timer = zombie:getModData().TLOU_standOnMeTimer
-									if timer then
-										-- movingObject:addLineChatElement(tostring(os.time() - timer))
-										-- check threshold for this infected type
-										if os.time() - timer > ZombieTable.standOnInfected then
-											-- reaction to player
-											if isPlayer then
-												movingObject:setBumpType("stagger");
-												movingObject:setVariable("BumpFall", false);
-												movingObject:setVariable("BumpDone", true);
-												movingObject:setVariable("BumpFallType", "pushedFront");
-												zombie:getModData().TLOU_standOnMeTimer = nil
+	-- cache stuff
+	local StandOnInfectedFallChance = TLOU_infected.StandOnInfectedFallChance
+	local ZombieStandOnZombiePriority = TLOU_infected.ZombieStandOnZombiePriority
+	local zombie_priority = ZombieStandOnZombiePriority[ZType]
 
-											-- reaction to zombie
-											elseif isZombie and not movingObject:isProne() then
-												-- each infected has priority over some types, runners being the weakess
-												-- and bloaters the strongest
-												-- if the movingObject is not valid then stagger anyway
-												local trueID_movingObject = ZomboidForge.pID(movingObject)
-												local ZType_movingObject = ZomboidForge.GetZType(trueID_movingObject)
+	-- check squares around the zombie for either players or zombies and stagger all of these after some time
+	for i = -1,1 do for j = -1,1 do repeat -- x and y looping
+		local square = getSquare(z_x+i,z_y+j,z_z)
+		if not square then break end
 
-												local movingObject_priority = StandOnInfectedPriority[ZType_movingObject]
-												if not movingObject_priority or zombie_priority <= movingObject_priority then
-													movingObject:setStaggerBack(true)
-													zombie:getModData().TLOU_standOnMeTimer = nil
-												end
-											end
-										end
-									else
-										zombie:getModData().TLOU_standOnMeTimer = os.time()
-									end
-								end
-							end
-						end
-					end
+		-- access moving objects
+		local movingObjects = square:getMovingObjects()
+		for k = 0, movingObjects:size() - 1 do
+			local movingObject = movingObjects:get(k)
+
+			-- zed needs to be on the same level
+			local m_z = movingObject:getZ()
+			if m_z - m_z%1 ~= z_z then break end
+
+			-- verify the the moving objects are other zombies or players
+			local isZombie = instanceof(movingObject,"IsoZombie")
+			local isPlayer = instanceof(movingObject,"IsoPlayer")
+			if not (isPlayer or (isZombie and movingObject ~= zombie)) then break end
+
+			-- verify the moving object is standing on the zombie
+			if not ZombieOnGroundState.isCharacterStandingOnOther(movingObject,zombie) then break end
+
+			-- check how long the zombie has been stepped on
+			local zombie_modData = zombie:getModData()
+			if not zombie_modData.TLOU_standOnMeTimer then
+				zombie_modData.TLOU_standOnMeTimer = os.time()
+				break
+			end
+
+			local timer = zombie_modData.TLOU_standOnMeTimer
+
+			-- check threshold for this infected type
+			if os.time() - timer <= ZombieTable.standOnInfected then break end
+
+			-- reaction to player
+			if isPlayer then
+				movingObject:setBumpType("stagger")
+				local fall = false
+				if ZType == "TLOU_Bloater" or random:random(0,100) <= StandOnInfectedFallChance[ZType] then fall = true end
+				movingObject:setVariable("BumpFall", fall)
+				movingObject:setVariable("BumpDone", true)
+				movingObject:setVariable("BumpFallType", "pushedFront")
+				zombie_modData.TLOU_standOnMeTimer = nil
+
+				-- movingObject:setVariable("fromBehind",true)
+
+			-- reaction to zombie
+			elseif isZombie and not movingObject:isProne() then
+				-- each infected has priority over some types, runners being the weakess and bloaters the strongest
+				-- if the movingObject is not valid then stagger anyway
+				local ZType_movingObject = ZomboidForge.GetZType(movingObject)
+
+				local movingObject_priority = ZombieStandOnZombiePriority[ZType_movingObject]
+				if not movingObject_priority or zombie_priority <= movingObject_priority then
+					movingObject:setStaggerBack(true)
+					zombie_modData.TLOU_standOnMeTimer = nil
 				end
 			end
 		end
-	elseif zombie:getModData().TLOU_standOnMeTimer then
-		zombie:getModData().TLOU_standOnMeTimer = nil
-	end
+	until true end end
 end
 
 --#endregion
 
-ZomboidForge.hitTimeReaction = function(ZType,zombie,bonusData)
-	if not bonusData then return nil end
-
-	-- get zombie data
-	local ZombieTable = ZomboidForge.ZTypes[ZType]
-
-	-- retrieve current hit time and weapon used
-	local currentHitTime = bonusData.currentHitTime
-
-	-- don't chip armor if hand attack
-	if bonusData.handPush or bonusData.footStomp then
-		return currentHitTime
-	end
-
-	-- armor was already pierced
-	local totalArmor = ZombieTable.totalArmor
-	if currentHitTime >= totalArmor then
-		return totalArmor
-	end
-
-	-- retrieve handWeapon
-	local handWeapon = bonusData.handWeapon
-
-	-- check is ranged
-	local isRanged = handWeapon:isRanged()
-
-	-- handle weapon as ranged
-	if isRanged then
-		-- check ammo type
-		local ammoType = handWeapon:getAmmoType()
-		if ammoType then
-			-- access caliber stats
-			local bulletData = CaliberData[ammoType]
-			if bulletData then
-				-- verify bullet should damage armor
-				if bulletData.increaseHitTime then
-					local bulletEnergyMinimum = bulletData.Emin
-					local bulletEnergyMaximum = bulletData.Emax
-					local zombieEnergyRequired = ZombieTable.energyRequired
-
-					-- will damage OR might damage and coin flip for damage
-					if bulletEnergyMinimum >= zombieEnergyRequired
-					or bulletEnergyMaximum >= zombieEnergyRequired and random:random(1,2) == 1 then
-						local ratio = (bulletEnergyMinimum + bulletEnergyMaximum)/(2*zombieEnergyRequired)
-						ratio = ratio - ratio%1
-
-						return currentHitTime + ratio
-					end
-				end
-
-				return currentHitTime
-			end
-		end
-
-	-- handle weapon as melee
-	else
-		-- weapon is heavy and will chunk armor by a lot
-		if handWeapon:isAlwaysKnockdown() then
-			return currentHitTime + 4
-		end
-	end
-end
-
-ZomboidForge.customDamage_tankyInfected = function(data)
-	if data.ZType == "TLOU_Clicker" then
-		-- ignore foot stomping damage if option is set
-		if data.footStomp and TLOU_infected.NoStompClickers then
-			return 0
-		end
-	end
-
-	-- ZType,player,zombie,handWeapon,damage
-    -- process inputs
-    local zombie = data.zombie
-    local ZombieTable = data.ZombieTable
-
-	local handWeapon = data.handWeapon
-	-- check is ranged
-	local isRanged = handWeapon:isRanged()
-
-	-- handle weapon as ranged
-	local ratio = 1
-	if isRanged then
-		-- check ammo type
-		local ammoType = handWeapon:getAmmoType()
-		if ammoType then
-			-- access caliber stats
-			local bulletData = CaliberData[ammoType]
-			if bulletData then
-				-- verify bullet should damage armor
-				if bulletData.increaseHitTime then
-					local energyInBullet = (bulletData.Emin + bulletData.Emax)/2
-					local zombieEnergyRequired = ZombieTable.energyRequired
-
-					ratio = energyInBullet/zombieEnergyRequired + 1
-				end
-			end
-		end
-	end
-
-	-- get damage
-	local hitTime = zombie:getHitTime()
-	local multiplier = (hitTime/ZombieTable.totalArmor)^4 * 4
-	local damage = data.damage/hitTime^2*multiplier*ratio
-
-	-- if zombie is on fire, deal more damage even past max damage output
-	if ZombieTable.extrafireDamage and zombie:isOnFire() then
-		return damage * ZombieTable.fireDamageMultiplier
-	end
-
-	return damage
-end
-
 -- player cannot push infected
-ZomboidForge.NoPush = function(ZType,zombie,bonusData)
-	local handWeapon
-	if not TLOU_infected.AllowWeaponPush and bonusData then
-		handWeapon = bonusData.handWeapon
-	else
-		local target = zombie:getTarget()
-		handWeapon = target and target:getPrimaryHandItem()
-	end
-
-	if instanceof(handWeapon,"HandWeapon") and handWeapon:getFullType() ~= "Base.BareHands" then
-		return false
-	else
-		return true
+TLOU_infected.NoPush = function(zombie,ZType,ZombieTable,attacker,handWeapon,HP,damage,handPush,footStomp)
+	if handPush or ZType == "TLOU_Bloater" then
+		zombie:setAvoidDamage(true)
+		-- zombie:setHealth(HP)
 	end
 end
 
 -- grabby infected, slowing you down in place
-ZomboidForge.GrabbyInfected = function(data)
+TLOU_infected.GrabbyInfected = function(zombie,victim,attackOutcome,hitReaction)
 	-- verify victim is alive and not in god mode
-	local victim = data.victim
-	if not victim:isAlive() or victim:isGodMod() then return end
+	if not victim:isAlive() or victim:isGodMod() and false then return end
+
+	-- verify attack is valid
+	if attackOutcome == "start" and false then return end
 
 	-- infected grabs target
 	victim:setSlowFactor(1)
@@ -482,17 +378,15 @@ ZomboidForge.GrabbyInfected = function(data)
 end
 
 -- One shot victim
-ZomboidForge.KillTarget = function(data)
+TLOU_infected.KillTarget = function(zombie,victim,attackOutcome,hitReaction)
 	-- verify victim is alive and not in god mode
-	local victim = data.victim
 	if not victim:isAlive() or victim:isGodMod() then return end
 
 	-- verify attack is valid
-	if data.attackOutcome ~= "success" or data.hitReaction ~= "Bite" then return end
-
-	-- kill player
-	local zombie = data.zombie
-	victim:Kill(zombie)
+	if attackOutcome == "success" and hitReaction == "Bite" then
+		-- kill player
+		victim:Kill(zombie)
+	end
 end
 
 
