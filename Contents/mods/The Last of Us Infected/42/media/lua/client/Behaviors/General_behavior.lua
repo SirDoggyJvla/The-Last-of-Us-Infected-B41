@@ -356,14 +356,6 @@ end
 
 --#endregion
 
--- player cannot push infected
-TLOU_infected.NoPush = function(zombie,ZType,ZombieTable,attacker,handWeapon,HP,damage,handPush,footStomp)
-	if handPush or ZType == "TLOU_Bloater" then
-		zombie:setAvoidDamage(true)
-		-- zombie:setHealth(HP)
-	end
-end
-
 -- grabby infected, slowing you down in place
 TLOU_infected.GrabbyInfected = function(zombie,victim,attackOutcome,hitReaction)
 	-- verify victim is alive and not in god mode

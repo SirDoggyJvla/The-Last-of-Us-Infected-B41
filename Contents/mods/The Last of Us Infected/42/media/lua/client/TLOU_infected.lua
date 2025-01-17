@@ -212,7 +212,12 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 				TLOU_infected.ClickerAgro,
 			},
 			customDamage 			= 		"customDamage_tankyInfected",
-			hitTime 				=		"hitTimeReaction",
+			-- hitTime 				=		0,
+			ignorePush				=		SandboxVars.TLOU_infected.NoPushClickers,
+			onlyOneShotgunPellet	=		true,
+			fixShotgunsDamage		=		true,
+
+			-- other behavior
 			canCrawlUnderVehicles	=		true,
 
 			-- custom data for TLOU_infected
@@ -256,10 +261,15 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 			onZombieHitCharacter = {
 				TLOU_infected.KillTarget,
 			},
-			shouldIgnoreStagger 	=		true,
-			hitTime 				=		"hitTimeReaction",
-			onlyJawStab 			=		true,
+			-- hitTime 				=		0,
 			jawStabImmune			=		true,
+			ignoreStagger 			=		true,
+			ignoreKnockdown 		=		true,
+			ignorePush				=		true,
+			onlyOneShotgunPellet	=		true,
+			fixShotgunsDamage		=		true,
+
+			-- other behavior
 			canCrawlUnderVehicles	=		true,
 
 			-- custom data for TLOU_infected
@@ -366,13 +376,6 @@ TLOU_infected.Initialize_TLOUInfected = function(ZTypes)
 
 
 	--- CLICKERS ---
-
-	if SandboxVars.TLOU_infected.NoPushClickers then
-		if clicker then
-			clicker.onCharacterHitZombie = clicker.onCharacterHitZombie or {}
-			table.insert(clicker.onCharacterHitZombie,TLOU_infected.NoPush)
-		end
-	end
 
 	if SandboxVars.TLOU_infected.OneShotClickers then
 		if clicker then

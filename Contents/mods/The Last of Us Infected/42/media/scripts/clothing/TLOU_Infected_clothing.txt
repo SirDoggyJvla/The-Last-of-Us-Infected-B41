@@ -8,8 +8,11 @@ module TLOU {
         Type = Clothing,
         ClothingItem = Bloater,
         BodyLocation = Torso1Legs1,
-	    CanHaveHoles = False,
-        BloodLocation = Trousers;Jumper,
+	    CanHaveHoles = FALSE,
+        BloodLocation = Trousers;Jumper;FullHelmet;Hands;Neck,
+		BiteDefense = 100,
+		BulletDefense = 100,
+		ScratchDefense = 100,
 	}
 	
 	model W_Fungi
@@ -36,9 +39,9 @@ module TLOU {
 		PoisonPower = 15,
 		UseForPoison = 10,
 		BadInMicrowave = true,
-		CantBeFrozen = false,
+		CantBeFrozen = FALSE,
 		DangerousUncooked = TRUE,
-        IsCookable = false,
+        IsCookable = FALSE,
 		FoodType = Mushroom,
 		OnEat = OnEat_WildFoodGeneric,
 
@@ -63,10 +66,11 @@ module TLOU {
 		Type = Clothing,
 		ClothingItem = ClickerBody_01,
 		BodyLocation = UnderwearBottom,
-		BloodLocation = Head,
-		Icon = ficon,
-		CanHaveHoles = false,
-		WorldStaticModel = W_Fungi,
+		CanHaveHoles = FALSE,
+		BloodLocation = Trousers;Jumper;FullHelmet;Hands;Neck,
+		BiteDefense = 100,
+		BulletDefense = 100,
+		ScratchDefense = 100,
     }
 
 	item ClickerBody_02
@@ -75,10 +79,11 @@ module TLOU {
 		Type = Clothing,
 		ClothingItem = ClickerBody_02,
 		BodyLocation = UnderwearBottom,
-		BloodLocation = Head,
-		Icon = ficon,
-		CanHaveHoles = false,
-		WorldStaticModel = W_Fungi,
+		CanHaveHoles = FALSE,
+		BloodLocation = Trousers;Jumper;FullHelmet;Hands;Neck,
+		BiteDefense = 100,
+		BulletDefense = 100,
+		ScratchDefense = 100,
     }
 
 	item ClickerBody_03
@@ -87,10 +92,11 @@ module TLOU {
 		Type = Clothing,
 		ClothingItem = ClickerBody_03,
 		BodyLocation = UnderwearBottom,
-		BloodLocation = Head,
-		Icon = ficon,
-		CanHaveHoles = false,
-		WorldStaticModel = W_Fungi,
+		CanHaveHoles = FALSE,
+		BloodLocation = Trousers;Jumper;FullHelmet;Hands;Neck,
+		BiteDefense = 100,
+		BulletDefense = 100,
+		ScratchDefense = 100,
     }
 
 	item ClickerBody_04
@@ -99,9 +105,10 @@ module TLOU {
 		Type = Clothing,
 		ClothingItem = ClickerBody_04,
 		BodyLocation = UnderwearBottom,
-		BloodLocation = Head,
-		Icon = ficon,
-		CanHaveHoles = false,
-		WorldStaticModel = W_Fungi,
+		CanHaveHoles = FALSE,
+		BloodLocation = Trousers;Jumper;FullHelmet;Hands;Neck,
+		BiteDefense = 100,
+		BulletDefense = 100,
+		ScratchDefense = 100,
     }
 }
